@@ -14,26 +14,26 @@ pop_size_mean = 200
 pop_size_se = 30
 
 pop_growth_mean = 1
-pop_growth_se = 0.03
+pop_growth_se = 0
 
-survivals_mean <- c(0.5, 0.7, 0.8, 0.95)
-fecundities_mean <- c(0, 0, 0.05, 0.55)
+survivals <- c(0.5, 0.7, 0.8, 0.95)
+fecundities <- c(0, 0, 0.05, 0.55)
 
 model_demo = M2_noDD_WithDemoStoch
 time_horzion = 30
-coeff_var_environ = 0.10
+coeff_var_environ = 0
 fatal_constant = "h"
-N_type = "Ntotal"
+pop_size_type = "Ntotal"
 
 
 ##--------------------------------------------
 ##  Calibration : FYI, for table dsiply     --
 ##--------------------------------------------
 # Calibrate vital rates to match the the desired lambda
-inits <- init_calib(s = survivals_mean, f = fecundities_mean, lam0 = pop_growth_mean)
-vr_calibrated <- calibrate_params(inits = inits, f = fecundities_mean, s = survivals_mean, lam0 = pop_growth_mean)
-s_calibrated <- head(vr_calibrated, length(survivals_mean))
-f_calibrated <- tail(vr_calibrated, length(fecundities_mean))
+inits <- init_calib(s = survivals, f = fecundities, lam0 = pop_growth_mean)
+vr_calibrated <- calibrate_params(inits = inits, f = fecundities, s = survivals, lam0 = pop_growth_mean)
+s_calibrated <- head(vr_calibrated, length(survivals))
+f_calibrated <- tail(vr_calibrated, length(fecundities))
 
 
 ##==============================================================================
@@ -41,9 +41,9 @@ f_calibrated <- tail(vr_calibrated, length(fecundities_mean))
 ##==============================================================================
 run0 <- run_simul(nsim,
                   fatalities_mean, fatalities_se,
-                  pop_size_mean, pop_size_se, N_type,
+                  pop_size_mean, pop_size_se, pop_size_type,
                   pop_growth_mean, pop_growth_se,
-                  survivals_mean, fecundities_mean,
+                  survivals, fecundities,
                   model_demo, time_horzion, coeff_var_environ, fatal_constant)
 
 
@@ -69,4 +69,4 @@ out[time_horzion,,]
 
 plot_impact(N, xlab = "Annee", ylab = "Taille de population (totale)")
 
-which(is.nan(N))
+
