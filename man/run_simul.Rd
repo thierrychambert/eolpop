@@ -13,8 +13,8 @@ run_simul(
   pop_size_type,
   pop_growth_mean,
   pop_growth_se,
-  survivals_mean,
-  fecundities_mean,
+  survivals,
+  fecundities,
   model_demo,
   time_horzion,
   coeff_var_environ,
@@ -39,9 +39,9 @@ or the Number of Pairs ("Npair"). A stable age distribution is used to infer the
 
 \item{pop_growth_se}{Standard Error for population growth rate (= uncertainty around the value provided).}
 
-\item{survivals_mean}{a vector. Average survival probabilities for each age class.}
+\item{survivals}{a vector. Average survival probabilities for each age class.}
 
-\item{fecundities_mean}{a vector of fecundity values for each age class.}
+\item{fecundities}{a vector of fecundity values for each age class.}
 
 \item{model_demo}{an R object corresponding to the demographic model to be used. The 4 possible models currently are:
 M1_noDD_noDemoStoch, M2_noDD_WithDemoStoch, M3_WithDD_noDemoStoch, M4_WithDD_WithDemoStoch,}
@@ -71,9 +71,9 @@ pop_size_type = "Npair"
 pop_growth_mean = 1
 pop_growth_se = 0.03
 
-survivals_mean <- c(0.5, 0.7, 0.8, 0.95)
+survivals <- c(0.5, 0.7, 0.8, 0.95)
 
-fecundities_mean <- c(0, 0, 0.05, 0.55)
+fecundities <- c(0, 0, 0.05, 0.55)
 
 model_demo = M2_noDD_WithDemoStoch
 
@@ -85,7 +85,7 @@ run_simul(nsim = 10,
            fatalities_mean, fatalities_se,
            pop_size_mean, pop_size_se, pop_size_type,
            pop_growth_mean, pop_growth_se,
-           survivals_mean, fecundities_mean,
+           survivals, fecundities,
            model_demo, time_horzion, coeff_var_environ, fatal_constant)
 
 

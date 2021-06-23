@@ -12,8 +12,8 @@
 #' or the Number of Pairs ("Npair"). A stable age distribution is used to infer the size of each age class.
 #' @param pop_growth_mean a number. Average population growth rate (lambda).
 #' @param pop_growth_se Standard Error for population growth rate (= uncertainty around the value provided).
-#' @param survivals_mean a vector. Average survival probabilities for each age class.
-#' @param fecundities_mean a vector of fecundity values for each age class.
+#' @param survivals a vector. Average survival probabilities for each age class.
+#' @param fecundities a vector of fecundity values for each age class.
 #' @param model_demo an R object corresponding to the demographic model to be used. The 4 possible models currently are:
 #' M1_noDD_noDemoStoch, M2_noDD_WithDemoStoch, M3_WithDD_noDemoStoch, M4_WithDD_WithDemoStoch,
 #' @param time_horzion a number. The number of years (time horizon) over which to project the population dynamics.
@@ -39,9 +39,9 @@
 #' pop_growth_mean = 1
 #' pop_growth_se = 0.03
 #'
-#' survivals_mean <- c(0.5, 0.7, 0.8, 0.95)
+#' survivals <- c(0.5, 0.7, 0.8, 0.95)
 #'
-#' fecundities_mean <- c(0, 0, 0.05, 0.55)
+#' fecundities <- c(0, 0, 0.05, 0.55)
 #'
 #' model_demo = M2_noDD_WithDemoStoch
 #'
@@ -53,7 +53,7 @@
 #'            fatalities_mean, fatalities_se,
 #'            pop_size_mean, pop_size_se, pop_size_type,
 #'            pop_growth_mean, pop_growth_se,
-#'            survivals_mean, fecundities_mean,
+#'            survivals, fecundities,
 #'            model_demo, time_horzion, coeff_var_environ, fatal_constant)
 #'
 #'
@@ -61,7 +61,7 @@ run_simul <- function(nsim,
                       fatalities_mean, fatalities_se,
                       pop_size_mean, pop_size_se, pop_size_type,
                       pop_growth_mean, pop_growth_se,
-                      survivals_mean, fecundities_mean,
+                      survivals, fecundities,
                       model_demo, time_horzion, coeff_var_environ, fatal_constant){
 
   # Coefficient of variation for environment stochasticity
@@ -71,7 +71,7 @@ run_simul <- function(nsim,
   nyr <- time_horzion
 
   # Number of age classes
-  nac <- length(survivals_mean)
+  nac <- length(survivals)
 
   # Number of fatalities scenario (+1 because we include a base scenario of NO fatality)
   nsc <- length(fatalities_mean)
@@ -97,7 +97,7 @@ run_simul <- function(nsim,
       # 2. Population size : draw and distribute by age class
       N0 <- sample_gamma(1, mu = pop_size_mean, sd =  pop_size_se) %>%
         round %>%
-        pop_vector(pop_size_type = pop_size_type, s = survivals_mean, f = survivals_mean)
+        pop_vector(pop_size_type = pop_size_type, s = survivals, f = fecundities)
 
       if(pop_growth_se > 0){
 
@@ -105,18 +105,18 @@ run_simul <- function(nsim,
         lam0 <- sample_gamma(1, mu = pop_growth_mean, sd = pop_growth_se)
 
         # 4. Calibrate vital rates to match the the desired lambda
-        inits <- init_calib(s = survivals_mean, f = fecundities_mean, lam0 = lam0)
+        inits <- init_calib(s = survivals, f = fecundities, lam0 = lam0)
 
-        vr <- calibrate_params(inits = inits, f = fecundities_mean, s = survivals_mean, lam0 = lam0)
-        s <- head(vr, length(survivals_mean))
-        f <- tail(vr, length(fecundities_mean))
+        vr <- calibrate_params(inits = inits, f = fecundities, s = survivals, lam0 = lam0)
+        s <- head(vr, length(survivals))
+        f <- tail(vr, length(fecundities))
         lam_it[sim] <- lambda(build_Leslie(s,f))
 
       }else{
 
         # No parameter uncertainty on population growth
-        s <- survivals_mean
-        f <- fecundities_mean
+        s <- survivals
+        f <- fecundities
         lam_it[sim] <- lambda(build_Leslie(s,f))
 
       } # End if/else
