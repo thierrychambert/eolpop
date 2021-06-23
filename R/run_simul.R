@@ -4,8 +4,10 @@
 #' Run multiple population projections (simulations)
 #'
 #' @param nsim number of simulation
+#' @param cumuated_impacts Logical. If TRUE, we used the projection model for cumulated impacts.
 #' @param fatalities_mean a vector (numeric). Average number of fatalities, for each scenario.
 #' @param fatalities_se a vector (numeric). Standard Error for the number of fatalities, for each scenario (= uncertainties around the values provided).
+#' @param onset_time a vector (numeric). The times at which each wind farm fatality starts applying.
 #' @param pop_size_mean a single number. Average population size (either total population or number of pairs - see Ntype below).
 #' @param pop_size_se Standard Error for population size (= uncertainty around the value provided).
 #' @param pop_size_type character value indicating if the provided value pop_size correpsonds to Total Population Size ("Ntotal")
@@ -49,16 +51,16 @@
 #' coeff_var_environ = 0.10
 #' fatal_constant = "h"
 #'
-#' run_simul(nsim = 10,
-#'            fatalities_mean, fatalities_se,
+#' run_simul(nsim = 10, cumuated_impacts = FALSE,
+#'            fatalities_mean, fatalities_se, onset_time = NULL,
 #'            pop_size_mean, pop_size_se, pop_size_type,
 #'            pop_growth_mean, pop_growth_se,
 #'            survivals, fecundities,
 #'            model_demo, time_horzion, coeff_var_environ, fatal_constant)
 #'
 #'
-run_simul <- function(nsim,
-                      fatalities_mean, fatalities_se,
+run_simul <- function(nsim, cumuated_impacts,
+                      fatalities_mean, fatalities_se, onset_time,
                       pop_size_mean, pop_size_se, pop_size_type,
                       pop_growth_mean, pop_growth_se,
                       survivals, fecundities,
@@ -121,8 +123,16 @@ run_simul <- function(nsim,
 
       } # End if/else
 
+      #
+      if(cumuated_impacts){
+        fun_project <- pop_project_cumulated_impacts
+      }else{
+        fun_project <- pop_project
+        onset_time = NULL
+      } # end if
+
       # Project population trajectory
-      N[,,,sim] <- pop_project(fatalities = M, intial_pop_vector = N0, s = s, f = f,
+      N[,,,sim] <- fun_project(fatalities = M, onset_time = onset_time, intial_pop_vector = N0, s = s, f = f,
                            model_demo = model_demo, time_horzion = time_horzion,
                            coeff_var_environ = coeff_var_environ, fatal_constant = fatal_constant)
     } # sim

@@ -1,105 +1,53 @@
-source("C:/rdev/eolpop/inst/ShinyApp/ui.R")
-
-input <- list(M1 = 5, M1_se = 0, N00_mu = 200, N_type = "Npair", lam0 = 0.95, mort_cons = "h")
-
-run0 <- run_simul(nsim = nsim,
-                  fatalities_mean = c(M0, input$M1),
-                  fatalities_se = c(M0_se, input$M1_se),
-                  pop_size_mean = input$N00_mu,
-                  pop_size_se = N00_se,
-                  N_type = input$N_type,
-                  pop_growth_mean = input$lam0,
-                  pop_growth_se = lam0_se,
-                  survivals_mean = s_input,
-                  fecundities_mean = f_input,
-                  model_demo = model_demo,
-                  time_horzion = TH,
-                  coeff_var_environ = cv_env,
-                  fatal_constant = input$mort_cons)
-
-out <- list(N = NULL)
-out$N <- run0$N
-
-N <- out$N
-
-names(out)
-dim(out$N)
-
-get_metrics(out$N)
-
-get_metrics(N = out$N)[dim(out$N)[2],"avg","sc1"]
-
-
-# Impact
-print_it <- function(impact, lci, uci){
-  paste0("Impact sur la taille de population : ", round(impact, 2)*100, "%",
-         " [", round(lci, 2)*100, "% ; ", round(uci, 2)*100, "%]")
-}
-
-print_out <- function() if(is.null(out$N)) {} else {
-  print_it(impact = get_metrics(N = out$N)[30,"avg","sc1"],
-           lci = get_metrics(N = out$N)[30,"lci","sc1"],
-           uci = get_metrics(N = out$N)[30,"uci","sc1"])
-}
-
-print_out()
-
-
-
-
-
-
-
-
-
-
-
-
-ui <- fluidPage(
-  checkboxInput("error", "error?"),
-  textOutput("result")
-)
-server <- function(input, output, session) {
-  a <- reactive({
-    if (input$error) {
-      stop("Error!")
-    } else {
-      1
-    }
-  })
-  b <- reactive(a() + 1)
-  c <- reactive(b() + 1)
-  output$result <- renderText(c())
-}
-
-shinyApp(ui = ui, server = server)
-
-
-
-
-
-
-
-
-
 rm(list = ls(all.names = TRUE))
-graphics.off()
-
 library(eolpop)
+library(magrittr)
 
-#load(file = "./data/run0.rda")
-names(run0)
+s <- c(0.5, 0.7, 0.8, 0.95)
+f <- c(0, 0, 0.05, 0.55)
+N0 <- pop_vector(pop_size = 200, pop_size_type = "Npair", s, f)
+intial_pop_vector <- N0
 
-out <- run0
-dim(out$N)
-get_metrics(out$N)
+fatalities = c(0, 8, 10)
+onset_time = c(1, 5, 20)
 
-
-get_metrics(N = out$N)[dim(out$N)[2],"avg","sc1"]
-
-get_metrics(N = out$N)[dim(out$N)[2],"lci","sc1"]
-
-get_metrics(N = out$N)[dim(out$N)[2],"uci","sc1"]
-
+model_demo = M2_noDD_WithDemoStoch
+time_horzion = 30
+coeff_var_environ = 0.1
+fatal_constant = "h"
 
 
+TH = time_horzion
+
+# Fatalities from each wind farm
+Mi <- matrix(fatalities, nrow = length(fatalities), ncol = nyr)
+
+# Fatalities from each wind farm
+for(j in 2:nrow(Mi)){
+  if(onset_time[j] > 1) Mi[j,1:(onset_time[j]-1)] <- 0
+} # j
+
+# Cumulated Fatalities
+Mc <- Mi
+for(j in 2:nrow(Mc)) Mc[j,] <- apply(Mc[(j-1):j,], 2, sum)
+
+h <- Mc[,t-1]/apply(N[,t-1,], 2, sum)
+
+h <- Mc[,t-1]/apply(N[,1,], 2, sum)
+
+
+
+
+pop_project(fatalities = c(0, 5, 10), intial_pop_vector = N0, s = s, f = f,
+ model_demo = M2_noDD_WithDemoStoch, time_horzion = 30,
+ coeff_var_environ = 0.1, fatal_constant = "h")
+
+
+
+j=2
+start = onset_time[j]
+vec = M[,j]
+
+
+set_onset<- function(vec, start){
+  if(start > 1) vec[1:(start-1)] <- 0
+} # function

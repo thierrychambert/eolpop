@@ -6,8 +6,10 @@
 \usage{
 run_simul(
   nsim,
+  cumuated_impacts,
   fatalities_mean,
   fatalities_se,
+  onset_time,
   pop_size_mean,
   pop_size_se,
   pop_size_type,
@@ -24,9 +26,13 @@ run_simul(
 \arguments{
 \item{nsim}{number of simulation}
 
+\item{cumuated_impacts}{Logical. If TRUE, we used the projection model for cumulated impacts.}
+
 \item{fatalities_mean}{a vector (numeric). Average number of fatalities, for each scenario.}
 
 \item{fatalities_se}{a vector (numeric). Standard Error for the number of fatalities, for each scenario (= uncertainties around the values provided).}
+
+\item{onset_time}{a vector (numeric). The times at which each wind farm fatality starts applying.}
 
 \item{pop_size_mean}{a single number. Average population size (either total population or number of pairs - see Ntype below).}
 
@@ -81,8 +87,8 @@ time_horzion = 30
 coeff_var_environ = 0.10
 fatal_constant = "h"
 
-run_simul(nsim = 10,
-           fatalities_mean, fatalities_se,
+run_simul(nsim = 10, cumuated_impacts = FALSE,
+           fatalities_mean, fatalities_se, onset_time = NULL,
            pop_size_mean, pop_size_se, pop_size_type,
            pop_growth_mean, pop_growth_se,
            survivals, fecundities,

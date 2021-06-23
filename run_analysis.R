@@ -7,7 +7,7 @@ library(eolpop)
 ## Inputs
 nsim = 100
 
-fatalities_mean = c(0, 2, 5, 10, 15)
+fatalities_mean = c(0, 3, 12, 4)
 fatalities_se = fatalities_mean*0.05
 
 pop_size_mean = 200
@@ -25,6 +25,8 @@ coeff_var_environ = 0
 fatal_constant = "h"
 pop_size_type = "Ntotal"
 
+cumuated_impacts = TRUE
+onset_time = c(1, 3, 7, 15)
 
 ##--------------------------------------------
 ##  Calibration : FYI, for table dsiply     --
@@ -39,8 +41,8 @@ f_calibrated <- tail(vr_calibrated, length(fecundities))
 ##==============================================================================
 ##                         Analyses (simulations)                             ==
 ##==============================================================================
-run0 <- run_simul(nsim,
-                  fatalities_mean, fatalities_se,
+run0 <- run_simul(nsim, cumuated_impacts,
+                  fatalities_mean, fatalities_se, onset_time,
                   pop_size_mean, pop_size_se, pop_size_type,
                   pop_growth_mean, pop_growth_se,
                   survivals, fecundities,
@@ -50,18 +52,17 @@ run0 <- run_simul(nsim,
 
 # save(run0, file = "./data/run0.rda")
 names(run0)
-run0$time_run
-lambdas <- run0$lambdas
-N <- run0$N
-dim(N)
-# N[,,,1]
 
 N <- run0$N
 out <- get_metrics(N)
-out
+dim(out)
+out[time_horzion,"avg",]
 
-out[time_horzion,,]
- out[,"avg","sc1"]
+# Par parc
+for(j in 2:length())
+
+j=4
+out[time_horzion, -2, j] - out[time_horzion, -2, j-1]
 
 # draws_histog(draws = lambdas, mu = pop_growth_mean, se = pop_growth_se)
 

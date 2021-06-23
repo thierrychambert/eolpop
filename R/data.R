@@ -8,4 +8,4 @@
 #'
 #' A list Also a 4D array containing results : population size by age class (dim 1), each year (dim 2),
 #' for all scenarios (dim 3), and for each simulation run (dim 4).
-"run0"
+# "run0"
