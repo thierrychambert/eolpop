@@ -1,0 +1,31 @@
+out$N <- run_simul(nsim = nsim,
+                   fatalities_mean = c(M0, input$M1),
+                   fatalities_se = c(M0_se, input$M1_se),
+                   pop_size_mean = input$N00_mu,
+                   pop_size_se = N00_se,
+                   N_type = input$N_type,
+                   pop_growth_mean = input$lam0,
+                   pop_growth_se = lam0_se,
+                   survivals_mean = s_input,
+                   fecundities_mean = f_input,
+                   model_demo = model_demo,
+                   time_horzion = TH,
+                   coeff_var_environ = cv_env,
+                   fatal_constant = input$mort_cons)
+
+
+
+out <- run_simul(nsim = nsim,
+                 fatalities_mean = c(M0, input$M1),
+                 fatalities_se = c(M0_se, M1_se),
+                 pop_size_mean = N00_mu,
+                 pop_size_se = N00_se,
+                 N_type = "Npair",
+                 pop_growth_mean = lam0,
+                 pop_growth_se = lam0_se,
+                 survivals_mean = s_input,
+                 fecundities_mean = f_input,
+                 model_demo = model_demo,
+                 time_horzion = TH,
+                 coeff_var_environ = cv_env,
+                 fatal_constant = "h")

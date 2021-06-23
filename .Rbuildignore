@@ -1,0 +1,8 @@
+^eolpop\.Rproj$
+^\.Rproj\.user$
+^devtools_history\.R$
+^run_analysis\.R$
+^test_build_Leslie\.R$
+^\./tests/test_build_Leslie\.R$
+^junk\.R$
+^run_shiny\.R$
