@@ -6,21 +6,19 @@
 \usage{
 pop_project(
   fatalities,
-  onset_time = NULL,
   intial_pop_vector,
   s,
   f,
   model_demo,
   time_horzion,
   coeff_var_environ,
-  fatal_constant = "h"
+  fatal_constant = "h",
+  onset_time = NULL
 )
 }
 \arguments{
 \item{fatalities}{a vector (numeric). Each value correspond to the number of fatalities for each scenario.
 The number of scenario assesed corresponds to the size of that vector.}
-
-\item{onset_time}{unused. Just here because it's required for cumulated impact and in higher level 'run_simul" function.}
 
 \item{intial_pop_vector}{a vector (numeric). Initial size of each age class. Typically, the output of the
 pop_vector function.}
@@ -38,6 +36,8 @@ M1_noDD_noDemoStoch, M2_noDD_WithDemoStoch, M3_WithDD_noDemoStoch, M4_WithDD_Wit
 
 \item{fatal_constant}{text (character). Either "h" or "M". Using "h" sets the fatality RATE as the constant value across years.
 Using "M" sets the NUMBER of fatalities as the constant value across years.}
+
+\item{onset_time}{unused. Just here because it's required for cumulated impact and in higher level 'run_simul" function.}
 }
 \value{
 a 3D array containing the size of each age class (dim 1), for each year (dim 2) and each scenario (dim 3).
