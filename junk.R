@@ -7,6 +7,53 @@ s <- c(0.5, 0.7, 0.8, 0.95)
 f <- c(0, 0, 0.05, 0.55)
 N1 <- pop_vector(pop_size = 200, pop_size_type = "Npair", s, f)
 h <- 0.05
+DD_params <- list(rMAX = 0.15, K = 1200, theta = 1)
+
+
+
+# Infer K
+infer_DD(lambda_MAX = 1.15, K = NULL, theta = 1, pop_size_current = 200, pop_growth_current = 1.08)
+
+lambda_MAX = 1.15
+K = NULL
+theta = 1
+pop_size_current = 200
+pop_growth_current = 1.08
+
+
+# Infer lambda_MAX
+infer_DD(lambda_MAX = NULL, K = 2000, theta = 1, pop_size_current = 200, pop_growth_current = 1.08)
+
+lambda_MAX = NULL
+K = 429
+theta = 1
+pop_size_current = 200
+pop_growth_current = 1.08
+
+# Get an error
+infer_DD(lambda_MAX = NULL, K = NULL, theta = 1, pop_size_current = 200, pop_growth_current = 1.08)
+
+
+# Infer K
+rMAX = 0.15
+lam_a = 1.08
+theta = 1
+N_a = 200
+r_a = lam_a - 1 ; r_a
+
+K <- (N_a/((1-(r_a/rMAX))^(1/theta))) %>% round
+K
+
+# Infer rMAX
+K = 2000
+lam_a = 1.08
+theta = 1
+N_a = 500
+r_a = lam_a - 1 ; r_a
+
+rMAX <- r_a/((1-(N_a/K))^theta)
+rMAX
+
 
 
 
@@ -41,7 +88,69 @@ lambda(A_Nt)
 
 
 
+A <- build_Leslie(s = s, f = f)
+diff_rel_lam <- (1.5 - lambda(A))/lambda(A)
+diff_rel_lam
+d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
+c(s,f) + d
 
+
+match_lam_delta(diff_rel_lam = 0.5, s=s, f=f)
+
+
+
+
+
+
+
+
+M <- fatalities
+N0 <- intial_pop_vector
+cv_env <- coeff_var_environ
+
+# Number of years
+nyr <- time_horzion
+
+# Number of age classes
+nac <- length(s)
+
+# Number of fatalities scenario
+nsc <- length(fatalities)
+
+# Initiate Pop Size (output) Array
+N <- array(NA, dim = c(nac, nyr, nsc), dimnames = list(paste0("age", 1:nac),
+                                                       paste0("year", 1:nyr),
+                                                       paste0("scenario", 1:nsc)
+))
+N[,1,] <-  N0
+
+## Loops over time (years)
+for(t in 2:nyr){
+
+  # Environmental Stochasticity
+  ss = 1 - rnorm(nac, mean = qlogis(1-s), sd = cv_env/(s)) %>% plogis        ## sample thru the mortality rate : 1 - s
+  ff = rnorm(nac, mean = log(f), sd = cv_env) %>% exp
+
+  # Fatalities : constant number (M) or constant rate (h)
+  if(fatal_constant == "M"){
+    h <- M/apply(N[,t-1,], 2, sum)
+  } else {
+    h <- M/apply(N[,1,], 2, sum)
+  }
+
+  # Sample a seed for RNG
+  seed <- runif(1, 0, 1e6)
+
+  ## Projection : apply the LESLIE matrix calculation forward
+  # Scenario 0
+  for(j in 1:nsc){
+    set.seed(seed)
+    N[,t,j] <- model_demo(N1 = N[,t-1,j], s = ss, f = ff, h = h[j], DD_params = DD_params)
+  } # j
+
+} # t
+
+N
 
 
 
@@ -73,6 +182,37 @@ model_demo = model_demo; time_horzion = time_horzion;
 coeff_var_environ = coeff_var_environ; fatal_constant = fatal_constant
 
 ##
+
+
+# Environmental Stochasticity
+ss = 1 - rnorm(nac, mean = qlogis(1-s), sd = cv_env/(s)) %>% plogis        ## sample thru the mortality rate : 1 - s
+ff = rnorm(nac, mean = log(f), sd = cv_env) %>% exp
+ss ; ff
+
+# Fatalities : constant number (M) or constant rate (h)
+if(fatal_constant == "M"){
+  h <- M/apply(N[,t-1,], 2, sum)
+} else {
+  h <- M/apply(N[,1,], 2, sum)
+}
+h
+
+# Sample a seed for RNG
+seed <- runif(1, 0, 1e6)
+
+## Projection : apply the LESLIE matrix calculation forward
+# Scenario 0
+#for(j in 1:nsc){
+j = 1
+  set.seed(seed)
+  N[,t,j] <- model_demo(N1 = N[,t-1,j], s = ss, f = ff, h = h[j], DD_params = DD_params)
+#} # j
+N
+
+model_demo(N1 = N[,t-1,j], s = ss, f = ff, h = h[j], DD_params = DD_params)
+
+
+t=2
 
 N1 = N[,t-1,j]
 s = ss

@@ -90,7 +90,7 @@ init_calib  <- function(s, f, lam0){
   nac = length(s)
 
   inits_vr <- c(s,f) + d
-  inits_vr <- c(tail(inits_vr, nac), head(inits_vr, nac))
+  inits_vr <- c(tail(inits_vr, nac), head(inits_vr, nac) %>% sapply(min, 0.999))
   inits <- inits_vr[inits_vr != 0]
   return(inits)
 } # End function

@@ -19,7 +19,7 @@ pop_growth_se = 0.05
 survivals <- c(0.5, 0.7, 0.8, 0.95)
 fecundities <- c(0, 0, 0.05, 0.55)
 
-model_demo = M3_WithDD_noDemoStoch #M2_noDD_WithDemoStoch #
+model_demo = M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #
 time_horzion = 30
 coeff_var_environ = 0.10
 fatal_constant = "h"
@@ -51,42 +51,19 @@ run0 <- run_simul(nsim, cumuated_impacts,
                   model_demo, time_horzion, coeff_var_environ, fatal_constant)
 
 
-# saved time (ratio): 493/12
 # save(run0, file = "./data/run0.rda")
 names(run0)
-
 run0$time_run
+# saved time (ratio): 493/12
 
 N <- run0$N
 out <- get_metrics(N)
 out[time_horzion,"avg",]
-
-# Impact par parc
-# for(j in 2:length())
-#j=4
-#out[time_horzion, -2, j] - out[time_horzion, -2, j-1]
-
 
 plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
 
 plot_impact(N, xlab = "Annee", ylab = "Taille de population (totale)")
 
 
-##==============================================================================
-##                         Check lambda draws                                 ==
-##==============================================================================
-draws_histog <- function(draws, mu, se){
-
-  # Plot histogram
-  h <- hist(draws, breaks = length(draws)/10, border = 0)
-
-  # Theoretical Normal Curve
-  par(new=T)
-  curve(dnorm(x, mean=mu, sd=se), add=FALSE, lwd=3, col="darkblue",
-        xlim = c(min(draws), max(draws)), axes = FALSE, xlab = "", ylab = "")
-
-} # End function
-################################################################################
-
-
+source("draws_histog.R")
 draws_histog(draws = run0$lambdas, mu = pop_growth_mean, se = pop_growth_se)

@@ -6,3 +6,4 @@
 ^\./tests/test_build_Leslie\.R$
 ^junk\.R$
 ^run_shiny\.R$
+^draws_histog\.R$

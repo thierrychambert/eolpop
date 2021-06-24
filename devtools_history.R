@@ -41,3 +41,8 @@ usethis::use_build_ignore("run_shiny.R")
 ## Put it on Git
 library(usethis)
 usethis::use_git()
+
+
+# Ignore file "run_shiny.R"
+usethis::use_build_ignore("draws_histog.R")
+
