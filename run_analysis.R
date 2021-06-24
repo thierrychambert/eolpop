@@ -51,7 +51,7 @@ run0 <- run_simul(nsim, cumuated_impacts,
                   model_demo, time_horzion, coeff_var_environ, fatal_constant)
 
 
-
+# saved time (ratio): 493/12
 # save(run0, file = "./data/run0.rda")
 names(run0)
 

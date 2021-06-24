@@ -125,11 +125,13 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params = NULL){
 
   # Apply density dependence effect
   lam_Nt <- 1 + rMAX*(1-(sum(N1)/K)^theta)
-  lam_Nt
 
   # Calibrate vital rates to match lam_Nt
-  inits <- init_calib(s = s, f = f, lam0 = lam_Nt)
-  vr_Nt <- calibrate_params(inits = inits, f = f, s = s, lam0 = lam_Nt)
+  A <- build_Leslie(s = s, f = f)
+  diff_rel_lam <- (lam_Nt - lambda(A))/lambda(A)
+  d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
+  vr_Nt <- c(s,f) + d
+
   s_Nt <- head(vr_Nt, length(s))
   f_Nt <- tail(vr_Nt, length(f))
 
