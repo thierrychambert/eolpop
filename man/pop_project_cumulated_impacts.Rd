@@ -10,6 +10,7 @@ pop_project_cumulated_impacts(
   intial_pop_vector,
   s,
   f,
+  DD_params,
   model_demo,
   time_horzion,
   coeff_var_environ,
@@ -28,6 +29,8 @@ pop_vector function.}
 \item{s}{a vector of survival probabilities for each age class}
 
 \item{f}{a vector of fecundity values for each age class}
+
+\item{DD_params}{NULL or a list. Density-dependence parameters (rMAX, K, theta). Only used in DD models M3 and M4.}
 
 \item{model_demo}{an R object corresponding to the demographic model to be used. The 4 possible models currently are:
 M1_noDD_noDemoStoch, M2_noDD_WithDemoStoch, M3_WithDD_noDemoStoch, M4_WithDD_WithDemoStoch,}

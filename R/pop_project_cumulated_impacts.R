@@ -10,6 +10,7 @@
 #' pop_vector function.
 #' @param s a vector of survival probabilities for each age class
 #' @param f a vector of fecundity values for each age class
+#' @param DD_params NULL or a list. Density-dependence parameters (rMAX, K, theta). Only used in DD models M3 and M4.
 #' @param model_demo an R object corresponding to the demographic model to be used. The 4 possible models currently are:
 #' M1_noDD_noDemoStoch, M2_noDD_WithDemoStoch, M3_WithDD_noDemoStoch, M4_WithDD_WithDemoStoch,
 #' @param time_horzion a number. The number of years (time horizon) over which to project the population dynamics.
@@ -33,6 +34,7 @@ pop_project_cumulated_impacts <- function(fatalities,
                                           onset_time,
                                           intial_pop_vector,
                                           s, f,
+                                          DD_params,
                                           model_demo,
                                           time_horzion,
                                           coeff_var_environ,
@@ -93,7 +95,7 @@ pop_project_cumulated_impacts <- function(fatalities,
     # Scenario 0
     for(j in 1:nsc){
       set.seed(seed)
-      N[,t,j] <- model_demo(N1 = N[,t-1,j], s = ss, f = ff, h = h[j])
+      N[,t,j] <- model_demo(N1 = N[,t-1,j], s = ss, f = ff, h = h[j], DD_params = DD_params)
     } # j
 
   } # t

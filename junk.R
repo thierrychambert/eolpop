@@ -1,11 +1,76 @@
 rm(list = ls(all.names = TRUE))
 library(eolpop)
 library(magrittr)
+library(popbio)
 
 s <- c(0.5, 0.7, 0.8, 0.95)
 f <- c(0, 0, 0.05, 0.55)
-N0 <- pop_vector(pop_size = 200, pop_size_type = "Npair", s, f)
-intial_pop_vector <- N0
+N1 <- pop_vector(pop_size = 200, pop_size_type = "Npair", s, f)
+h <- 0.05
+
+
+
+A <- build_Leslie(s = s, f = f)
+lambda(A)
+lam_N
+
+rMAX = 0.15
+K = sum(N1)*5
+theta = 1
+
+# Apply density dependence effect
+lam_Nt <- 1 + rMAX*(1-(sum(N1)/K)^theta)
+lam_Nt
+
+# Calibrate vital rates to match lam_Nt
+inits <- init_calib(s = s, f = f, lam0 = lam_Nt)
+vr_Nt <- calibrate_params(inits = inits, f = f, s = s, lam0 = lam_Nt)
+s_Nt <- head(vr_Nt, length(s))
+f_Nt <- tail(vr_Nt, length(f))
+
+s ; s_Nt
+f ; f_Nt
+
+A_Nt <- build_Leslie(s = s_Nt, f = f_Nt)
+lambda(A_Nt)
+
+
+
+s = s_calibrated
+f = f_calibrated
+
+diff_rel_lam = 0.04
+
+
+##
+
+survivals = s_calibrated
+fecundities = f_calibrated
+
+##
+
+fatalities = M; onset_time = onset_time; intial_pop_vector = N0; s = s; f = f;
+model_demo = model_demo; time_horzion = time_horzion;
+coeff_var_environ = coeff_var_environ; fatal_constant = fatal_constant
+
+##
+
+N1 = N[,t-1,j]
+s = ss
+f = ff
+h = h[j]
+
+##
+
+
+
+
+
+
+
+
+
+
 
 fatalities = c(0, 8, 10)
 onset_time = c(1, 5, 20)

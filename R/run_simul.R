@@ -16,6 +16,7 @@
 #' @param pop_growth_se Standard Error for population growth rate (= uncertainty around the value provided).
 #' @param survivals a vector. Average survival probabilities for each age class.
 #' @param fecundities a vector of fecundity values for each age class.
+#' @param DD_params NULL or a list. Density-dependence parameters (rMAX, K, theta). Only used in DD models M3 and M4.
 #' @param model_demo an R object corresponding to the demographic model to be used. The 4 possible models currently are:
 #' M1_noDD_noDemoStoch, M2_noDD_WithDemoStoch, M3_WithDD_noDemoStoch, M4_WithDD_WithDemoStoch,
 #' @param time_horzion a number. The number of years (time horizon) over which to project the population dynamics.
@@ -55,7 +56,7 @@
 #'            fatalities_mean, fatalities_se, onset_time = NULL,
 #'            pop_size_mean, pop_size_se, pop_size_type,
 #'            pop_growth_mean, pop_growth_se,
-#'            survivals, fecundities,
+#'            survivals, fecundities, DD_params = NULL,
 #'            model_demo, time_horzion, coeff_var_environ, fatal_constant)
 #'
 #'
@@ -63,7 +64,7 @@ run_simul <- function(nsim, cumuated_impacts,
                       fatalities_mean, fatalities_se, onset_time,
                       pop_size_mean, pop_size_se, pop_size_type,
                       pop_growth_mean, pop_growth_se,
-                      survivals, fecundities,
+                      survivals, fecundities, DD_params,
                       model_demo, time_horzion, coeff_var_environ, fatal_constant){
 
   # Coefficient of variation for environment stochasticity
@@ -132,9 +133,10 @@ run_simul <- function(nsim, cumuated_impacts,
       } # end if
 
       # Project population trajectory
-      N[,,,sim] <- fun_project(fatalities = M, onset_time = onset_time, intial_pop_vector = N0, s = s, f = f,
-                           model_demo = model_demo, time_horzion = time_horzion,
-                           coeff_var_environ = coeff_var_environ, fatal_constant = fatal_constant)
+      N[,,,sim] <- fun_project(fatalities = M, onset_time = onset_time, intial_pop_vector = N0,
+                               s = s, f = f, DD_params = DD_params,
+                               model_demo = model_demo, time_horzion = time_horzion,
+                               coeff_var_environ = coeff_var_environ, fatal_constant = fatal_constant)
     } # sim
   ) # system.time
 

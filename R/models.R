@@ -12,6 +12,7 @@
 #' @param s a vector of survival probabilities for each age class
 #' @param f a vector of fecundity values for each age class
 #' @param h a number. The harvest or fatality rate
+#' @param DD_params density-dependence parameters. Not used in this model.
 #'
 #' @return a vector of population sizes for each age class at time t2
 #' @export
@@ -23,7 +24,7 @@
 #' h <- 0.05
 #' M1_noDD_noDemoStoch(N1, s, f, h)
 #'
-M1_noDD_noDemoStoch <- function(N1, s, f, h){
+M1_noDD_noDemoStoch <- function(N1, s, f, h, DD_params = NULL){
 
   # Build the LESLIE matrix
   A <- build_Leslie(s = s, f = f)
@@ -50,6 +51,7 @@ M1_noDD_noDemoStoch <- function(N1, s, f, h){
 #' @param s a vector of survival probabilities for each age class
 #' @param f a vector of fecundity values for each age class
 #' @param h a number. The harvest or fatality rate
+#' @param DD_params density-dependence parameters. Not used in this model.
 #'
 #' @return a vector of population sizes for each age class at time t2
 #' @export
@@ -61,7 +63,7 @@ M1_noDD_noDemoStoch <- function(N1, s, f, h){
 #' h <- 0.05
 #' M2_noDD_WithDemoStoch(N1, s, f, h)
 #'
-M2_noDD_WithDemoStoch <- function(N1, s, f, h){
+M2_noDD_WithDemoStoch <- function(N1, s, f, h, DD_params = NULL){
 
   nac = length(s)
 
@@ -78,3 +80,66 @@ M2_noDD_WithDemoStoch <- function(N1, s, f, h){
 ################################################################################
 
 
+
+
+##==============================================================================
+##                         ADD DENSITY DEPENDENCE                             ==
+##==============================================================================
+
+
+
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##  Model 3: WITH Density-Dependence (noDD), No Demographic Stochasticity     ~~
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#' Demographic model without Density-Dependence and without Demographic Stochasticity
+#' In addition to natural survivals and fecundities, this demographic model includes
+#' a specific harvest / fatality parameter.
+#' NOTE : This is a POST-BREEDING demographic model.
+#'
+#' @param N1 a vector of population sizes for each age class at time t1
+#' @param s a vector of survival probabilities for each age class
+#' @param f a vector of fecundity values for each age class
+#' @param h a number. The harvest or fatality rate
+#' @param DD_params a list containing the 3 parameters required to model density-dependence :
+#' rMAX (maximum population intinsic rate of increase: lambda_max - 1),
+#' K (carrying capacity), and
+#' theta (shape of DD relationshp)
+#'
+#' @return a vector of population sizes for each age class at time t2
+#' @export
+#'
+#' @examples
+#' s <- c(0.5, 0.7, 0.8, 0.95)
+#' f <- c(0, 0, 0.05, 0.55)
+#' N1 <- c(50, 60, 75, 100)
+#' h <- 0.05
+#' M1_noDD_noDemoStoch(N1, s, f, h)
+#'
+M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params = NULL){
+
+  # Extract DD parameters from list
+  rMAX = DD_params$rMAX
+  K = DD_params$K
+  theta = DD_params$theta
+
+  # Apply density dependence effect
+  lam_Nt <- 1 + rMAX*(1-(sum(N1)/K)^theta)
+  lam_Nt
+
+  # Calibrate vital rates to match lam_Nt
+  inits <- init_calib(s = s, f = f, lam0 = lam_Nt)
+  vr_Nt <- calibrate_params(inits = inits, f = f, s = s, lam0 = lam_Nt)
+  s_Nt <- head(vr_Nt, length(s))
+  f_Nt <- tail(vr_Nt, length(f))
+
+  # Build the LESLIE matrix
+  A_Nt <- build_Leslie(s = s_Nt, f = f_Nt)
+
+  # Apply the LESLIE matrix calculation at t+1
+  N2 <- A_Nt%*%N1*(1-h)
+
+  return(N2)
+
+} # END FUNCTION
+################################################################################

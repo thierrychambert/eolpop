@@ -2,6 +2,7 @@
 
 export(M1_noDD_noDemoStoch)
 export(M2_noDD_WithDemoStoch)
+export(M3_WithDD_noDemoStoch)
 export(build_Leslie)
 export(calibrate_params)
 export(elicitation)

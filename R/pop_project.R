@@ -16,6 +16,7 @@
 #' @param fatal_constant text (character). Either "h" or "M". Using "h" sets the fatality RATE as the constant value across years.
 #' Using "M" sets the NUMBER of fatalities as the constant value across years.
 #' @param onset_time unused. Just here because it's required for cumulated impact and in higher level 'run_simul" function.
+#' @param DD_params NULL or a list. Density-dependence parameters (rMAX, K, theta). Only used in DD models M3 and M4.
 #'
 #' @return a 3D array containing the size of each age class (dim 1), for each year (dim 2) and each scenario (dim 3).
 #' @export
@@ -33,6 +34,7 @@
 pop_project <- function(fatalities,
                         intial_pop_vector,
                         s, f,
+                        DD_params = NULL,
                         model_demo,
                         time_horzion,
                         coeff_var_environ,
@@ -81,7 +83,7 @@ pop_project <- function(fatalities,
     # Scenario 0
     for(j in 1:nsc){
       set.seed(seed)
-      N[,t,j] <- model_demo(N1 = N[,t-1,j], s = ss, f = ff, h = h[j])
+      N[,t,j] <- model_demo(N1 = N[,t-1,j], s = ss, f = ff, h = h[j], DD_params = DD_params)
     } # j
 
   } # t
