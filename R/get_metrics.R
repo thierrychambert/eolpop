@@ -39,12 +39,10 @@ get_metrics <- function(N){
   for(j in 1:dim(N)[3]){
     # Relative Difference of Population Size
     DR_N[,j,] <- (colSums(N[,,j,]) - N_ref) / N_ref
-    #DR_N[,j,] <- (colSums(N[,,j,]) - colSums(N[,,"sc0",])) / colSums(N[,,"sc0",])
 
     # Remove rare cases where sc0 = 0 and sc1 > 0 (making DR = +Inf)
-    #DR_N[,j,][DR_N[,j,] == Inf] <- NaN
 
-    impact[,"avg",j] <- rowMeans(DR_N[,j,], na.rm = TRUE)
+    impact[,"avg",j] <- apply(DR_N[,j,], 1, mean, na.rm = TRUE)
     impact[,"se",j] <- apply(DR_N[,j,], 1, sd, na.rm = TRUE)
 
     # Upper and Lower Confidence Intervals for DR_N
