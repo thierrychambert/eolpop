@@ -1,4 +1,190 @@
-rm(list = ls(all.names = TRUE))
+
+
+
+### Impact of each SCENARIO
+## Relative difference of population size
+DR_N <- array(NA, dim = dim(N)[2:4],
+              dimnames = list(paste0("year", 1:dim(N)[2]),
+                              paste0("sc", (1:dim(N)[3])-1)
+              ))
+
+impact_sc <- array(NA, dim = c(dim(N)[2], 4, dim(N)[3]),
+                dimnames = list(paste0("year", 1:dim(N)[2]),
+                                c("avg", "se", "lci", "uci"),
+                                paste0("sc", (1:dim(N)[3])-1)
+                ))
+
+
+# Define reference population size (sc0)
+N_ref <- colSums(N[,,"sc0",])
+
+# Remove cases where sc0 = 0
+N_ref[N_ref == 0] <- NaN
+
+for(j in 1:dim(N)[3]){
+  # Relative Difference of Population Size
+  DR_N[,j,] <- (colSums(N[,,j,]) - N_ref) / N_ref
+
+  # Remove rare cases where sc0 = 0 and sc1 > 0 (making DR = +Inf)
+  impact_sc[,"avg",j] <- apply(DR_N[,j,], 1, mean, na.rm = TRUE)
+  impact_sc[,"se",j] <- apply(DR_N[,j,], 1, sd, na.rm = TRUE)
+
+  # Upper and Lower Confidence Intervals for DR_N
+  impact_sc[,"uci",j] <- apply(DR_N[,j,], 1, quantile, probs = 0.025, na.rm = TRUE)
+  impact_sc[,"lci",j] <-
+    apply(DR_N[,j,], 1, quantile, probs = 0.975, na.rm = TRUE) %>%
+    sapply(min, 0)
+
+} # j
+
+
+## Probability of extinction
+TH <- time_horzion
+
+Pext_sc <- DR_Pext_sc <- NA
+
+Pext_ref <- mean(colSums(N[,TH,"sc0",]) == 0)
+
+for(j in 1:dim(N)[3]){
+
+  Pext_sc[j] <- mean(colSums(N[,TH,j,]) == 0)
+  DR_Pext_sc[j] <- (Pext_sc[j] - Pext_ref) / Pext_ref
+
+} # j
+
+
+
+
+if(cumuated_impacts){
+  ### Impact of each WIND FARM
+  ## Relative difference of population size
+  DR_N <- array(NA, dim = dim(N)[2:4],
+                dimnames = list(paste0("year", 1:dim(N)[2]),
+                                paste0("sc", (1:dim(N)[3])-1)
+                ))
+
+  impact_indiv <- array(NA, dim = c(dim(N)[2], 4, dim(N)[3]),
+                        dimnames = list(paste0("year", 1:dim(N)[2]),
+                                        c("avg", "se", "lci", "uci"),
+                                        paste0("sc", (1:dim(N)[3])-1)
+                        ))
+
+  impact_indiv[,,1] <- 0
+
+
+  for(j in 2:dim(N)[3]){
+
+    # Define reference population size (sc0)
+    N_ref <- colSums(N[,,j-1,])
+
+    # Remove cases where sc0 = 0
+    N_ref[N_ref == 0] <- NaN
+
+    # Relative Difference of Population Size
+    DR_N[,j,] <- (colSums(N[,,j,]) - N_ref) / N_ref
+
+    # Remove rare cases where sc0 = 0 and sc1 > 0 (making DR = +Inf)
+    impact_indiv[,"avg",j] <- apply(DR_N[,j,], 1, mean, na.rm = TRUE)
+    impact_indiv[,"se",j] <- apply(DR_N[,j,], 1, sd, na.rm = TRUE)
+
+    # Upper and Lower Confidence Intervals for DR_N
+    impact_indiv[,"uci",j] <- apply(DR_N[,j,], 1, quantile, probs = 0.025, na.rm = TRUE)
+    impact_indiv[,"lci",j] <-
+      apply(DR_N[,j,], 1, quantile, probs = 0.975, na.rm = TRUE) %>%
+      sapply(min, 0)
+
+  } # j
+
+  ## Probability of extinction
+  Pext_indiv <- DR_Pext_indiv <- 0
+
+  Pext_indiv[1] <- mean(colSums(N[,TH,1,]) == 0)
+
+  for(j in 2:dim(N)[3]){
+
+    Pext_indiv[j] <- Pext_sc[j] - Pext_sc[j-1]
+
+    Pext_ref <- Pext_sc[j-1]
+
+    DR_Pext_indiv[j] <- Pext_indiv[j] / Pext_ref
+
+  } # j
+
+  Pext_indiv <- sapply(Pext_indiv, max, 0)
+  DR_Pext_indiv <- sapply(DR_Pext_indiv, max, 0)
+
+
+} # end if "ci=umulated_impacts"
+
+
+
+
+impact_indiv[30,"avg",]
+impact_sc[30,"avg",]
+
+impact_indiv[30,"se",]
+impact_sc[30,"se",]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+cumsum(impact_indiv[30,"avg",])
+
+dim(N)
+sc0 <- mean(colSums(N[,30,1,]))
+sc1 <- mean(colSums(N[,30,2,]))
+sc2 <- mean(colSums(N[,30,3,]))
+
+(sc1-sc0)/sc0
+(sc2-sc0)/sc0
+
+(sc2-sc1)/sc1
+
+(sc2-sc0)/sc0 + (sc2-sc1)/sc1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# rm(list = ls(all.names = TRUE))
 library(eolpop)
 library(magrittr)
 library(popbio)
@@ -11,267 +197,27 @@ DD_params <- list(rMAX = 0.15, K = 1200, theta = 1)
 
 
 
-# Infer K
-infer_DD(lambda_MAX = 1.15, K = NULL, theta = 1, pop_size_current = 200, pop_growth_current = 1.08)
-
-lambda_MAX = 1.15
-K = NULL
-theta = 1
-pop_size_current = 200
-pop_growth_current = 1.08
 
 
-# Infer lambda_MAX
-infer_DD(lambda_MAX = NULL, K = 2000, theta = 1, pop_size_current = 200, pop_growth_current = 1.08)
+# Extract DD parameters from list
+rMAX = DD_params$rMAX
+K = DD_params$K
+theta = DD_params$theta
 
-lambda_MAX = NULL
-K = 429
-theta = 1
-pop_size_current = 200
-pop_growth_current = 1.08
-
-# Get an error
-infer_DD(lambda_MAX = NULL, K = NULL, theta = 1, pop_size_current = 200, pop_growth_current = 1.08)
-
-
-# Infer K
-rMAX = 0.15
-lam_a = 1.08
-theta = 1
-N_a = 200
-r_a = lam_a - 1 ; r_a
-
-K <- (N_a/((1-(r_a/rMAX))^(1/theta))) %>% round
-K
-
-# Infer rMAX
-K = 2000
-lam_a = 1.08
-theta = 1
-N_a = 500
-r_a = lam_a - 1 ; r_a
-
-rMAX <- r_a/((1-(N_a/K))^theta)
-rMAX
-
-
-
-
-
-
-
-rMAX = 0.15
-K = sum(N1)*5
-theta = 1
-
+rMAX = -10
 # Apply density dependence effect
-N1 = K
-lam_Nt <- 1 + rMAX*(1-(sum(N1)/K)^theta)
-lam_Nt
+1 + rMAX*(1-(sum(N1)/K)^theta)
+
+build_Leslie(s = s_calibrated, f = f_calibrated) %>% lambda
 
 
-# Calibrate vital rates to match lam_Nt
+
+# Build Leslie matrix
 A <- build_Leslie(s = s, f = f)
-diff_rel_lam <- (lam_Nt - lambda(A))/lambda(A)
-d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
-vr_Nt <- c(s,f) + d
 
-s_Nt <- head(vr_Nt, length(s))
-f_Nt <- tail(vr_Nt, length(f))
+# Test if the overall lambda < 1 (lambda before applying density dependence)
+if(lambda(A) < 1){
 
-A_Nt <- build_Leslie(s = s_Nt, f = f_Nt)
-lambda(A_Nt)
-
-
-
-
-
-
-
-A <- build_Leslie(s = s, f = f)
-diff_rel_lam <- (1.5 - lambda(A))/lambda(A)
-diff_rel_lam
-d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
-c(s,f) + d
-
-
-match_lam_delta(diff_rel_lam = 0.5, s=s, f=f)
-
-
-
-
-
-
-
-
-M <- fatalities
-N0 <- intial_pop_vector
-cv_env <- coeff_var_environ
-
-# Number of years
-nyr <- time_horzion
-
-# Number of age classes
-nac <- length(s)
-
-# Number of fatalities scenario
-nsc <- length(fatalities)
-
-# Initiate Pop Size (output) Array
-N <- array(NA, dim = c(nac, nyr, nsc), dimnames = list(paste0("age", 1:nac),
-                                                       paste0("year", 1:nyr),
-                                                       paste0("scenario", 1:nsc)
-))
-N[,1,] <-  N0
-
-## Loops over time (years)
-for(t in 2:nyr){
-
-  # Environmental Stochasticity
-  ss = 1 - rnorm(nac, mean = qlogis(1-s), sd = cv_env/(s)) %>% plogis        ## sample thru the mortality rate : 1 - s
-  ff = rnorm(nac, mean = log(f), sd = cv_env) %>% exp
-
-  # Fatalities : constant number (M) or constant rate (h)
-  if(fatal_constant == "M"){
-    h <- M/apply(N[,t-1,], 2, sum)
-  } else {
-    h <- M/apply(N[,1,], 2, sum)
-  }
-
-  # Sample a seed for RNG
-  seed <- runif(1, 0, 1e6)
-
-  ## Projection : apply the LESLIE matrix calculation forward
-  # Scenario 0
-  for(j in 1:nsc){
-    set.seed(seed)
-    N[,t,j] <- model_demo(N1 = N[,t-1,j], s = ss, f = ff, h = h[j], DD_params = DD_params)
-  } # j
-
-} # t
-
-N
-
-
-
-
-
-
-
-
-# Calibrate vital rates to match lam_Nt
-inits <- init_calib(s = s, f = f, lam0 = lam_Nt)
-vr_Nt <- calibrate_params(inits = inits, f = f, s = s, lam0 = lam_Nt)
-
-
-s = s_calibrated
-f = f_calibrated
-
-diff_rel_lam = 0.04
-
-
-##
-
-survivals = s_calibrated
-fecundities = f_calibrated
-
-##
-
-fatalities = M; onset_time = onset_time; intial_pop_vector = N0; s = s; f = f;
-model_demo = model_demo; time_horzion = time_horzion;
-coeff_var_environ = coeff_var_environ; fatal_constant = fatal_constant
-
-##
-
-
-# Environmental Stochasticity
-ss = 1 - rnorm(nac, mean = qlogis(1-s), sd = cv_env/(s)) %>% plogis        ## sample thru the mortality rate : 1 - s
-ff = rnorm(nac, mean = log(f), sd = cv_env) %>% exp
-ss ; ff
-
-# Fatalities : constant number (M) or constant rate (h)
-if(fatal_constant == "M"){
-  h <- M/apply(N[,t-1,], 2, sum)
-} else {
-  h <- M/apply(N[,1,], 2, sum)
+  # If lambda < 1, we cannot infer lambda[t]
+  lam_t <- lambda(A)
 }
-h
-
-# Sample a seed for RNG
-seed <- runif(1, 0, 1e6)
-
-## Projection : apply the LESLIE matrix calculation forward
-# Scenario 0
-#for(j in 1:nsc){
-j = 1
-  set.seed(seed)
-  N[,t,j] <- model_demo(N1 = N[,t-1,j], s = ss, f = ff, h = h[j], DD_params = DD_params)
-#} # j
-N
-
-model_demo(N1 = N[,t-1,j], s = ss, f = ff, h = h[j], DD_params = DD_params)
-
-
-t=2
-
-N1 = N[,t-1,j]
-s = ss
-f = ff
-h = h[j]
-
-##
-
-
-
-
-
-
-
-
-
-
-
-fatalities = c(0, 8, 10)
-onset_time = c(1, 5, 20)
-
-model_demo = M2_noDD_WithDemoStoch
-time_horzion = 30
-coeff_var_environ = 0.1
-fatal_constant = "h"
-
-
-TH = time_horzion
-
-# Fatalities from each wind farm
-Mi <- matrix(fatalities, nrow = length(fatalities), ncol = nyr)
-
-# Fatalities from each wind farm
-for(j in 2:nrow(Mi)){
-  if(onset_time[j] > 1) Mi[j,1:(onset_time[j]-1)] <- 0
-} # j
-
-# Cumulated Fatalities
-Mc <- Mi
-for(j in 2:nrow(Mc)) Mc[j,] <- apply(Mc[(j-1):j,], 2, sum)
-
-h <- Mc[,t-1]/apply(N[,t-1,], 2, sum)
-
-h <- Mc[,t-1]/apply(N[,1,], 2, sum)
-
-
-
-
-pop_project(fatalities = c(0, 5, 10), intial_pop_vector = N0, s = s, f = f,
- model_demo = M2_noDD_WithDemoStoch, time_horzion = 30,
- coeff_var_environ = 0.1, fatal_constant = "h")
-
-
-
-j=2
-start = onset_time[j]
-vec = M[,j]
-
-
-set_onset<- function(vec, start){
-  if(start > 1) vec[1:(start-1)] <- 0
-} # function
