@@ -5,10 +5,12 @@
 \title{Calculate Impact Metric
 Relative Difference of Population Size DR_N}
 \usage{
-get_metrics(N)
+get_metrics(N, cumuated_impacts = FALSE)
 }
 \arguments{
 \item{N}{a 4-D array containing demographic projection outputs}
+
+\item{cumuated_impacts}{Logical. If TRUE, we used the projection model for cumulated impacts.}
 }
 \value{
 a list of metric outputs : mean, SD, 95\% C.I. of the
@@ -22,6 +24,7 @@ Relative Difference of Population Size DR_N
 data("demo_proj")
 
 ## Calculate the metric
-get_metrics(demo_proj)
+get_metrics(demo_proj, cumuated_impacts = FALSE)
+
 
 }

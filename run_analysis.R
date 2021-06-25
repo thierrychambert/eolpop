@@ -7,26 +7,26 @@ library(eolpop)
 ## Inputs
 nsim = 100
 
-fatalities_mean = c(0, 3)
+fatalities_mean = c(0, 8, 3, 5, 2)
 fatalities_se = fatalities_mean*0.05
 
 pop_size_mean = 200
 pop_size_se = 30
 
-pop_growth_mean = 1.1
+pop_growth_mean = 0.8
 pop_growth_se = 0.05
 
 survivals <- c(0.5, 0.7, 0.8, 0.95)
 fecundities <- c(0, 0, 0.05, 0.55)
 
-model_demo = M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #
+model_demo = M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
 time_horzion = 30
 coeff_var_environ = 0.10
 fatal_constant = "h"
 pop_size_type = "Ntotal"
 
-cumuated_impacts = FALSE
-onset_time = c(1, 3, 7, 15)
+cumuated_impacts = TRUE
+onset_time = c(1, 3, 7, 15, 20)
 
 DD_params <- list(rMAX = 0.15, K = 1200, theta = 1)
 
@@ -56,7 +56,7 @@ names(run0)
 run0$time_run
 # saved time (ratio): 493/12
 
-N <- run0$N
+N <- run0$N ; dim(N)
 out <- get_metrics(N)
 out[time_horzion,"avg",]
 

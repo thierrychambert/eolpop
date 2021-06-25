@@ -56,6 +56,9 @@ M1_noDD_noDemoStoch <- function(N1, s, f, h, DD_params = NULL){
 #' @return a vector of population sizes for each age class at time t2
 #' @export
 #'
+#' @import popbio
+#' @import magrittr
+#'
 #' @examples
 #' s <- c(0.5, 0.7, 0.8, 0.95)
 #' f <- c(0, 0, 0.05, 0.55)
@@ -110,6 +113,9 @@ M2_noDD_WithDemoStoch <- function(N1, s, f, h, DD_params = NULL){
 #' @return a vector of population sizes for each age class at time t2
 #' @export
 #'
+#' @import popbio
+#' @import magrittr
+#'
 #' @examples
 #' s <- c(0.5, 0.7, 0.8, 0.95)
 #' f <- c(0, 0, 0.05, 0.55)
@@ -163,6 +169,9 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params = NULL){
 #' @param f a vector of fecundity values for each age class
 #' @param h a number. The harvest or fatality rate
 #' @param DD_params density-dependence parameters. Not used in this model.
+#'
+#' @import popbio
+#' @import magrittr
 #'
 #' @return a vector of population sizes for each age class at time t2
 #' @export

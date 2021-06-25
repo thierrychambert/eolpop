@@ -13,7 +13,7 @@
 #' plot_impact(demo_proj, xlab = "year", ylab = "pop size")
 #'
 plot_impact <- function(N, ...){
-  out <- get_metrics(N)
+  out <- get_metrics(N)$scenario$impact_sc
   TH <- dim(N)[2]
   nsc <- dim(N)[3]
 

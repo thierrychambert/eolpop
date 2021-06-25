@@ -6,6 +6,7 @@
 #' Relative Difference of Population Size DR_N
 #'
 #' @param N a 4-D array containing demographic projection outputs
+#' @param cumuated_impacts Logical. If TRUE, we used the projection model for cumulated impacts.
 #'
 #' @return a list of metric outputs : mean, SD, 95% C.I. of the
 #' @export
@@ -15,20 +16,28 @@
 #' data("demo_proj")
 #'
 #' ## Calculate the metric
-#' get_metrics(demo_proj)
+#' get_metrics(demo_proj, cumuated_impacts = FALSE)
 #'
-get_metrics <- function(N){
+#'
+get_metrics <- function(N, cumuated_impacts = FALSE){
 
+  TH <- dim(N)[2]
+
+
+
+  ### Impact of each SCENARIO
+  ## Relative difference of population size
   DR_N <- array(NA, dim = dim(N)[2:4],
                 dimnames = list(paste0("year", 1:dim(N)[2]),
                                 paste0("sc", (1:dim(N)[3])-1)
                 ))
 
-  impact <- array(NA, dim = c(dim(N)[2], 4, dim(N)[3]),
-                  dimnames = list(paste0("year", 1:dim(N)[2]),
-                                  c("avg", "se", "lci", "uci"),
-                                  paste0("sc", (1:dim(N)[3])-1)
-                  ))
+  impact_sc <- array(NA, dim = c(dim(N)[2], 4, dim(N)[3]),
+                     dimnames = list(paste0("year", 1:dim(N)[2]),
+                                     c("avg", "se", "lci", "uci"),
+                                     paste0("sc", (1:dim(N)[3])-1)
+                     ))
+
 
   # Define reference population size (sc0)
   N_ref <- colSums(N[,,"sc0",])
@@ -41,19 +50,123 @@ get_metrics <- function(N){
     DR_N[,j,] <- (colSums(N[,,j,]) - N_ref) / N_ref
 
     # Remove rare cases where sc0 = 0 and sc1 > 0 (making DR = +Inf)
-
-    impact[,"avg",j] <- apply(DR_N[,j,], 1, mean, na.rm = TRUE)
-    impact[,"se",j] <- apply(DR_N[,j,], 1, sd, na.rm = TRUE)
+    impact_sc[,"avg",j] <- apply(DR_N[,j,], 1, mean, na.rm = TRUE)
+    impact_sc[,"se",j] <- apply(DR_N[,j,], 1, sd, na.rm = TRUE)
 
     # Upper and Lower Confidence Intervals for DR_N
-    impact[,"uci",j] <- apply(DR_N[,j,], 1, quantile, probs = 0.025, na.rm = TRUE)
-    impact[,"lci",j] <-
+    impact_sc[,"uci",j] <- apply(DR_N[,j,], 1, quantile, probs = 0.025, na.rm = TRUE)
+    impact_sc[,"lci",j] <-
       apply(DR_N[,j,], 1, quantile, probs = 0.975, na.rm = TRUE) %>%
       sapply(min, 0)
 
   } # j
 
-  return(impact)
+
+  ## Probability of extinction
+  Pext_sc <- DR_Pext_sc <- NA
+
+  Pext_ref <- mean(colSums(N[,TH,"sc0",]) == 0)
+
+  for(j in 1:dim(N)[3]){
+
+    Pext_sc[j] <- mean(colSums(N[,TH,j,]) == 0)
+    DR_Pext_sc[j] <- (Pext_sc[j] - Pext_ref) / Pext_ref
+
+  } # j
+
+  # Save scenario impacts into a list
+  scenario_impacts <- list(
+    impact_sc = impact_sc,
+    Pext_sc = Pext_sc,
+    DR_Pext_sc = DR_Pext_sc)
+
+
+
+  #===================================================================
+  #               CASE: CUMULATED IMPACT RUN                        ==
+  #===================================================================
+
+  indiv_impacts <- list(impacts = NULL)
+
+  ### Impact of each WIND FARM (only in case of a cumluted impact run)
+  impact_indiv <- array(NA, dim = c(dim(N)[2], 4, dim(N)[3]),
+                        dimnames = list(paste0("year", 1:dim(N)[2]),
+                                        c("avg", "se", "lci", "uci"),
+                                        paste0("sc", (1:dim(N)[3])-1)
+                          ))
+
+  Pext_indiv <- DR_Pext_indiv <- NA
+
+  if(cumuated_impacts){
+    ## Relative difference of population size
+    DR_N <- array(NA, dim = dim(N)[2:4],
+                  dimnames = list(paste0("year", 1:dim(N)[2]),
+                                  paste0("sc", (1:dim(N)[3])-1)
+                  ))
+
+
+    impact_indiv[,,1] <- 0
+
+
+    for(j in 2:dim(N)[3]){
+
+      # Define reference population size (sc0)
+      N_ref <- colSums(N[,,j-1,])
+
+      # Remove cases where sc0 = 0
+      N_ref[N_ref == 0] <- NaN
+
+      # Relative Difference of Population Size
+      DR_N[,j,] <- (colSums(N[,,j,]) - N_ref) / N_ref
+
+      # Remove rare cases where sc0 = 0 and sc1 > 0 (making DR = +Inf)
+      impact_indiv[,"avg",j] <- apply(DR_N[,j,], 1, mean, na.rm = TRUE)
+      impact_indiv[,"se",j] <- apply(DR_N[,j,], 1, sd, na.rm = TRUE)
+
+      # Upper and Lower Confidence Intervals for DR_N
+      impact_indiv[,"uci",j] <- apply(DR_N[,j,], 1, quantile, probs = 0.025, na.rm = TRUE)
+      impact_indiv[,"lci",j] <-
+        apply(DR_N[,j,], 1, quantile, probs = 0.975, na.rm = TRUE) %>%
+        sapply(min, 0)
+
+    } # j
+
+    ## Probability of extinction
+    Pext_indiv <- DR_Pext_indiv <- 0
+
+    # for scenario 0
+    Pext_indiv[1] <- mean(colSums(N[,TH,1,]) == 0)
+
+    for(j in 2:dim(N)[3]){
+
+      Pext_indiv[j] <- Pext_sc[j] - Pext_sc[j-1]
+
+      Pext_ref <- Pext_sc[j-1]
+
+      DR_Pext_indiv[j] <- Pext_indiv[j] / Pext_ref
+
+    } # j
+
+    Pext_indiv <- sapply(Pext_indiv, max, 0)
+    DR_Pext_indiv <- sapply(DR_Pext_indiv, max, 0)
+
+    # Save individual wind farm impacts into a list
+    indiv_impacts <- list(
+      impact_indiv = impact_indiv,
+      Pext_indiv = Pext_indiv,
+      DR_Pext_indiv = DR_Pext_indiv)
+
+
+  } # end if "ci=umulated_impacts"
+
+
+
+  return(
+    list(
+      scenario = scenario_impacts,
+      indiv_farm = indiv_impacts
+    )
+  )
 
 } # End function
 ################################################################################
