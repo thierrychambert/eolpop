@@ -21,11 +21,11 @@ coeff_var_environ = 0.10
 fatal_constant = "h"
 
 run_test <- run_simul(nsim = 10, cumuated_impacts = FALSE,
-          fatalities_mean, fatalities_se, onset_time = NULL,
-          pop_size_mean, pop_size_se, pop_size_type,
-          pop_growth_mean, pop_growth_se,
-          survivals, fecundities, DD_params = DD_params,
-          model_demo = NULL, time_horzion, coeff_var_environ, fatal_constant)
+                      fatalities_mean, fatalities_se, onset_time = NULL,
+                      pop_size_mean, pop_size_se, pop_size_type,
+                      pop_growth_mean, pop_growth_se,
+                      survivals, fecundities, DD_params = DD_params,
+                      model_demo = NULL, time_horzion, coeff_var_environ, fatal_constant)
 
 
 

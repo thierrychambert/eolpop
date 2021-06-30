@@ -4,6 +4,8 @@
 #' Plot demographic trajectories
 #'
 #' @param N a 4-D array containing demographic projection outputs
+#' @param onset_year a vector containing the years of each wind farm start being active
+#' (thus, the year at whihc each fatality value starts kicking in)
 #' @param ... any other graphical input similar to the R plot function
 #'
 #' @return a plot of the relative impact of each scenario.
@@ -15,17 +17,18 @@
 #' @examples
 #' # plot_impact(demo_proj, xlab = "year", ylab = "pop size")
 #'
-plot_impact <- function(N, ...){
+plot_impact <- function(N, onset_year = NULL, ...){
 
   # Get metrics and dimensions
   out <- get_metrics(N)$scenario$impact
   TH <- dim(N)[2]
   nsc <- dim(N)[3]
-
+  if(is.null(onset_year)) onset_year <- 1
+  years <- min(onset_year) + (1:TH) - 1
 
   # Build dataframe
-  df <- as.data.frame(cbind(year = 1:nrow(out), out[,,1], scenario = 1))
-  for(j in 2:nsc) df <- rbind(df, cbind(year = 1:TH, out[,,j], scenario = j))
+  df <- as.data.frame(cbind(year = years, out[,,1], scenario = 1))
+  for(j in 2:nsc) df <- rbind(df, cbind(year = years, out[,,j], scenario = j))
 
   ## Define Graphic Parameters
   size = 1.5

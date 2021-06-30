@@ -76,7 +76,7 @@ out$scenario$DR_Pext
 
 # plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
 
-p <- plot_impact(N, xlab = "Annee", ylab = "Impact relatif")
+p <- plot_impact(N, onset_year = onset_year , xlab = "Annee", ylab = "Impact relatif")
 p
 
 #source("draws_histog.R")

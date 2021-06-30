@@ -4,10 +4,13 @@
 \alias{plot_impact}
 \title{Plot demographic trajectories}
 \usage{
-plot_impact(N, ...)
+plot_impact(N, onset_year = NULL, ...)
 }
 \arguments{
 \item{N}{a 4-D array containing demographic projection outputs}
+
+\item{onset_year}{a vector containing the years of each wind farm start being active
+(thus, the year at whihc each fatality value starts kicking in)}
 
 \item{...}{any other graphical input similar to the R plot function}
 }
