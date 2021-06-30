@@ -5,7 +5,7 @@ graphics.off()
 library(eolpop)
 
 ## Inputs
-nsim = 100
+nsim = 1000
 
 fatalities_mean = c(0, 8, 3, 5, 2)
 fatalities_se = fatalities_mean*0.05
@@ -13,8 +13,8 @@ fatalities_se = fatalities_mean*0.05
 pop_size_mean = 200
 pop_size_se = 30
 
-pop_growth_mean = 0.8
-pop_growth_se = 0.05
+pop_growth_mean = 0.98
+pop_growth_se = 0
 
 survivals <- c(0.5, 0.7, 0.8, 0.95)
 fecundities <- c(0, 0, 0.05, 0.55)
@@ -25,7 +25,7 @@ coeff_var_environ = 0.10
 fatal_constant = "h"
 pop_size_type = "Ntotal"
 
-cumuated_impacts = TRUE
+cumuated_impacts = FALSE
 onset_time = c(1, 3, 7, 15, 20)
 
 DD_params <- list(rMAX = 0.15, K = 1200, theta = 1)
@@ -57,13 +57,20 @@ run0$time_run
 # saved time (ratio): 493/12
 
 N <- run0$N ; dim(N)
-out <- get_metrics(N)
-out[time_horzion,"avg",]
+out <- get_metrics(N, cumuated_impacts = cumuated_impacts)
+names(out)
+out$warning
+names(out$scenario)
+out$indiv_farm
+
+out$scenario$impact_sc[time_horzion,,]
+out$scenario$Pext_sc
+out$scenario$DR_Pext_sc
 
 plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
 
-plot_impact(N, xlab = "Annee", ylab = "Taille de population (totale)")
+plot_impact(N, xlab = "Annee", ylab = "Impact relatif")
 
 
-source("draws_histog.R")
-draws_histog(draws = run0$lambdas, mu = pop_growth_mean, se = pop_growth_se)
+#source("draws_histog.R")
+#draws_histog(draws = run0$lambdas, mu = pop_growth_mean, se = pop_growth_se)

@@ -1,223 +1,134 @@
+out <- get_metrics(N)$scenario$impact_sc
+TH <- dim(N)[2]
+nsc <- dim(N)[3]
 
+library(dplyr)
 
+df <- as.data.frame(cbind(year = 1:nrow(out), out[,,1], scenario = 1))
+for(j in 2:dim(out)[3]) df <- rbind(df, cbind(year = 1:nrow(out), out[,,j], scenario = j))
+dim(df)
+class(df)
+names(df)
 
-### Impact of each SCENARIO
-## Relative difference of population size
-DR_N <- array(NA, dim = dim(N)[2:4],
-              dimnames = list(paste0("year", 1:dim(N)[2]),
-                              paste0("sc", (1:dim(N)[3])-1)
-              ))
+filter(df, scenario == 1)
+filter(df, scenario > 1)
 
-impact_sc <- array(NA, dim = c(dim(N)[2], 4, dim(N)[3]),
-                dimnames = list(paste0("year", 1:dim(N)[2]),
-                                c("avg", "se", "lci", "uci"),
-                                paste0("sc", (1:dim(N)[3])-1)
-                ))
 
+library(ggplot2)
+library(plotly)
 
-# Define reference population size (sc0)
-N_ref <- colSums(N[,,"sc0",])
+## pars
+size = 1.5
 
-# Remove cases where sc0 = 0
-N_ref[N_ref == 0] <- NaN
+# Plot lines
+p <-
+  ggplot(data = df, aes(x = year, y = avg)) +
+  geom_line(data = filter(df, scenario > 1), size = size, aes(colour = factor(scenario))) +
+  geom_line(data = filter(df, scenario == 1), size = size, colour = "black")
 
-for(j in 1:dim(N)[3]){
-  # Relative Difference of Population Size
-  DR_N[,j,] <- (colSums(N[,,j,]) - N_ref) / N_ref
+# Plot CIs
+p <- p + geom_ribbon(data = filter(df, scenario > 1),
+                     aes(ymin = uci, ymax = lci, fill = factor(scenario)), linetype = 0, alpha = 0.100)
 
-  # Remove rare cases where sc0 = 0 and sc1 > 0 (making DR = +Inf)
-  impact_sc[,"avg",j] <- apply(DR_N[,j,], 1, mean, na.rm = TRUE)
-  impact_sc[,"se",j] <- apply(DR_N[,j,], 1, sd, na.rm = TRUE)
+# Add legend
+Legend <- "parc"
+nsc <- max(df$scenario)-1
+p <- p + labs(x = "Annee", y = "Impact relatif",
+              col = "Scenario", fill = "Scenario") +
+  scale_color_hue(labels = paste(Legend, 1:nsc), aesthetics = c("colour", "fill"))
+p
 
-  # Upper and Lower Confidence Intervals for DR_N
-  impact_sc[,"uci",j] <- apply(DR_N[,j,], 1, quantile, probs = 0.025, na.rm = TRUE)
-  impact_sc[,"lci",j] <-
-    apply(DR_N[,j,], 1, quantile, probs = 0.975, na.rm = TRUE) %>%
-    sapply(min, 0)
 
-} # j
 
 
-## Probability of extinction
-TH <- time_horzion
 
-Pext_sc <- DR_Pext_sc <- NA
 
-Pext_ref <- mean(colSums(N[,TH,"sc0",]) == 0)
 
-for(j in 1:dim(N)[3]){
 
-  Pext_sc[j] <- mean(colSums(N[,TH,j,]) == 0)
-  DR_Pext_sc[j] <- (Pext_sc[j] - Pext_ref) / Pext_ref
 
-} # j
+# Plot lines
+p <-
+  ggplot(data = df, aes(x = year, y = avg)) +
+  geom_line(data = filter(df, scenario > 1), size = size, aes(colour = factor(scenario))) +
+  geom_line(data = filter(df, scenario == 1), size = size, colour = "black")
 
+# Plot CIs
+p <- p + geom_ribbon(data = filter(df, scenario > 1),
+                     aes(ymin = uci, ymax = lci, fill = factor(scenario)), linetype = 0, alpha = 0.100)
 
+# Add legend
+Legend <- "parc"
+nsc <- max(df$scenario)-1
+p <- p + labs(x = "Annee", y = "Impact relatif",
+              col = "Scenario", fill = "Scenario") +
+  scale_color_hue(labels = paste(Legend, 1:nsc)) +
+  scale_fill_hue(labels = paste(Legend, 1:nsc))
 
+p
+ggplotly(p)
 
-if(cumuated_impacts){
-  ### Impact of each WIND FARM
-  ## Relative difference of population size
-  DR_N <- array(NA, dim = dim(N)[2:4],
-                dimnames = list(paste0("year", 1:dim(N)[2]),
-                                paste0("sc", (1:dim(N)[3])-1)
-                ))
+rm(fig)
+fig <- ggplotly(p)
+fig
 
-  impact_indiv <- array(NA, dim = c(dim(N)[2], 4, dim(N)[3]),
-                        dimnames = list(paste0("year", 1:dim(N)[2]),
-                                        c("avg", "se", "lci", "uci"),
-                                        paste0("sc", (1:dim(N)[3])-1)
-                        ))
 
-  impact_indiv[,,1] <- 0
 
 
-  for(j in 2:dim(N)[3]){
 
-    # Define reference population size (sc0)
-    N_ref <- colSums(N[,,j-1,])
 
-    # Remove cases where sc0 = 0
-    N_ref[N_ref == 0] <- NaN
+#### Plotly
+p <-
+  ggplot(data = filter(df, scenario > 1), aes(x = year, y = avg)) +
+  geom_line(size = size, aes(colour = factor(scenario)))
 
-    # Relative Difference of Population Size
-    DR_N[,j,] <- (colSums(N[,,j,]) - N_ref) / N_ref
 
-    # Remove rare cases where sc0 = 0 and sc1 > 0 (making DR = +Inf)
-    impact_indiv[,"avg",j] <- apply(DR_N[,j,], 1, mean, na.rm = TRUE)
-    impact_indiv[,"se",j] <- apply(DR_N[,j,], 1, sd, na.rm = TRUE)
+# Plot CIs
+p <- p + geom_ribbon(aes(ymin = uci, ymax = lci, fill = factor(scenario)),
+                     linetype = 0, alpha = 0.100)
 
-    # Upper and Lower Confidence Intervals for DR_N
-    impact_indiv[,"uci",j] <- apply(DR_N[,j,], 1, quantile, probs = 0.025, na.rm = TRUE)
-    impact_indiv[,"lci",j] <-
-      apply(DR_N[,j,], 1, quantile, probs = 0.975, na.rm = TRUE) %>%
-      sapply(min, 0)
+# Add legend
+Legend <- "parc"
+nsc <- max(df$scenario)-1
+p <- p + labs(x = "Annee", y = "Impact relatif",
+              col = "Scenario", fill = "Scenario") +
+  scale_color_hue(labels = paste(Legend, 1:nsc), aesthetics = c("colour", "fill"))
+p
 
-  } # j
+rm(fig)
+fig <- ggplotly(p)
+fig
 
-  ## Probability of extinction
-  Pext_indiv <- DR_Pext_indiv <- 0
 
-  Pext_indiv[1] <- mean(colSums(N[,TH,1,]) == 0)
+fig <- ggplotly(p)
+fig
 
-  for(j in 2:dim(N)[3]){
 
-    Pext_indiv[j] <- Pext_sc[j] - Pext_sc[j-1]
 
-    Pext_ref <- Pext_sc[j-1]
 
-    DR_Pext_indiv[j] <- Pext_indiv[j] / Pext_ref
 
-  } # j
+#### Plotly
 
-  Pext_indiv <- sapply(Pext_indiv, max, 0)
-  DR_Pext_indiv <- sapply(DR_Pext_indiv, max, 0)
+p <-
+  ggplot(data = df, aes(x = year, y = avg)) +
+  geom_line(size = size, aes(colour = factor(scenario)))
+p
 
+fig <- ggplotly(p, layerData = 1)
+fig
 
-} # end if "ci=umulated_impacts"
 
+##################
 
 
+p <- ggplot(data = df, aes(x = year, y = avg, colour = factor(scenario)))
+p <- p + geom_line(size = 2)
+p
 
-impact_indiv[30,"avg",]
-impact_sc[30,"avg",]
+p <- p + geom_ribbon(aes(ymin = uci, ymax = lci, fill = factor(scenario)), linetype = 0, alpha = 0.075)
+p
 
-impact_indiv[30,"se",]
-impact_sc[30,"se",]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-cumsum(impact_indiv[30,"avg",])
-
-dim(N)
-sc0 <- mean(colSums(N[,30,1,]))
-sc1 <- mean(colSums(N[,30,2,]))
-sc2 <- mean(colSums(N[,30,3,]))
-
-(sc1-sc0)/sc0
-(sc2-sc0)/sc0
-
-(sc2-sc1)/sc1
-
-(sc2-sc0)/sc0 + (sc2-sc1)/sc1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# rm(list = ls(all.names = TRUE))
-library(eolpop)
-library(magrittr)
-library(popbio)
-
-s <- c(0.5, 0.7, 0.8, 0.95)
-f <- c(0, 0, 0.05, 0.55)
-N1 <- pop_vector(pop_size = 200, pop_size_type = "Npair", s, f)
-h <- 0.05
-DD_params <- list(rMAX = 0.15, K = 1200, theta = 1)
-
-
-
-
-
-# Extract DD parameters from list
-rMAX = DD_params$rMAX
-K = DD_params$K
-theta = DD_params$theta
-
-rMAX = -10
-# Apply density dependence effect
-1 + rMAX*(1-(sum(N1)/K)^theta)
-
-build_Leslie(s = s_calibrated, f = f_calibrated) %>% lambda
-
-
-
-# Build Leslie matrix
-A <- build_Leslie(s = s, f = f)
-
-# Test if the overall lambda < 1 (lambda before applying density dependence)
-if(lambda(A) < 1){
-
-  # If lambda < 1, we cannot infer lambda[t]
-  lam_t <- lambda(A)
-}
+#########
+p <- ggplot(data = df, aes(x = year, y = avg, colour = factor(scenario)))
+p <- p + geom_line(size = 2)
+p

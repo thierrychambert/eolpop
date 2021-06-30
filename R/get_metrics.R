@@ -2,11 +2,20 @@
 ##                        Get Output metrics                                  ==
 ##==============================================================================
 
-#' Calculate Impact Metric
-#' Relative Difference of Population Size DR_N
+#' Calculate Impact Metrics
+#'
+#' @description
+#' get_metrics takes the output array of the simulations run and calculate two impact metrics :
+#' (1) The relative difference (between scenarios) in population size at the time horizon, and
+#' (2) The difference in terms of extinction probability.
+#'
+#' When used on a cumulated_impacts analysis, this function also calculates these two metrics
+#'  for each individual wind farm.
+#'
 #'
 #' @param N a 4-D array containing demographic projection outputs
-#' @param cumuated_impacts Logical. If TRUE, we used the projection model for cumulated impacts.
+#' @param cumuated_impacts Logical. Must be set to TRUE if the output array N corresponds to
+#' a cumulated impacts demographic analysis (see ?run_simul).
 #'
 #' @return a list of metric outputs : mean, SD, 95% C.I. of the
 #' @export
@@ -22,8 +31,7 @@
 get_metrics <- function(N, cumuated_impacts = FALSE){
 
   TH <- dim(N)[2]
-
-
+  warning <- NULL
 
   ### Impact of each SCENARIO
   ## Relative difference of population size
@@ -42,18 +50,35 @@ get_metrics <- function(N, cumuated_impacts = FALSE){
   # Define reference population size (sc0)
   N_ref <- colSums(N[,,"sc0",])
 
-  # Remove cases where sc0 = 0
-  N_ref[N_ref == 0] <- NaN
+  # Remove cases where pop size under sc0 is too small (N < 30)
+  ## to get accurate proportion (avg) and uncertainty metrics
+  N_ref[N_ref < 30] <- NaN
+
+  ## Create a warning if the sample size (number of useable iterations for calculation) becomes too small
+  spl_size <- apply(N_ref, 1,
+        function(x) sum(!is.nan(x))
+        )
+
+  # Warning message, if required
+  if (min(spl_size) < 200) warning <- paste0(
+    "WARNING : small sample size to calculate metrics, starting on year ",
+    min(which(spl_size < 200)),
+    ", due to high extinction rate.
+    Use more simulations to get accurate proportions and uncertainty metrics."
+    )
+
 
   for(j in 1:dim(N)[3]){
     # Relative Difference of Population Size
     DR_N[,j,] <- (colSums(N[,,j,]) - N_ref) / N_ref
 
-    # Remove rare cases where sc0 = 0 and sc1 > 0 (making DR = +Inf)
+    # Impact metric : Average value
     impact_sc[,"avg",j] <- apply(DR_N[,j,], 1, mean, na.rm = TRUE)
+
+    # Impact metric : SE
     impact_sc[,"se",j] <- apply(DR_N[,j,], 1, sd, na.rm = TRUE)
 
-    # Upper and Lower Confidence Intervals for DR_N
+    # Impact metric : Upper and Lower Confidence Intervals for DR_N
     impact_sc[,"uci",j] <- apply(DR_N[,j,], 1, quantile, probs = 0.025, na.rm = TRUE)
     impact_sc[,"lci",j] <-
       apply(DR_N[,j,], 1, quantile, probs = 0.975, na.rm = TRUE) %>%
@@ -71,6 +96,9 @@ get_metrics <- function(N, cumuated_impacts = FALSE){
 
     Pext_sc[j] <- mean(colSums(N[,TH,j,]) == 0)
     DR_Pext_sc[j] <- (Pext_sc[j] - Pext_ref) / Pext_ref
+
+    DR_Pext_sc[DR_Pext_sc == Inf] <- Pext_sc[DR_Pext_sc == Inf]
+    DR_Pext_sc[is.nan(DR_Pext_sc)] <- 0
 
   } # j
 
@@ -113,8 +141,23 @@ get_metrics <- function(N, cumuated_impacts = FALSE){
       # Define reference population size (sc0)
       N_ref <- colSums(N[,,j-1,])
 
-      # Remove cases where sc0 = 0
-      N_ref[N_ref == 0] <- NaN
+      # Remove cases where pop size under sc0 is too small (N < 30)
+      ## to get accurate proportion (avg) and uncertainty metrics
+      N_ref[N_ref < 30] <- NaN
+
+      ## Create a warning if the sample size (number of useable iterations for calculation) becomes too small
+      spl_size <- apply(N_ref, 1,
+                        function(x) sum(!is.nan(x))
+      )
+
+      # Warning message, if required
+      if (min(spl_size) < 200) warning <- paste0(
+        "WARNING : small sample size to calculate metrics, starting on year ",
+        min(which(spl_size < 200)),
+        ", due to high extinction rate.
+        Use more simulations to get accurate proportions and uncertainty metrics."
+      )
+
 
       # Relative Difference of Population Size
       DR_N[,j,] <- (colSums(N[,,j,]) - N_ref) / N_ref
@@ -164,7 +207,8 @@ get_metrics <- function(N, cumuated_impacts = FALSE){
   return(
     list(
       scenario = scenario_impacts,
-      indiv_farm = indiv_impacts
+      indiv_farm = indiv_impacts,
+      warning = warning
     )
   )
 
