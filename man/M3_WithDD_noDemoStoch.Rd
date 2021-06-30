@@ -7,7 +7,7 @@ In addition to natural survivals and fecundities, this demographic model include
 a specific harvest / fatality parameter.
 NOTE : This is a POST-BREEDING demographic model.}
 \usage{
-M3_WithDD_noDemoStoch(N1, s, f, h, DD_params = NULL)
+M3_WithDD_noDemoStoch(N1, s, f, h, DD_params)
 }
 \arguments{
 \item{N1}{a vector of population sizes for each age class at time t1}

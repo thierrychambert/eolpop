@@ -124,7 +124,7 @@ M2_noDD_WithDemoStoch <- function(N1, s, f, h, DD_params = NULL){
 #' DD_params <- list(rMAX = 0.15, K = 1200, theta = 1)
 #' M3_WithDD_noDemoStoch(N1, s, f, h,DD_params = DD_params)
 #'
-M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params = NULL){
+M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params){
 
   # Extract DD parameters from list
   rMAX = DD_params$rMAX

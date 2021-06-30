@@ -1,13 +1,15 @@
 rm(list = ls(all.names = TRUE))
 graphics.off()
 
+
+
 ## Libraries
 library(eolpop)
 
 ## Inputs
 nsim = 1000
 
-fatalities_mean = c(0, 8, 3, 5, 2)
+fatalities_mean = c(0, 2, 3, 5, 2)
 fatalities_se = fatalities_mean*0.05
 
 pop_size_mean = 200
@@ -19,14 +21,16 @@ pop_growth_se = 0
 survivals <- c(0.5, 0.7, 0.8, 0.95)
 fecundities <- c(0, 0, 0.05, 0.55)
 
-model_demo = M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
+model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
 time_horzion = 30
 coeff_var_environ = 0.10
 fatal_constant = "h"
 pop_size_type = "Ntotal"
 
-cumuated_impacts = FALSE
-onset_time = c(1, 3, 7, 15, 20)
+cumuated_impacts = TRUE
+
+onset_year = 2000 + c(1, 3, 7, 15, 20)
+onset_time = onset_year - min(onset_year) + 1
 
 DD_params <- list(rMAX = 0.15, K = 1200, theta = 1)
 
@@ -59,18 +63,21 @@ run0$time_run
 N <- run0$N ; dim(N)
 out <- get_metrics(N, cumuated_impacts = cumuated_impacts)
 names(out)
+
 out$warning
 names(out$scenario)
-out$indiv_farm
 
-out$scenario$impact_sc[time_horzion,,]
-out$scenario$Pext_sc
-out$scenario$DR_Pext_sc
+fatalities_mean
+out$indiv_farm$impact[time_horzion,,]
 
-plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
+out$scenario$impact[time_horzion,,]
+out$scenario$Pext
+out$scenario$DR_Pext
 
-plot_impact(N, xlab = "Annee", ylab = "Impact relatif")
+# plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
 
+p <- plot_impact(N, xlab = "Annee", ylab = "Impact relatif")
+p
 
 #source("draws_histog.R")
 #draws_histog(draws = run0$lambdas, mu = pop_growth_mean, se = pop_growth_se)

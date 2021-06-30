@@ -15,7 +15,8 @@
 #'
 #' @import popbio
 #' @import magrittr
-#' @import stats
+#' @rawNamespace import(stats, except = c(filter, lag))
+#'
 #' @examples
 #' s <- c(0.5, 0.7, 0.8, 0.95)
 #' f <- c(0, 0, 0.05, 0.55)

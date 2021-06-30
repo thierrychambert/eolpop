@@ -51,3 +51,10 @@ usethis::use_build_ignore("draws_histog.R")
 library(gitignore)
 library(usethis)
 usethis::use_git_ignore(ignores = "junk.R", directory = ".")
+
+
+# Add package in the DESCRIPTION file: Imports
+usethis::use_package("dplyr")
+usethis::use_package("ggplot2")
+
+

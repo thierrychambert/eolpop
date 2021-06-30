@@ -5,7 +5,7 @@
 \title{Infer Densisty-dependence Parameters}
 \usage{
 infer_DD(
-  lambda_MAX = NULL,
+  rMAX = NULL,
   K = NULL,
   theta = 1,
   pop_size_current,
@@ -13,13 +13,13 @@ infer_DD(
 )
 }
 \arguments{
-\item{lambda_MAX}{a strictly positive number. Maximum (theoretical) population growth rate.}
+\item{rMAX}{a number. Maximum (theoretical) population intrinsic rate of increase.}
 
 \item{K}{a strictly positive number. Carrying capacity (= maximum size that the population can ever reach)}
 
 \item{theta}{a strictly positive number. Parameter defining the shape of the density-dependence relationship.
-The relationship is defined as : lambda <- 1 + rMAX*(1-(N/K)^theta)
-where rMAX = lambda_MAX - 1}
+The relationship is defined as : r <- rMAX*(1-(N/K)^theta)
+Note lambda = r + 1}
 
 \item{pop_size_current}{a strictly positive number. Current population size.}
 
@@ -33,9 +33,9 @@ infer_DD calculates the missing value of a parameter (either K or rMAX, whicheve
 }
 \examples{
 ## Infer K
-infer_DD(lambda_MAX = 1.15, K = NULL, theta = 1, pop_size_current = 200, pop_growth_current = 1.08)
-## Infer lambda_MAX
-infer_DD(lambda_MAX = NULL, K = 2000, theta = 1, pop_size_current = 200, pop_growth_current = 1.08)
+infer_DD(rMAX = 0.15, K = NULL, theta = 1, pop_size_current = 200, pop_growth_current = 1.08)
+## Infer rMAX
+infer_DD(rMAX = NULL, K = 2000, theta = 1, pop_size_current = 200, pop_growth_current = 1.08)
 
 
 }

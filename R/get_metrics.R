@@ -104,9 +104,9 @@ get_metrics <- function(N, cumuated_impacts = FALSE){
 
   # Save scenario impacts into a list
   scenario_impacts <- list(
-    impact_sc = impact_sc,
-    Pext_sc = Pext_sc,
-    DR_Pext_sc = DR_Pext_sc)
+    impact = impact_sc,
+    Pext = Pext_sc,
+    DR_Pext = DR_Pext_sc)
 
 
 
@@ -195,9 +195,9 @@ get_metrics <- function(N, cumuated_impacts = FALSE){
 
     # Save individual wind farm impacts into a list
     indiv_impacts <- list(
-      impact_indiv = impact_indiv,
-      Pext_indiv = Pext_indiv,
-      DR_Pext_indiv = DR_Pext_indiv)
+      impact = impact_indiv,
+      Pext = Pext_indiv,
+      DR_Pext = DR_Pext_indiv)
 
 
   } # end if "ci=umulated_impacts"

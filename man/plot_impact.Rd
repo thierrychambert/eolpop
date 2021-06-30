@@ -18,6 +18,6 @@ a plot of the relative impact of each scenario.
 Plot demographic trajectories
 }
 \examples{
-plot_impact(demo_proj, xlab = "year", ylab = "pop size")
+# plot_impact(demo_proj, xlab = "year", ylab = "pop size")
 
 }

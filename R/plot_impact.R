@@ -9,34 +9,45 @@
 #' @return a plot of the relative impact of each scenario.
 #' @export
 #'
+#' @importFrom dplyr filter
+#' @import ggplot2
+#'
 #' @examples
-#' plot_impact(demo_proj, xlab = "year", ylab = "pop size")
+#' # plot_impact(demo_proj, xlab = "year", ylab = "pop size")
 #'
 plot_impact <- function(N, ...){
-  out <- get_metrics(N)$scenario$impact_sc
+
+  # Get metrics and dimensions
+  out <- get_metrics(N)$scenario$impact
   TH <- dim(N)[2]
   nsc <- dim(N)[3]
 
-  # Initiate plot
-  x=1:nrow(out)
-  plot(x = x, y = out[,"avg",1], type = 'n', ylim = c(min(out[,"uci",], na.rm = TRUE),0), ...)
-  abline(h = -1, lwd = 3, lty = 2)
 
-  for(j in 1:nsc){
-    # Average Impact
-    # points(x = x, y = out[,"avg",j], type = 'l', col=j, lwd=3)
+  # Build dataframe
+  df <- as.data.frame(cbind(year = 1:nrow(out), out[,,1], scenario = 1))
+  for(j in 2:nsc) df <- rbind(df, cbind(year = 1:TH, out[,,j], scenario = j))
 
-    # Shaded area for CI
-    polygon.x <- c(x, rev(x))
-    polygon.y <- c(out[,"lci",j], rev(out[,"uci",j]))
-    polygon(x=polygon.x, y=polygon.y, col=adjustcolor(j, alpha.f=0.1), border=NA)
-    } # j
+  ## Define Graphic Parameters
+  size = 1.5
 
-  # Redraw Average Impact on top
-  for(j in 1:nsc){
-    points(x = x, y = out[,"avg",j], type = 'l', col=j, lwd=3)
-  } # j
+  # Plot lines
+  p <-
+    ggplot(data = df, aes(x = .data$year, y = .data$avg)) +
+    geom_line(data = dplyr::filter(df, .data$scenario > 1), size = size, aes(colour = factor(.data$scenario))) +
+    geom_line(data = dplyr::filter(df, .data$scenario == 1), size = size, colour = "black")
 
+  # Plot CIs
+  p <- p + geom_ribbon(data = filter(df, .data$scenario > 1),
+                       aes(ymin = .data$uci, ymax = .data$lci, fill = factor(.data$scenario)), linetype = 0, alpha = 0.100)
+
+  # Add legend
+  Legend <- "parc"
+  nsc <- max(df$scenario)-1
+  p <- p + labs(x = "Annee", y = "Impact relatif",
+                col = "Scenario", fill = "Scenario") +
+    scale_color_hue(labels = paste(Legend, 1:nsc), aesthetics = c("colour", "fill"))
+
+  return(p)
 
 } # End function
 ################################################################################

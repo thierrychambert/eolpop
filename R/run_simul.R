@@ -17,8 +17,10 @@
 #' @param survivals a vector. Average survival probabilities for each age class.
 #' @param fecundities a vector of fecundity values for each age class.
 #' @param DD_params NULL or a list. Density-dependence parameters (rMAX, K, theta). Only used in DD models M3 and M4.
-#' @param model_demo an R object corresponding to the demographic model to be used. The 4 possible models currently are:
-#' M1_noDD_noDemoStoch, M2_noDD_WithDemoStoch, M3_WithDD_noDemoStoch, M4_WithDD_WithDemoStoch,
+#' @param model_demo is NULL, by default, because the model choice will be made inside each iteration (simulation),
+#' base on the values of N0 and lam0 that are drawn.
+#' But it can be forced by setting the value, which must then be an R object corresponding to the demographic model to be used.
+#' The 4 possible models currently are: M1_noDD_noDemoStoch, M2_noDD_WithDemoStoch, M3_WithDD_noDemoStoch, M4_WithDD_WithDemoStoch,
 #' @param time_horzion a number. The number of years (time horizon) over which to project the population dynamics.
 #' @param coeff_var_environ a number. The coefficient of variation to model environment stochasticity.
 #' @param fatal_constant text (character). Either "h" or "M". Using "h" sets the fatality RATE as the constant value across years.
@@ -28,8 +30,6 @@
 #' each simulation iteration (dim 4)
 #' @export
 #'
-#' @import magrittr
-#' @import popbio
 #'
 #' @examples
 #' fatalities_mean = c(0, 5, 10, 15, 20)
@@ -46,18 +46,19 @@
 #'
 #' fecundities <- c(0, 0, 0.05, 0.55)
 #'
-#' model_demo = M2_noDD_WithDemoStoch
 #'
 #' time_horzion = 30
 #' coeff_var_environ = 0.10
 #' fatal_constant = "h"
 #'
+#' DD_params <- list(rMAX = NULL, K = 1200, theta = 1)
+#'
 #' run_simul(nsim = 10, cumuated_impacts = FALSE,
 #'            fatalities_mean, fatalities_se, onset_time = NULL,
 #'            pop_size_mean, pop_size_se, pop_size_type,
 #'            pop_growth_mean, pop_growth_se,
-#'            survivals, fecundities, DD_params = NULL,
-#'            model_demo, time_horzion, coeff_var_environ, fatal_constant)
+#'            survivals, fecundities, DD_params = DD_params,
+#'            model_demo = NULL, time_horzion, coeff_var_environ, fatal_constant)
 #'
 #'
 run_simul <- function(nsim, cumuated_impacts,
@@ -65,7 +66,7 @@ run_simul <- function(nsim, cumuated_impacts,
                       pop_size_mean, pop_size_se, pop_size_type,
                       pop_growth_mean, pop_growth_se,
                       survivals, fecundities, DD_params,
-                      model_demo, time_horzion, coeff_var_environ, fatal_constant){
+                      model_demo = NULL, time_horzion, coeff_var_environ, fatal_constant){
 
   # Coefficient of variation for environment stochasticity
   cv_env <- coeff_var_environ
@@ -123,6 +124,41 @@ run_simul <- function(nsim, cumuated_impacts,
         lam_it[sim] <- lambda(build_Leslie(s,f))
 
       } # End if/else
+
+
+      # Choose the model demographique to use (it choice was not forced)
+      if(is.null(model_demo)){
+
+        ## Define the complete model by default
+        model_demo <- M4_WithDD_WithDemoStoch
+
+        # DECLINING (or stable), but initially LARGE population
+        if(lam_it[sim] <= 1 & sum(N0) > 3000) model_demo <- M1_noDD_noDemoStoch
+
+        # DECLINING  (or stable), and initially SMALL population
+        if(lam_it[sim] <= 1 & sum(N0) <= 3000) model_demo <- M2_noDD_WithDemoStoch
+
+
+        # GROWING population...
+        if(lam_it[sim] > 1){
+
+          # Extract rMAX
+          DD_params$rMAX <-
+            infer_DD(K = DD_params$K, theta = DD_params$theta,
+                     pop_size_current = sum(N0), pop_growth_current = lam_it[sim])$rMAX
+
+          # ... and initially LARGE population
+          if(sum(N0) > 500) model_demo <- M3_WithDD_noDemoStoch
+
+
+          # ... but initially SMALL population
+          if(sum(N0) <= 500) model_demo <- M4_WithDD_WithDemoStoch
+
+        } # if lam > 1
+
+
+      } # end if "is.null"
+
 
       #
       if(cumuated_impacts){
