@@ -2,12 +2,11 @@ rm(list = ls(all.names = TRUE))
 graphics.off()
 
 
-
 ## Libraries
 library(eolpop)
 
 ## Inputs
-nsim = 1000
+nsim = 100
 
 fatalities_mean = c(0, 2, 3, 5, 2)
 fatalities_se = fatalities_mean*0.05
@@ -15,7 +14,7 @@ fatalities_se = fatalities_mean*0.05
 pop_size_mean = 200
 pop_size_se = 30
 
-pop_growth_mean = 0.98
+pop_growth_mean = 1.1
 pop_growth_se = 0
 
 survivals <- c(0.5, 0.7, 0.8, 0.95)
@@ -32,7 +31,7 @@ cumuated_impacts = TRUE
 onset_year = 2000 + c(1, 3, 7, 15, 20)
 onset_time = onset_year - min(onset_year) + 1
 
-DD_params <- list(rMAX = 0.15, K = 1200, theta = 1)
+DD_params <- list(rMAX = NULL, K = 1200, theta = 1)
 
 ##--------------------------------------------
 ##  Calibration : FYI, for table dsiply     --
@@ -74,7 +73,7 @@ out$scenario$impact[time_horzion,,]
 out$scenario$Pext
 out$scenario$DR_Pext
 
-# plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
+plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
 
 p <- plot_impact(N, onset_year = onset_year , xlab = "Annee", ylab = "Impact relatif")
 p
