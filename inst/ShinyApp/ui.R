@@ -11,7 +11,7 @@ library(eolpop)
 source("./inst/ShinyApp/param_fixes.R")
 
 species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")
-species_list <- unique(as.character(data$NomEspece))
+species_list <- unique(as.character(species_data$NomEspece))
 
 
 # Data elicitation, fatalities for cumulated impacts, vital rates and DD_params
