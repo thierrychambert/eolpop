@@ -179,15 +179,11 @@ server <- function(input, output){
     param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 2)
   })
 
+
   # Survival and fecundity calibration
   observeEvent({
     input$run
-    # input$species_choice
-    # input$pop_growth_mean
   },{
-
-    ##  Avoid unrealistic scenarios
-    #param$pop_growth_mean <- min(1 + param$rMAX_species, input$pop_growth_mean)
 
     param$vr_calibrated <- calibrate_params(
       inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
