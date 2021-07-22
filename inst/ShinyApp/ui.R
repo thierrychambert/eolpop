@@ -7,9 +7,8 @@ library(tidyverse)
 
 library(eolpop)
 
-# source("./inst/ShinyApp/f_output.R")
-source("./inst/ShinyApp/param_fixes.R")
 
+#♠ Species data / list
 species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")
 species_list <- unique(as.character(species_data$NomEspece))
 

@@ -58,3 +58,6 @@ usethis::use_package("dplyr")
 usethis::use_package("ggplot2")
 
 
+# Add package in the DESCRIPTION file: Imports
+usethis::use_package("shiny")
+

@@ -172,19 +172,26 @@ server <- function(input, output){
     }
   })
 
+
+  # Observe pop growth value
+  ##  Avoid unrealistic scenarios
+  observe({
+    param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 2)
+  })
+
   # Survival and fecundity calibration
   observeEvent({
     input$run
-    #input$species_choice
-    #input$pop_growth_mean
+    # input$species_choice
+    # input$pop_growth_mean
   },{
 
     ##  Avoid unrealistic scenarios
-    pop_growth_mean <- min(1 + param$rMAX_species, input$pop_growth_mean)
+    #param$pop_growth_mean <- min(1 + param$rMAX_species, input$pop_growth_mean)
 
     param$vr_calibrated <- calibrate_params(
-      inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = input$pop_growth_mean),
-      f = param$fecundities, s = param$survivals, lam0 = input$pop_growth_mean
+      inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
+      f = param$fecundities, s = param$survivals, lam0 = param$pop_growth_mean
       )
     param$s_calibrated <- head(param$vr_calibrated, length(param$survivals))
     param$f_calibrated <- tail(param$vr_calibrated, length(param$fecundities))
@@ -205,7 +212,10 @@ server <- function(input, output){
   observeEvent({
     input$run
   }, {
-    param$N1 <- run_simul(nsim = input$nsim,
+
+    withProgress(message = 'Simulation progress', value = 0, {
+
+    param$N1 <- run_simul_shiny(nsim = input$nsim,
                         cumuated_impacts = param$cumulated_impacts,
 
                         fatalities_mean = param$fatalities_mean,
@@ -216,7 +226,7 @@ server <- function(input, output){
                         pop_size_se = input$pop_size_se,
                         pop_size_type = input$pop_size_type,
 
-                        pop_growth_mean = input$pop_growth_mean,
+                        pop_growth_mean = param$pop_growth_mean,
                         pop_growth_se = input$pop_growth_se,
 
                         survivals = param$s_calibrated,
@@ -230,7 +240,8 @@ server <- function(input, output){
                         time_horzion = time_horzion,
                         coeff_var_environ = coeff_var_environ,
                         fatal_constant = input$fatal_constant)
-  })
+    }) # Close withProgress
+  }) # Close observEvent
 
 
   # Plot Impacts
@@ -309,7 +320,7 @@ server <- function(input, output){
   output$carrying_capacity_info <- renderText({paste0("Moyenne Capacité de charge : ", input$carrying_capacity)})
 
   output$pop_trend_type_info <- renderText({paste0("Type de Tendance de pop : ", input$lambda_input_type)})
-  output$pop_trend_mean_info <- renderText({paste0("Moyenne Tendance de pop : ", input$pop_growth_mean)})
+  output$pop_trend_mean_info <- renderText({paste0("Moyenne Tendance de pop : ", param$pop_growth_mean)})
   output$pop_trend_se_info <- renderText({paste0("Ecart-type Tendance de pop : ", input$pop_growth_se)})
 }
 # End server

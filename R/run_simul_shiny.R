@@ -1,7 +1,9 @@
 ##==============================================================================
 ##                     Function to run simulations                            ==
 ##==============================================================================
-#' Run multiple population projections (simulations)
+#' Run multiple population projections (simulations).
+#' Exactly the same function as run_simul, except that it includes a line of code to display
+#' the simulation progress bar in Shiny (incProgress function)
 #'
 #' @param nsim number of simulation
 #' @param cumuated_impacts Logical. If TRUE, we used the projection model for cumulated impacts.
@@ -45,41 +47,11 @@
 #' each simulation iteration (dim 4)
 #' @export
 #'
-#' @examples
-#' fatalities_mean = c(0, 5, 10, 15, 20)
-#' fatalities_se = fatalities_mean*0.05
 #'
-#' pop_size_mean = 200
-#' pop_size_se = 30
-#' pop_size_type = "Npair"
+#' @importFrom shiny incProgress
 #'
-#' pop_growth_mean = 1
-#' pop_growth_se = 0.03
-#'
-#' survivals <- c(0.5, 0.7, 0.8, 0.95)
-#'
-#' fecundities <- c(0, 0, 0.05, 0.55)
-#'
-#'
-#' time_horzion = 30
-#' coeff_var_environ = 0.10
-#' fatal_constant = "h"
-#'
-#' carrying_capacity = 1200
-#' theta = 1
-#' rMAX_species <- 0.15
-#'
-#' run_simul(nsim = 10, cumuated_impacts = FALSE,
-#'            fatalities_mean, fatalities_se, onset_time = NULL,
-#'            pop_size_mean, pop_size_se, pop_size_type,
-#'            pop_growth_mean, pop_growth_se,
-#'            survivals, fecundities,
-#'            carrying_capacity, theta,
-#'            rMAX_species,
-#'            model_demo = NULL, time_horzion, coeff_var_environ, fatal_constant)
-#'
-#'
-run_simul <- function(nsim, cumuated_impacts,
+
+run_simul_shiny <- function(nsim, cumuated_impacts,
                       fatalities_mean, fatalities_se, onset_time,
                       pop_size_mean, pop_size_se, pop_size_type,
                       pop_growth_mean, pop_growth_se,
@@ -127,6 +99,11 @@ run_simul <- function(nsim, cumuated_impacts,
     ##--------------------------------------------
     for(sim in 1:nsim){
 
+
+      # Increments to be shown in Shiny's Progess bar
+      shiny::incProgress(1/nsim, detail = paste("simulation", sim))
+      Sys.sleep(0.001)
+
       ## PARAMETER UNCERTAINTY : draw values for each input
       # 1. Nomber of fatalities
       M <- NA
@@ -167,9 +144,9 @@ run_simul <- function(nsim, cumuated_impacts,
 
       } # End if/else
 
-model_demo = NULL
+      model_demo = NULL
 
-            # Choose the model demographique to use (if choice was not forced)
+      # Choose the model demographique to use (if choice was not forced)
       if(is.null(model_demo)){
 
         ## Define the complete model by default
@@ -187,8 +164,8 @@ model_demo = NULL
 
           # Extract rMAX
           DD_params$rMAX <- infer_rMAX(K = K, theta = theta,
-                     pop_size_current = sum(N0), pop_growth_current = lam_it[sim],
-                     rMAX_theoretical = rMAX_species)
+                                       pop_size_current = sum(N0), pop_growth_current = lam_it[sim],
+                                       rMAX_theoretical = rMAX_species)
 
           # ... and initially LARGE population
           if(sum(N0) > 500) model_demo <- M3_WithDD_noDemoStoch
