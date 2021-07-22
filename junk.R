@@ -1,46 +1,43 @@
 rm(list = ls(all.names = TRUE))
 graphics.off()
 
+
 ## Libraries
 library(eolpop)
-library(magrittr)
-library(popbio)
-
-
-
-nsim = 10
-time_horzion = 60
-pop_growth_mean = 1.6
-
 
 ## Inputs
+nsim = 10
 
-fatalities_mean = c(0, 5)
-fatalities_se = c(0,0.05)
+fatalities_mean = c(0, 10, 5, 8)
+fatalities_se = c(0, 0.05, 0.05, 0.05)
 
 pop_size_mean = 200
 pop_size_se = 25
 
-pop_growth_se = 0.03
+pop_growth_mean = 1
+pop_growth_se = 0
 
 survivals <- c(0.5, 0.7, 0.8, 0.95)
 fecundities <- c(0, 0, 0.05, 0.55)
 
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
+time_horzion = 50
 coeff_var_environ = 0.10
-fatal_constant = "h"
+fatal_constant = "M"
 pop_size_type = "Npair"
 
-cumuated_impacts = FALSE
+cumuated_impacts = TRUE
 
 onset_year = c(2010, 2013, 2016)
 onset_time = onset_year - min(onset_year) + 1
+onset_time = c(min(onset_time), onset_time)
 
 # Pop size total
 sum(pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = survivals, f = fecundities))
 
+
 # Define K
-carrying_capacity = 210
+carrying_capacity = 500
 theta = 1
 K = pop_vector(pop_size = carrying_capacity, pop_size_type = pop_size_type, s = survivals, f = fecundities) %>% sum
 K
@@ -49,21 +46,10 @@ K
 rMAX_species <- rMAX_spp(surv = tail(survivals,1), afr = min(which(fecundities != 0)))
 rMAX_species
 
-
-
-
-##--------------------------------------------
-##  Avoid dumb scenarios                    --
-##--------------------------------------------
+##  Avoid unrealistic scenarios
 pop_growth_mean <- min(1 + rMAX_species, pop_growth_mean)
 pop_growth_mean
 
-
-
-
-
-
-#pop_growth_mean = 1 + rMAX_species
 
 ##--------------------------------------------
 ##  Calibration                             --
@@ -126,7 +112,7 @@ sim=1
     # 1. Nomber of fatalities
     M <- NA
     for(j in 1:nsc){
-      M[j] <- sample_gamma(1, mu = fatalities_mean[j], sd = fatalities_se[j])
+        M[j] <- sample_gamma(1, mu = fatalities_mean[j], sd = fatalities_se[j])
     }
 
     # 2. Population size : draw and distribute by age class
@@ -208,53 +194,34 @@ sim=1
 
 
 
-
-
-
-
-
-
-
-
-
-lam0 <- 1.5
-
-# 4. Calibrate vital rates to match the the desired lambda
-inits <- init_calib(s = survivals, f = fecundities, lam0 = lam0)
-
-vr <- calibrate_params(inits = inits, f = fecundities, s = survivals, lam0 = lam0)
-s <- head(vr, length(survivals))
-f <- tail(vr, length(fecundities))
-lam_it[sim] <- lambda(build_Leslie(s,f))
-lam_it[sim]
-lambda(build_Leslie(s,f))
-
-
-
-model_demo <- M3_WithDD_noDemoStoch
-DD_params$K <- 2500
-nyr = 60
-
-
-
-
-
-
-
-
-
-
+    fatalities = M
 #######################################################################
     ##--------------------------------------------
-    ##  Pop project                               --
+    ##  Pop project cumulated                               --
     ##--------------------------------------------
 
+
+
+    ## Fatalities taking onset time into account
+    # Initiate matrix
+    Mi <- matrix(fatalities, nrow = length(fatalities), ncol = nyr)
+
+    # Fatalities from each wind farm
+    for(j in 2:nrow(Mi)){
+      if(onset_time[j] > 1) Mi[j,1:(onset_time[j]-1)] <- 0
+    } # j
+
+    # Cumulated Fatalities
+    Mc <- Mi
+    for(j in 2:nrow(Mc)) Mc[j,] <- apply(Mc[(j-1):j,], 2, sum)
+
     # Initiate Pop Size (output) Array
-    N <- array(NA, dim = c(nac, nyr, nsc), dimnames = list(paste0("age", 1:nac),
+    N <- array(0, dim = c(nac, nyr, nsc), dimnames = list(paste0("age", 1:nac),
                                                            paste0("year", 1:nyr),
                                                            paste0("scenario", 1:nsc)
     ))
     N[,1,] <-  N0
+
 
     ## Loops over time (years)
     for(t in 2:nyr){
@@ -265,14 +232,13 @@ nyr = 60
 
       # Fatalities : constant number (M) or constant rate (h)
       if(fatal_constant == "M"){
-        h <- M/apply(N[,t-1,], 2, sum)
+        h <- Mc[,t-1]/apply(N[,t-1,], 2, sum)
       } else {
-        h <- M/apply(N[,1,], 2, sum)
+        h <- Mc[,t-1]/apply(N[,1,], 2, sum)
       }
 
       # Sample a seed for RNG
-      seed <- ((((Sys.time() %>% as.numeric) %% 1e5) * 1e5) %% 1e5) %>% round
-      #runif(1, 0, 1e6)
+      seed <- runif(1, 0, 1e6)
 
       ## Projection : apply the LESLIE matrix calculation forward
       # Scenario 0
@@ -285,210 +251,34 @@ nyr = 60
 
 
 
-colSums(N[,,1])
 
 
 
-DD_params
+    t = 31
+    j = 4
 
 
 
+    ## M2_noDD_WithDemoStoch
 
+    t = t+1
 
-h=0
-N1 = N0
-sum(N1) * lambda(build_Leslie(s,f))
-K
+    h = sapply(Mc[,t-1]/apply(N[,t-1,], 2, sum), min, 1)
+    h
 
+    #N1 = N[,t,j]
+    #N1 = N2
+    N1 = c(2,1,1,3)
 
-lam_Nt <- 1 + rMAX*(1-(sum(N1)/K)^theta)
-sum(N1) * lam_Nt
+    # Number of age classes
+    nac = length(s)
 
+    # Survivors (to "natural mortality" (s) and Wind Turbine Fatalities (1-h))
+    S <- rbinom(nac, N1, (1-h)*s)
+    N2 <- c(rep(0, nac-1), tail(S,1)) + c(0, head(S,-1))
 
-A_Nt <- build_Leslie(s = s_Nt, f = f_Nt)
-lambda(A_Nt)
+    # Births
+    N2[1] <- sum(rpois(nac, f*N2))
 
-N2 <- A_Nt%*%N1
-sum(N2)
-
-#######################################################################
-##--------------------------------------------
-##  Model                             --
-##--------------------------------------------
-
-
-N1 = N2
-
-
-# Extract DD parameters from list
-rMAX = DD_params$rMAX
-K = DD_params$K
-theta = DD_params$theta
-
-# Apply density dependence effect
-lam_Nt <- 1 + rMAX*(1-(sum(N1)/K)^theta)
-
-# Calibrate vital rates to match lam_Nt
-A <- build_Leslie(s = s, f = f)
-diff_rel_lam <- (lam_Nt - lambda(A))/lambda(A)
-d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
-vr_Nt <- c(s,f) + d
-
-s_Nt <- head(vr_Nt, length(s)) %>% sapply(min, 0.999)
-f_Nt <- tail(vr_Nt, length(f))
-
-
-## Check if approximation is close enough to desired lambda
-if( abs((lambda(build_Leslie(s = s_Nt, f = f_Nt)) - lam_Nt) / lam_Nt) > 0.005 ){
-
-  # If difference is too large : Use optimisation function for better calibration
-  inits <- c(tail(vr_Nt, length(f)), head(vr_Nt, length(s)) %>% sapply(min, 0.999))
-  inits <- inits[inits != 0]
-  vr_calib <- calibrate_params(inits = inits, f = f_Nt, s = s_Nt, lam0 = lam_Nt)
-  s_Nt <- head(vr_calib, length(s_Nt))
-  f_Nt <- tail(vr_calib, length(f_Nt))
-
-} # if
-
-
-# Number of age classes
-nac = length(s)
-
-# Survivors (to "natural mortality" (s) and Wind Turbine Fatalities (1-h))
-S <- rbinom(nac, N1, (1-h)*s_Nt)
-N2 <- c(rep(0, nac-1), tail(S,1)) + c(0, head(S,-1))
-
-# Births
-N2[1] <- sum(rpois(nac, f_Nt*N2))
-
-sum(N2)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-N1 = N2
-
-  ## M3_WithDD_noDemoStoch
-
-  # Extract DD parameters from list
-  rMAX = DD_params$rMAX
-  K = DD_params$K
-  theta = DD_params$theta
-
-  # Apply density dependence effect
-  lam_Nt <- 1 + rMAX*(1-(sum(N1)/K)^theta)
-
-  # Calibrate vital rates to match lam_Nt
-  A <- build_Leslie(s = s, f = f)
-  diff_rel_lam <- (lam_Nt - lambda(A))/lambda(A)
-  d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
-  vr_Nt <- c(s,f) + d
-
-  s_Nt <- head(vr_Nt, length(s)) %>% sapply(min, 0.999)
-  f_Nt <- tail(vr_Nt, length(f))
-
-  lambda(build_Leslie(s = s_Nt, f = f_Nt))
-
-  ## Check if approximation is close enough to desired lambda
-  if( abs((lambda(build_Leslie(s = s_Nt, f = f_Nt)) - lam_Nt) / lam_Nt) > 0.005 ){
-
-    # If difference is too large : Use optimisation function for better calibration
-    inits <- c(tail(vr_Nt, length(f)), head(vr_Nt, length(s)) %>% sapply(min, 0.999))
-    inits <- inits[inits != 0]
-    vr_calib <- calibrate_params(inits = inits, f = f_Nt, s = s_Nt, lam0 = lam_Nt)
-    s_Nt <- head(vr_calib, length(s_Nt))
-    f_Nt <- tail(vr_calib, length(f_Nt))
-
-  } # if
-
-  # Build the LESLIE matrix
-  A_Nt <- build_Leslie(s = s_Nt, f = f_Nt)
-
-  # Apply the LESLIE matrix calculation at t+1
-  N2 <- A_Nt%*%N1*(1-h)
-
-sum(N2)
-
-
-
-
-
-
-
-
-
-
-
-
-    build_Leslie(s = survivals, f = fecundities) %>% lambda
-    N0 <- sample_gamma(1, mu = pop_size_mean, sd =  pop_size_se) %>%
-      round %>%
-      pop_vector(pop_size_type = pop_size_type, s = survivals, f = fecundities)
-
-    sum(N0)
-    pop_size_mean + 3*pop_size_se
-    carrying_capacity < (pop_size_mean + 3*pop_size_se)
-
-
-
-    sum(N0)
-    K
-
-
-    lam0
-    1+rMAX_species
-    pop_growth_mean
-
-    DD_params
-
-
-
-
-##==============================================================================
-##                         Analyses (simulations)                             ==
-##==============================================================================
-run0 <- run_simul(nsim, cumuated_impacts,
-                  fatalities_mean, fatalities_se, onset_time,
-                  pop_size_mean, pop_size_se, pop_size_type,
-                  pop_growth_mean, pop_growth_se,
-                  survivals = s_calibrated, fecundities = f_calibrated,
-                  carrying_capacity = carrying_capacity, theta = theta,
-                  rMAX_species = rMAX_species,
-                  model_demo, time_horzion, coeff_var_environ, fatal_constant)
-
-
-
-N = run0$N
-#plot_impact(N = N, xlab = "year", ylab = "pop size")
-plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
-abline(h = K)
-
-
-
-
-(N[,1,,1])
-colSums(N[,,,]) %>% max
+    N2
+    N[,t+1,j] = N2

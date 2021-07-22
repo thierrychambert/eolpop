@@ -72,9 +72,9 @@ pop_project <- function(fatalities,
 
     # Fatalities : constant number (M) or constant rate (h)
     if(fatal_constant == "M"){
-      h <- M/apply(N[,t-1,], 2, sum)
+      h <- sapply(M/apply(N[,t-1,], 2, sum), min, 1)
     } else {
-      h <- M/apply(N[,1,], 2, sum)
+      h <- sapply(M/apply(N[,1,], 2, sum), min, 1)
     }
 
     # Sample a seed for RNG

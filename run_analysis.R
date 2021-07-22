@@ -8,14 +8,14 @@ library(eolpop)
 ## Inputs
 nsim = 10
 
-fatalities_mean = c(0, 5)
-fatalities_se = c(0,0.05)
+fatalities_mean = c(0, 10, 5, 8)
+fatalities_se = c(0, 0.05, 0.05, 0.05)
 
 pop_size_mean = 200
 pop_size_se = 25
 
-pop_growth_mean = 0.95
-pop_growth_se = 0.03
+pop_growth_mean = 1
+pop_growth_se = 0
 
 survivals <- c(0.5, 0.7, 0.8, 0.95)
 fecundities <- c(0, 0, 0.05, 0.55)
@@ -23,13 +23,14 @@ fecundities <- c(0, 0, 0.05, 0.55)
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
 time_horzion = 50
 coeff_var_environ = 0.10
-fatal_constant = "h"
-pop_size_type = "Ntotal"
+fatal_constant = "M"
+pop_size_type = "Npair"
 
-cumuated_impacts = FALSE
+cumuated_impacts = TRUE
 
 onset_year = c(2010, 2013, 2016)
 onset_time = onset_year - min(onset_year) + 1
+onset_time = c(min(onset_time), onset_time)
 
 # Pop size total
 sum(pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = survivals, f = fecundities))
@@ -50,8 +51,6 @@ pop_growth_mean <- min(1 + rMAX_species, pop_growth_mean)
 pop_growth_mean
 
 
-
-
 ##--------------------------------------------
 ##  Calibration                             --
 ##--------------------------------------------
@@ -62,7 +61,6 @@ s_calibrated <- head(vr_calibrated, length(survivals))
 f_calibrated <- tail(vr_calibrated, length(fecundities))
 
 build_Leslie(s = s_calibrated, f = f_calibrated) %>% lambda
-
 
 
 
@@ -80,14 +78,17 @@ run0 <- run_simul(nsim, cumuated_impacts,
                   model_demo, time_horzion, coeff_var_environ, fatal_constant)
 
 
+
+
+
 N <- run0$N ; dim(N)
 plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
 abline(h = K)
 
-
 colSums(N[,,,]) %>% max
 
-# plot_impact(N, onset_year = onset_year , xlab = "Annee", ylab = "Impact relatif")
+plot_impact(N, onset_year = onset_year , xlab = "Annee", ylab = "Impact relatif")
+
 #plot_impact(N = N, xlab = "year", ylab = "pop size")
 #source("draws_histog.R")
 #draws_histog(draws = run0$lambdas, mu = pop_growth_mean, se = pop_growth_se)
