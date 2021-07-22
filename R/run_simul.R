@@ -16,7 +16,22 @@
 #' @param pop_growth_se Standard Error for population growth rate (= uncertainty around the value provided).
 #' @param survivals a vector. Average survival probabilities for each age class.
 #' @param fecundities a vector of fecundity values for each age class.
-#' @param DD_params NULL or a list. Density-dependence parameters (rMAX, K, theta). Only used in DD models M3 and M4.
+#'
+#' @param carrying_capacity a strictly positive number.
+#' Carrying capacity (= maximum size that the population can reach). Here, the unit is the same as pop_size_type.
+#' It can thus be expressed as the total population or the number of pair.
+#' @param theta a strictly positive number. Parameter defining the shape of the density-dependence relationship.
+#' The relationship is defined as : r <- rMAX*(1-(N/K)^theta)
+#' Note lambda = r + 1
+#'
+#' @param rMAX_species the maximum value of rMAX for the species under consideration,
+#' usually calculated using the Niel & Lebreton (2005) equation.
+#' It can be calculated using the function rMAX_spp. See ?rMAX_spp for details.
+#'
+#' References :
+#' Niel, C., and J. Lebreton. 2005. Using demographic invariants to detect overharvested bird
+#' populations from incomplete data. Conservation Biology 19:826–835.
+#'
 #' @param model_demo is NULL, by default, because the model choice will be made inside each iteration (simulation),
 #' base on the values of N0 and lam0 that are drawn.
 #' But it can be forced by setting the value, which must then be an R object corresponding to the demographic model to be used.
@@ -51,13 +66,17 @@
 #' coeff_var_environ = 0.10
 #' fatal_constant = "h"
 #'
-#' DD_params <- list(rMAX = NULL, K = 1200, theta = 1)
+#' carrying_capacity = 1200
+#' theta = 1
+#' rMAX_species <- 0.15
 #'
 #' run_simul(nsim = 10, cumuated_impacts = FALSE,
 #'            fatalities_mean, fatalities_se, onset_time = NULL,
 #'            pop_size_mean, pop_size_se, pop_size_type,
 #'            pop_growth_mean, pop_growth_se,
-#'            survivals, fecundities, DD_params = DD_params,
+#'            survivals, fecundities,
+#'            carrying_capacity, theta,
+#'            rMAX_species,
 #'            model_demo = NULL, time_horzion, coeff_var_environ, fatal_constant)
 #'
 #'
@@ -65,8 +84,21 @@ run_simul <- function(nsim, cumuated_impacts,
                       fatalities_mean, fatalities_se, onset_time,
                       pop_size_mean, pop_size_se, pop_size_type,
                       pop_growth_mean, pop_growth_se,
-                      survivals, fecundities, DD_params,
+                      survivals, fecundities,
+                      carrying_capacity, theta = 1, rMAX_species,
                       model_demo = NULL, time_horzion, coeff_var_environ, fatal_constant){
+
+
+  # Create object to store DD parameters
+  DD_params <- list()
+
+  # Define K
+  K <- sum(pop_vector(pop_size = carrying_capacity, pop_size_type = pop_size_type, s = survivals, f = fecundities))
+
+  # Fill the list of DD parameters
+  DD_params$K <- NULL
+  DD_params$theta <- theta
+  DD_params$rMAX <- rMAX_species
 
   # Coefficient of variation for environment stochasticity
   cv_env <- coeff_var_environ
@@ -85,10 +117,13 @@ run_simul <- function(nsim, cumuated_impacts,
                                                                paste0("year", 1:nyr),
                                                                paste0("sc", (1:nsc)-1)
   ))
-  # object to store values of population growth drawn at each iteration
+  # Object to store values of population growth drawn at each iteration
   lam_it <- rep(NA, nsim)
 
+  # Time
   time_run <- system.time(
+
+    #
     for(sim in 1:nsim){
 
       ## PARAMETER UNCERTAINTY : draw values for each input
@@ -102,6 +137,12 @@ run_simul <- function(nsim, cumuated_impacts,
       N0 <- sample_gamma(1, mu = pop_size_mean, sd =  pop_size_se) %>%
         round %>%
         pop_vector(pop_size_type = pop_size_type, s = survivals, f = fecundities)
+
+      # Define K
+      K <- sum(pop_vector(pop_size = carrying_capacity, pop_size_type = pop_size_type, s = survivals, f = fecundities))
+      if(K < sum(N0)) K <- round(sum(N0)*1.05)
+      DD_params$K <- K
+
 
       if(pop_growth_se > 0){
 
@@ -125,8 +166,9 @@ run_simul <- function(nsim, cumuated_impacts,
 
       } # End if/else
 
+model_demo = NULL
 
-      # Choose the model demographique to use (it choice was not forced)
+            # Choose the model demographique to use (if choice was not forced)
       if(is.null(model_demo)){
 
         ## Define the complete model by default
@@ -143,9 +185,9 @@ run_simul <- function(nsim, cumuated_impacts,
         if(lam_it[sim] > 1){
 
           # Extract rMAX
-          DD_params$rMAX <-
-            infer_DD(K = DD_params$K, theta = DD_params$theta,
-                     pop_size_current = sum(N0), pop_growth_current = lam_it[sim])$rMAX
+          DD_params$rMAX <- infer_rMAX(K = K, theta = theta,
+                     pop_size_current = sum(N0), pop_growth_current = lam_it[sim],
+                     rMAX_theoretical = rMAX_species)
 
           # ... and initially LARGE population
           if(sum(N0) > 500) model_demo <- M3_WithDD_noDemoStoch

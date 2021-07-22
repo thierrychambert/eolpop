@@ -23,8 +23,9 @@
 infer_DD <- function(rMAX = NULL, K = NULL, theta = 1, pop_size_current, pop_growth_current){
 
   if(!is.null(rMAX)){
-    # Infer K
-    #rMAX = lambda_MAX - 1
+
+    ## Infer K
+        #rMAX = lambda_MAX - 1
     r_a = pop_growth_current - 1
     N_a = pop_size_current
 
@@ -33,12 +34,13 @@ infer_DD <- function(rMAX = NULL, K = NULL, theta = 1, pop_size_current, pop_gro
   }else{
 
     if(!is.null(K)){
-      # Infer rMAX
+
+      ## Infer rMAX
       N_a = pop_size_current
       r_a = pop_growth_current - 1
 
       rMAX <- r_a/((1-(N_a/K))^theta)
-      #lambda_MAX = rMAX + 1
+          #lambda_MAX = rMAX + 1
 
     }else{
 

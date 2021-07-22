@@ -6,41 +6,66 @@ graphics.off()
 library(eolpop)
 
 ## Inputs
-nsim = 100
+nsim = 10
 
-fatalities_mean = c(0, 2, 3, 5, 2)
-fatalities_se = fatalities_mean*0.05
+fatalities_mean = c(0, 5)
+fatalities_se = c(0,0.05)
 
 pop_size_mean = 200
-pop_size_se = 30
+pop_size_se = 25
 
-pop_growth_mean = 1.1
-pop_growth_se = 0
+pop_growth_mean = 0.95
+pop_growth_se = 0.03
 
 survivals <- c(0.5, 0.7, 0.8, 0.95)
 fecundities <- c(0, 0, 0.05, 0.55)
 
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
-time_horzion = 30
+time_horzion = 50
 coeff_var_environ = 0.10
 fatal_constant = "h"
 pop_size_type = "Ntotal"
 
-cumuated_impacts = TRUE
+cumuated_impacts = FALSE
 
-onset_year = 2000 + c(1, 3, 7, 15, 20)
+onset_year = c(2010, 2013, 2016)
 onset_time = onset_year - min(onset_year) + 1
 
-DD_params <- list(rMAX = NULL, K = 1200, theta = 1)
+# Pop size total
+sum(pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = survivals, f = fecundities))
+
+
+# Define K
+carrying_capacity = 500
+theta = 1
+K = pop_vector(pop_size = carrying_capacity, pop_size_type = pop_size_type, s = survivals, f = fecundities) %>% sum
+K
+
+# Define theoretical rMAX for the species
+rMAX_species <- rMAX_spp(surv = tail(survivals,1), afr = min(which(fecundities != 0)))
+rMAX_species
+
+##  Avoid unrealistic scenarios
+pop_growth_mean <- min(1 + rMAX_species, pop_growth_mean)
+pop_growth_mean
+
+
+
 
 ##--------------------------------------------
-##  Calibration : FYI, for table dsiply     --
+##  Calibration                             --
 ##--------------------------------------------
 # Calibrate vital rates to match the the desired lambda
 inits <- init_calib(s = survivals, f = fecundities, lam0 = pop_growth_mean)
 vr_calibrated <- calibrate_params(inits = inits, f = fecundities, s = survivals, lam0 = pop_growth_mean)
 s_calibrated <- head(vr_calibrated, length(survivals))
 f_calibrated <- tail(vr_calibrated, length(fecundities))
+
+build_Leslie(s = s_calibrated, f = f_calibrated) %>% lambda
+
+
+
+
 
 ##==============================================================================
 ##                         Analyses (simulations)                             ==
@@ -50,33 +75,19 @@ run0 <- run_simul(nsim, cumuated_impacts,
                   pop_size_mean, pop_size_se, pop_size_type,
                   pop_growth_mean, pop_growth_se,
                   survivals = s_calibrated, fecundities = f_calibrated,
-                  DD_params = DD_params,
+                  carrying_capacity = carrying_capacity, theta = theta,
+                  rMAX_species = rMAX_species,
                   model_demo, time_horzion, coeff_var_environ, fatal_constant)
 
 
-# save(run0, file = "./data/run0.rda")
-names(run0)
-run0$time_run
-# saved time (ratio): 493/12
-
 N <- run0$N ; dim(N)
-out <- get_metrics(N, cumuated_impacts = cumuated_impacts)
-names(out)
-
-out$warning
-names(out$scenario)
-
-fatalities_mean
-out$indiv_farm$impact[time_horzion,,]
-
-out$scenario$impact[time_horzion,,]
-out$scenario$Pext
-out$scenario$DR_Pext
-
 plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
+abline(h = K)
 
-p <- plot_impact(N, onset_year = onset_year , xlab = "Annee", ylab = "Impact relatif")
-p
 
+colSums(N[,,,]) %>% max
+
+# plot_impact(N, onset_year = onset_year , xlab = "Annee", ylab = "Impact relatif")
+#plot_impact(N = N, xlab = "year", ylab = "pop size")
 #source("draws_histog.R")
 #draws_histog(draws = run0$lambdas, mu = pop_growth_mean, se = pop_growth_se)

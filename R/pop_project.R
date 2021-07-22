@@ -55,6 +55,7 @@ pop_project <- function(fatalities,
   # Number of fatalities scenario
   nsc <- length(fatalities)
 
+
   # Initiate Pop Size (output) Array
   N <- array(NA, dim = c(nac, nyr, nsc), dimnames = list(paste0("age", 1:nac),
                                                          paste0("year", 1:nyr),
@@ -77,7 +78,8 @@ pop_project <- function(fatalities,
     }
 
     # Sample a seed for RNG
-    seed <- runif(1, 0, 1e6)
+    seed <- ((((Sys.time() %>% as.numeric) %% 1e5) * 1e5) %% 1e5) %>% round
+      #runif(1, 0, 1e6)
 
     ## Projection : apply the LESLIE matrix calculation forward
     # Scenario 0

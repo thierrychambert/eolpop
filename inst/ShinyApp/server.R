@@ -16,8 +16,7 @@ server <- function(input, output){
     shinyjs::hide("pop_size_se")
     shinyjs::hide("pop_size_mat_expert")
     shinyjs::hide("carrying_cap_input_type")
-    shinyjs::hide("carrying_cap_mean")
-    shinyjs::hide("carrying_cap_se")
+    shinyjs::hide("carrying_capacity")
     shinyjs::hide("carrying_cap_mat_expert")
     shinyjs::hide("lambda_input_type")
     shinyjs::hide("pop_growth_mean")
@@ -75,8 +74,7 @@ server <- function(input, output){
     if(input$button_carrying_cap%%2 == 1){
       shinyjs::show("carrying_cap_input_type")
       if(input$carrying_cap_input_type == "Valeurs"){
-        shinyjs::show("carrying_cap_mean")
-        shinyjs::show("carrying_cap_se")
+        shinyjs::show("carrying_capacity")
       }
       if(input$carrying_cap_input_type == "Elicitation d'expert"){
         shinyjs::show("carrying_cap_mat_expert")
@@ -115,17 +113,27 @@ server <- function(input, output){
 
   ## Output
 
-  out <- reactiveValues(N1 = NULL, fatalities_mean = NULL, fecundities = NULL, survivals = NULL,
-                        cumulated_impacts = NULL, onset_time = NULL, onset_year = NULL,
-                        DD_params = NULL)
+  param <- reactiveValues(N1 = NULL,
+                          fatalities_mean = NULL,
+                          fecundities = NULL,
+                          survivals = NULL,
+                          s_calibrated = NULL,
+                          f_calibrated = NULL,
+                          vr_calibrated = NULL,
+                          cumulated_impacts = NULL,
+                          onset_time = NULL,
+                          onset_year = NULL,
+                          carrying_capacity = NULL,
+                          rMAX_species = rMAX_species,
+                          theta = theta)
 
   # Reactive values (cumulated impacts, fatalities mean, fatalities se, onset_time, survivals mean, fecundities mean)
 
   observeEvent({input$run}, {
     if(input$analysis_choice == "scenario"){
-      out$cumulated_impacts = FALSE
+      param$cumulated_impacts = FALSE
     } else {
-      out$cumulated_impacts = TRUE
+      param$cumulated_impacts = TRUE
     }
   })
 
@@ -133,12 +141,12 @@ server <- function(input, output){
 
   observeEvent({input$run}, {
     if(input$analysis_choice == "scenario"){
-      out$fatalities_mean <- c(0, input$fatalities_mean)
-      out$onset_time = NULL
+      param$fatalities_mean <- c(0, input$fatalities_mean)
+      param$onset_time = NULL
     } else {
-      out$fatalities_mean <- c(0, input$fatalities_mat_cumulated[,1])
-      out$onset_year <- c(min(input$fatalities_mat_cumulated[,3]), input$fatalities_mat_cumulated[,3])
-      out$onset_time <- out$onset_year - min(out$onset_year) + 1
+      param$fatalities_mean <- c(0, input$fatalities_mat_cumulated[,1])
+      param$onset_year <- c(min(input$fatalities_mat_cumulated[,3]), input$fatalities_mat_cumulated[,3])
+      param$onset_time <- param$onset_year - min(param$onset_year) + 1
     }
   })
 
@@ -146,27 +154,49 @@ server <- function(input, output){
 
   observeEvent({input$run}, {
     if(input$analysis_choice == "scenario"){
-      out$fatalities_se <- input$fatalities_se
+      param$fatalities_se <- c(0, input$fatalities_se)
     } else {
-      out$fatalities_se <- c(min(input$fatalities_mat_cumulated[,2]), input$fatalities_mat_cumulated[,2])
+      param$fatalities_se <- c(0, input$fatalities_mat_cumulated[,2])
     }
   })
 
-  # Survivals and fecundities means
+  # Survivals and fecundities
 
   observeEvent({input$run}, {
     if(input$fill_type_vr == "Manuelle"){
-      out$survivals <- input$mat_fill_vr[,1]
-      out$fecundities <- input$mat_fill_vr[,2]
+      param$survivals <- input$mat_fill_vr[,1]
+      param$fecundities <- input$mat_fill_vr[,2]
     } else {
-      out$survivals <- c(0.5, 0.7, 0.8, 0.95)
-      out$fecundities <- c(0, 0, 0.05, 0.55)
+      param$survivals <- survivals
+      param$fecundities <- fecundities
     }
   })
 
-  # observe({
-  #   DD_params$K <- input$carrying_cap_mean
-  # })
+  # Survival and fecundity calibration
+  observeEvent({
+    input$run
+    #input$species_choice
+    #input$pop_growth_mean
+  },{
+
+    ##  Avoid unrealistic scenarios
+    pop_growth_mean <- min(1 + param$rMAX_species, input$pop_growth_mean)
+
+    param$vr_calibrated <- calibrate_params(
+      inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = input$pop_growth_mean),
+      f = param$fecundities, s = param$survivals, lam0 = input$pop_growth_mean
+      )
+    param$s_calibrated <- head(param$vr_calibrated, length(param$survivals))
+    param$f_calibrated <- tail(param$vr_calibrated, length(param$fecundities))
+  })
+
+
+  # Observe carrying capacity
+  observeEvent({
+    input$run
+  },{
+    param$carrying_capacity = input$carrying_capacity
+  })
 
   # End of reactive
 
@@ -175,11 +205,30 @@ server <- function(input, output){
   observeEvent({
     input$run
   }, {
-    out$N1 <- run_simul(nsim = 10, cumuated_impacts = out$cumulated_impacts, onset_time = out$onset_time, fatalities_mean = out$fatalities_mean,
-                        fatalities_se = input$fatalities_se*out$fatalities_mean, DD_params = DD_params,
-                        pop_size_type = input$pop_size_type, pop_size_mean = input$pop_size_mean, pop_size_se = input$pop_size_se,
-                        pop_growth_mean = input$pop_growth_mean, pop_growth_se = input$pop_growth_se, survivals = out$survivals,
-                        fecundities = out$fecundities, model_demo = NULL, time_horzion = 30, coeff_var_environ = 0.1,
+    param$N1 <- run_simul(nsim = input$nsim,
+                        cumuated_impacts = param$cumulated_impacts,
+
+                        fatalities_mean = param$fatalities_mean,
+                        fatalities_se = param$fatalities_se,
+                        onset_time = param$onset_time,
+
+                        pop_size_mean = input$pop_size_mean,
+                        pop_size_se = input$pop_size_se,
+                        pop_size_type = input$pop_size_type,
+
+                        pop_growth_mean = input$pop_growth_mean,
+                        pop_growth_se = input$pop_growth_se,
+
+                        survivals = param$s_calibrated,
+                        fecundities = param$f_calibrated,
+
+                        carrying_capacity = param$carrying_capacity,
+                        theta = param$theta,
+                        rMAX_species = param$rMAX_species,
+
+                        model_demo = NULL,
+                        time_horzion = time_horzion,
+                        coeff_var_environ = coeff_var_environ,
                         fatal_constant = input$fatal_constant)
   })
 
@@ -187,7 +236,7 @@ server <- function(input, output){
   # Plot Impacts
 
   plot_out_impact <- function(){
-    if(is.null(out$N1)) {} else {plot_impact(N = out$N1$N, xlab = "year", ylab = "pop size")}
+    if(is.null(param$N1)) {} else {plot_impact(N = param$N1$N, xlab = "year", ylab = "pop size")}
   }
 
   output$graph_impact <- renderPlot({
@@ -197,7 +246,7 @@ server <- function(input, output){
   # Plot trajectories
 
   plot_out_traj <- function(){
-    if(is.null(out$N1)) {} else {plot_traj(N = out$N1$N, xlab = "year", ylab = "pop size")}
+    if(is.null(param$N1)) {} else {plot_traj(N = param$N1$N, xlab = "year", ylab = "pop size")}
   }
 
   output$graph_traj <- renderPlot({
@@ -214,7 +263,7 @@ server <- function(input, output){
     weights = t_mat_expert[2,]
 
     out <- elicitation(vals, Cp, weights)
-    return(list(out = out, mean = out$mean_smooth, SE = sqrt(out$var_smooth)))
+    return(list(out = out, mean = param$mean_smooth, SE = sqrt(param$var_smooth)))
   }
 
   func_eli_plot <- function(out){
@@ -257,8 +306,7 @@ server <- function(input, output){
   output$pop_size_mean_info <- renderText({paste0("Moyenne Taille de pop : ", input$pop_size_mean)})
   output$pop_size_se_info <- renderText({paste0("Ecart-type Taille de pop : ", input$pop_size_se)})
 
-  output$carrying_cap_mean_info <- renderText({paste0("Moyenne Capacité de charge : ", input$carrying_cap_mean)})
-  output$carrying_cap_se_info <- renderText({paste0("Ecart-type Capacité de charge : ", input$carrying_cap_se)})
+  output$carrying_capacity_info <- renderText({paste0("Moyenne Capacité de charge : ", input$carrying_capacity)})
 
   output$pop_trend_type_info <- renderText({paste0("Type de Tendance de pop : ", input$lambda_input_type)})
   output$pop_trend_mean_info <- renderText({paste0("Moyenne Tendance de pop : ", input$pop_growth_mean)})

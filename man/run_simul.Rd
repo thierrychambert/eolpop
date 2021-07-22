@@ -17,7 +17,9 @@ run_simul(
   pop_growth_se,
   survivals,
   fecundities,
-  DD_params,
+  carrying_capacity,
+  theta = 1,
+  rMAX_species,
   model_demo = NULL,
   time_horzion,
   coeff_var_environ,
@@ -50,7 +52,21 @@ or the Number of Pairs ("Npair"). A stable age distribution is used to infer the
 
 \item{fecundities}{a vector of fecundity values for each age class.}
 
-\item{DD_params}{NULL or a list. Density-dependence parameters (rMAX, K, theta). Only used in DD models M3 and M4.}
+\item{carrying_capacity}{a strictly positive number.
+Carrying capacity (= maximum size that the population can reach). Here, the unit is the same as pop_size_type.
+It can thus be expressed as the total population or the number of pair.}
+
+\item{theta}{a strictly positive number. Parameter defining the shape of the density-dependence relationship.
+The relationship is defined as : r <- rMAX*(1-(N/K)^theta)
+Note lambda = r + 1}
+
+\item{rMAX_species}{the maximum value of rMAX for the species under consideration,
+usually calculated using the Niel & Lebreton (2005) equation.
+It can be calculated using the function rMAX_spp. See ?rMAX_spp for details.
+
+References :
+Niel, C., and J. Lebreton. 2005. Using demographic invariants to detect overharvested bird
+populations from incomplete data. Conservation Biology 19:826–835.}
 
 \item{model_demo}{is NULL, by default, because the model choice will be made inside each iteration (simulation),
 base on the values of N0 and lam0 that are drawn.
@@ -91,13 +107,17 @@ time_horzion = 30
 coeff_var_environ = 0.10
 fatal_constant = "h"
 
-DD_params <- list(rMAX = NULL, K = 1200, theta = 1)
+carrying_capacity = 1200
+theta = 1
+rMAX_species <- 0.15
 
 run_simul(nsim = 10, cumuated_impacts = FALSE,
            fatalities_mean, fatalities_se, onset_time = NULL,
            pop_size_mean, pop_size_se, pop_size_type,
            pop_growth_mean, pop_growth_se,
-           survivals, fecundities, DD_params = DD_params,
+           survivals, fecundities,
+           carrying_capacity, theta,
+           rMAX_species,
            model_demo = NULL, time_horzion, coeff_var_environ, fatal_constant)
 
 
