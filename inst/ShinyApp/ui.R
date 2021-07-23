@@ -8,7 +8,7 @@ library(tidyverse)
 library(eolpop)
 
 
-#â™  Species data / list
+#??? Species data / list
 species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")
 species_list <- unique(as.character(species_data$NomEspece))
 
@@ -37,17 +37,17 @@ rMAX_species
 ##--------------------------------------------
 ui <- fluidPage(
   useShinyjs(),
-  titlePanel("eolpop : Impact demographique des Ã©oliennes"),
+  titlePanel("eolpop : Impact demographique des éoliennes"),
 
   # Creation of the first page (select species, analysis type choice)
 
   wellPanel(
     selectInput(inputId = "species_list",
-                h4(strong("SÃ©lection d'une espÃ¨ce ou groupe d'espÃ¨ces")),
+                h4(strong("Sélection d'une espèce ou groupe d'espèces")),
                 choices = species_list),
     radioButtons(inputId = "analysis_choice",
-                 h4(strong("SÃ©lectionner un type d'analyse")),
-                 choices = c("Impacts non cumulÃ©s" = "scenario", "Impacts cumulÃ©s" = "cumulated"))
+                 h4(strong("Sélectionner un type d'analyse")),
+                 choices = c("Impacts non cumulés" = "scenario", "Impacts cumulés" = "cumulated"))
   ), # End wellPanel
 
 
@@ -59,7 +59,7 @@ ui <- fluidPage(
     fluidRow(
       column(width = 6,
              textOutput(outputId = "specie_name"),
-             h4("MortalitÃ©s"),
+             h4("Mortalités"),
              textOutput(outputId = "fatalities_mean_info"),
              textOutput(outputId = "fatalities_se_info"),
              textOutput(outputId = "fatalities_expert_info"),
@@ -69,7 +69,7 @@ ui <- fluidPage(
              textOutput(outputId = "pop_size_expert_info")),
       fluidRow(
         column(width = 6,
-               h4("CapacitÃ© de charge"),
+               h4("Capacité de charge"),
                textOutput(outputId = "carrying_capacity_info"),
                textOutput(outputId = "carrying_cap_expert_info"),
                h4("Tendance de la population"),
@@ -92,25 +92,25 @@ ui <- fluidPage(
       ##--------------------------------------------
 
       actionButton(inputId = "button_fatalities",
-                   label = "MortalitÃ©s"),
+                   label = "Mortalités"),
       radioButtons(inputId = "fatal_constant",
-                   label = h4("ModÃ©lisation"),
-                   choices = c("Taux de mortalitÃ©s (h) constant" = "h",
-                               "Nombre de mortalitÃ©s (M) constant" = "M")),
+                   label = h4("Modélisation"),
+                   choices = c("Taux de mortalités (h) constant" = "h",
+                               "Nombre de mortalités (M) constant" = "M")),
 
       ### Part for non-cumulated impacts
       # Input type
       radioButtons(inputId = "fatalities_input_type",
-                   label = h4("Source des donnÃ©es"),
+                   label = h4("Source des données"),
                    choices = c("Valeurs", "Elicitation d'expert")),
 
       # Values
       numericInput(inputId = "fatalities_mean",
-                   label = "Moyenne des mortalitÃ©s annuelles",
+                   label = "Moyenne des mortalités annuelles",
                    value = 5,
                    min = 0, max = Inf, step = 0.5),
       numericInput(inputId = "fatalities_se",
-                   label = "Ecart-type des mortalitÃ©s annuelles",
+                   label = "Ecart-type des mortalités annuelles",
                    value = 0.05,
                    min = 0, max = Inf, step = 0.1),
 
@@ -124,14 +124,14 @@ ui <- fluidPage(
       ### Part for cumulated impacts
 
       numericInput(inputId = "farm_number_cumulated",
-                   label = "Nombre de parcs Ã©oliens",
+                   label = "Nombre de parcs éoliens",
                    value = 2, min = 2, max = Inf, step = 1),
       matrixInput(inputId = "fatalities_mat_cumulated",
                   value = matrix(data = data_fatalities, 3, 3,
                                  dimnames = list(c("#1", "#2", "#3"),
-                                                 c("Moyennes des mortalitÃ©s annuelles",
-                                                   "Ecart-type des mortalitÃ©s annuelles",
-                                                   "AnnÃ©e de mise en service du parc"))),
+                                                 c("Moyennes des mortalités annuelles",
+                                                   "Ecart-type des mortalités annuelles",
+                                                   "Année de mise en service du parc"))),
                   class = "numeric",
                   rows = list(names = TRUE),
                   cols = list(names = TRUE)),
@@ -146,7 +146,7 @@ ui <- fluidPage(
                    label = "Taille de la population"),
 
       radioButtons(inputId = "pop_size_type",
-                   label = h4("UnitÃ©"),
+                   label = h4("Unité"),
                    choices = c("Nombre de couple" = "Npair", "Effectif total" = "Ntotal")),
 
       radioButtons(inputId = "pop_size_input_type",
@@ -179,14 +179,14 @@ ui <- fluidPage(
 
       br(" "),
       actionButton(inputId = "button_carrying_cap",
-                   label = "CapacitÃ© de charge"),
+                   label = "Capacité de charge"),
 
       radioButtons(inputId = "carrying_cap_input_type",
-                   label = h4("Type d'unitÃ©"),
+                   label = h4("Type d'unité"),
                    choices = c("Valeurs", "Elicitation d'expert")),
 
       numericInput(inputId = "carrying_capacity",
-                   label = "CapacitÃ© de charge",
+                   label = "Capacité de charge",
                    value = 1000,
                    min = 0, max = Inf, step = 100),
 
@@ -206,7 +206,7 @@ ui <- fluidPage(
 
       radioButtons(inputId = "lambda_input_type",
                    label = h4("Type de tendance"),
-                   choices = c("Taux de croissance", "Elicitation d'expert", "Tendance locale ou rÃ©gionale")),
+                   choices = c("Taux de croissance", "Elicitation d'expert", "Tendance locale ou régionale")),
 
       numericInput(inputId = "pop_growth_mean",
                    label = "Moyenne de la croissance de la population",
@@ -226,7 +226,7 @@ ui <- fluidPage(
 
       radioButtons(inputId = "pop_trend",
                    label = h4("Tendance de la population"),
-                   choices = c("Croissance", "Stable", "DÃ©clin")),
+                   choices = c("Croissance", "Stable", "Déclin")),
 
       radioButtons(inputId = "pop_trend_strength",
                    label = NULL,
@@ -240,20 +240,20 @@ ui <- fluidPage(
 
       br(" "),
       actionButton(inputId = "button_vital_rates",
-                   label = "ParamÃ¨tres dÃ©mographiques"),
+                   label = "Paramètres démographiques"),
 
       radioButtons(inputId = "fill_type_vr",
                    label = "Type de saisie",
                    choices = c("Automatique", "Manuelle")),
 
       matrixInput(inputId = "mat_display_vr",
-                  value = matrix("", 4, 2, dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "FÃ©conditÃ©"))),
+                  value = matrix("", 4, 2, dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "Fécondité"))),
                   class = "numeric",
                   rows = list(names = TRUE),
                   cols = list(names = TRUE)),
 
       matrixInput(inputId = "mat_fill_vr",
-                  value = matrix(data = data_vr, 4, 2, dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "FÃ©conditÃ©"))),
+                  value = matrix(data = data_vr, 4, 2, dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "Fécondité"))),
                   class = "numeric",
                   rows = list(names = TRUE),
                   cols = list(names = TRUE))
@@ -277,33 +277,33 @@ ui <- fluidPage(
                  br(),
                  actionButton(inputId = "run", label = "Lancer l'analyse"),
                  hr(),
-                 h4("Graphique : Impact relatif de chaque scÃ©nario", align = "center"),
+                 h4("Graphique : Impact relatif de chaque scénario", align = "center"),
                  plotOutput("graph_impact", width = "100%", height = "550px"),
                  hr(),
-                 h4("Graphique : Trajectoire dÃ©mographique", align = "center"),
+                 h4("Graphique : Trajectoire démographique", align = "center"),
                  plotOutput("graph_traj", width = "100%", height = "550px")),
 
-        tabPanel(title = "Distribution paramÃ¨tres",
+        tabPanel(title = "Distribution paramètres",
                  br(),
                  actionButton(inputId = "run_expert", label = "Analyse"),
                  br(),
                  hr(),
-                 h4("#Graphe Ã©licitation d'expert pour les mortalitÃ©s", align = "center"),
+                 h4("#Graphe élicitation d'expert pour les mortalités", align = "center"),
                  textOutput(outputId = "fatalities_expert_mean"),
                  textOutput(outputId = "fatalities_expert_sqrt_var"),
                  plotOutput(outputId = "fatalities_expert_plot"),
                  hr(),
-                 h4("#Graphe Ã©licitation d'expert pour la taille de la population", align = "center"),
+                 h4("#Graphe élicitation d'expert pour la taille de la population", align = "center"),
                  textOutput(outputId = "pop_size_expert_mean"),
                  textOutput(outputId = "pop_size_expert_sqrt_var"),
                  plotOutput(outputId = "pop_size_expert_plot"),
                  hr(),
-                 h4("#Graphe Ã©licitation d'expert pour la capacitÃ© de charge", align = "center"),
+                 h4("#Graphe élicitation d'expert pour la capacité de charge", align = "center"),
                  textOutput(outputId = "carrying_cap_expert_mean"),
                  textOutput(outputId = "carrying_cap_expert_sqrt_var"),
                  plotOutput(outputId = "carrying_cap_expert_plot"),
                  hr(),
-                 h4("#Graphe Ã©licitation d'expert pour la tendance de la population", align = "center"),
+                 h4("#Graphe élicitation d'expert pour la tendance de la population", align = "center"),
                  textOutput(outputId = "pop_growth_expert_mean"),
                  textOutput(outputId = "pop_growth_expert_sqrt_var"),
                  plotOutput(outputId = "pop_growth_expert_plot"),
@@ -312,16 +312,16 @@ ui <- fluidPage(
         tabPanel(title = "Rapport",
                  br(),
                  radioButtons(inputId = "lifestyle",
-                              h4("Mode de vie de l'espÃ¨ce"),
-                              choices = c("SÃ©dentaire", "Non-sÃ©dentaire nicheur", "Non-sÃ©dentaire hivernant", "Migrateur de passage")),
+                              h4("Mode de vie de l'espèce"),
+                              choices = c("Sédentaire", "Non-sédentaire nicheur", "Non-sédentaire hivernant", "Migrateur de passage")),
                  numericInput(inputId = "wind_turbines",
-                              h4("Nombre d'Ã©oliennes"),
+                              h4("Nombre d'éoliennes"),
                               value = 5, min = 0, max = Inf, step = 1),
                  numericInput(inputId = "farm_number",
                               h4("Nombre de parcs"),
                               value = 1, min = 0, max = Inf, step = 1),
                  numericInput(inputId = "wind_turbines_2",
-                              h4("Nombre d'Ã©oliennes"),
+                              h4("Nombre d'éoliennes"),
                               value = 1, min = 0, max = Inf, step = 1)
 
         ) # End tabPanel

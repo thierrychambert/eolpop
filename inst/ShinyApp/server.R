@@ -92,7 +92,7 @@ server <- function(input, output){
       if(input$lambda_input_type == "Elicitation d'expert"){
         shinyjs::show("pop_growth_mat_expert")
       }
-      if(input$lambda_input_type == "Tendance locale ou rÃ©gionale"){
+      if(input$lambda_input_type == "Tendance locale ou régionale"){
         shinyjs::show("pop_trend")
         shinyjs::show("pop_trend_strength")
       }
@@ -307,13 +307,13 @@ server <- function(input, output){
 
   # Info outputs
 
-  output$fatalities_mean_info <- renderText({paste0("Moyenne des mortalitÃ©s : ", input$fatalities_mean)})
-  output$fatalities_se_info <- renderText({paste0("Ecart-type des mortalitÃ©s : ", input$fatalities_se)})
+  output$fatalities_mean_info <- renderText({paste0("Moyenne des mortalités : ", input$fatalities_mean)})
+  output$fatalities_se_info <- renderText({paste0("Ecart-type des mortalités : ", input$fatalities_se)})
 
   output$pop_size_mean_info <- renderText({paste0("Moyenne Taille de pop : ", input$pop_size_mean)})
   output$pop_size_se_info <- renderText({paste0("Ecart-type Taille de pop : ", input$pop_size_se)})
 
-  output$carrying_capacity_info <- renderText({paste0("Moyenne CapacitÃ© de charge : ", input$carrying_capacity)})
+  output$carrying_capacity_info <- renderText({paste0("Moyenne Capacité de charge : ", input$carrying_capacity)})
 
   output$pop_trend_type_info <- renderText({paste0("Type de Tendance de pop : ", input$lambda_input_type)})
   output$pop_trend_mean_info <- renderText({paste0("Moyenne Tendance de pop : ", param$pop_growth_mean)})
