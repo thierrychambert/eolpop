@@ -13,7 +13,7 @@ source("./inst/ShinyApp/param_fixes.R")
 species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")
 species_list <- species_data$NomEspece
 
-data_sf <- read.csv("./survivals_fecundities_species.csv", sep = ";", encoding = "UTF-8")
+data_sf <- read.csv("./inst/ShinyApp/survivals_fecundities_species.csv", sep = ";", encoding = "UTF-8")
 
 
 # Fixed parameters (for now)
