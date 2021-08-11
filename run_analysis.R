@@ -26,7 +26,7 @@ coeff_var_environ = 0.10
 fatal_constant = "M"
 pop_size_type = "Npair"
 
-cumuated_impacts = TRUE
+cumulated_impacts = TRUE
 
 onset_year = c(2010, 2013, 2016)
 onset_time = onset_year - min(onset_year) + 1
@@ -68,7 +68,7 @@ build_Leslie(s = s_calibrated, f = f_calibrated) %>% lambda
 ##==============================================================================
 ##                         Analyses (simulations)                             ==
 ##==============================================================================
-run0 <- run_simul(nsim, cumuated_impacts,
+run0 <- run_simul(nsim, cumulated_impacts,
                   fatalities_mean, fatalities_se, onset_time,
                   pop_size_mean, pop_size_se, pop_size_type,
                   pop_growth_mean, pop_growth_se,
@@ -80,7 +80,7 @@ run0 <- run_simul(nsim, cumuated_impacts,
 
 
 
-
+names(run0)
 N <- run0$N ; dim(N)
 plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
 abline(h = K)
@@ -88,6 +88,11 @@ abline(h = K)
 colSums(N[,,,]) %>% max
 
 plot_impact(N, onset_year = onset_year , xlab = "Annee", ylab = "Impact relatif")
+
+
+N <- run0$N
+output <- get_metrics(N, cumuated_impacts = cumulated_impacts)
+output$scenario$Pext
 
 #plot_impact(N = N, xlab = "year", ylab = "pop size")
 #source("draws_histog.R")
