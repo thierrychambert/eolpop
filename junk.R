@@ -1,233 +1,284 @@
+rm(list = ls(all.names = TRUE))
+graphics.off()
+
+
+## Libraries
 library(eolpop)
 
-fatalities_mean = c(0, 5, 10, 15, 20)
-fatalities_se = fatalities_mean*0.05
+## Inputs
+nsim = 10
+
+fatalities_mean = c(0, 10, 5, 8)
+fatalities_se = c(0, 0.05, 0.05, 0.05)
 
 pop_size_mean = 200
-pop_size_se = 30
-pop_size_type = "Npair"
+pop_size_se = 25
 
 pop_growth_mean = 1
-pop_growth_se = 0.03
+pop_growth_se = 0
 
 survivals <- c(0.5, 0.7, 0.8, 0.95)
-
 fecundities <- c(0, 0, 0.05, 0.55)
 
-DD_params <- list(rMAX = NULL, K = 1200, theta = 1)
-
-time_horzion = 30
+model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
+time_horzion = 50
 coeff_var_environ = 0.10
-fatal_constant = "h"
+fatal_constant = "M"
+pop_size_type = "Npair"
 
-run_test <- run_simul(nsim = 10, cumuated_impacts = FALSE,
-                      fatalities_mean, fatalities_se, onset_time = NULL,
-                      pop_size_mean, pop_size_se, pop_size_type,
-                      pop_growth_mean, pop_growth_se,
-                      survivals, fecundities, DD_params = DD_params,
-                      model_demo = NULL, time_horzion, coeff_var_environ, fatal_constant)
+cumuated_impacts = TRUE
 
+onset_year = c(2010, 2013, 2016)
+onset_time = onset_year - min(onset_year) + 1
+onset_time = c(min(onset_time), onset_time)
 
+# Pop size total
+sum(pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = survivals, f = fecundities))
 
-run_test
-run0 <- run_test
 
+# Define K
+carrying_capacity = 500
+theta = 1
+K = pop_vector(pop_size = carrying_capacity, pop_size_type = pop_size_type, s = survivals, f = fecundities) %>% sum
+K
 
+# Define theoretical rMAX for the species
+rMAX_species <- rMAX_spp(surv = tail(survivals,1), afr = min(which(fecundities != 0)))
+rMAX_species
 
+##  Avoid unrealistic scenarios
+pop_growth_mean <- min(1 + rMAX_species, pop_growth_mean)
+pop_growth_mean
 
 
+##--------------------------------------------
+##  Calibration                             --
+##--------------------------------------------
+# Calibrate vital rates to match the the desired lambda
+inits <- init_calib(s = survivals, f = fecundities, lam0 = pop_growth_mean)
+vr_calibrated <- calibrate_params(inits = inits, f = fecundities, s = survivals, lam0 = pop_growth_mean)
+s_calibrated <- head(vr_calibrated, length(survivals))
+f_calibrated <- tail(vr_calibrated, length(fecundities))
 
+build_Leslie(s = s_calibrated, f = f_calibrated) %>% lambda
 
+survivals = s_calibrated
+fecundities = f_calibrated
 
 
 
 
 
 
+#################################################################################################################
 
+##--------------------------------------------
+##  run simul                               --
+##--------------------------------------------
 
+# Create object to store DD parameters
+DD_params <- list()
 
+# Fill the list of DD parameters
+DD_params$K <- NULL
+DD_params$theta <- theta
+DD_params$rMAX <- rMAX_species
 
+# Coefficient of variation for environment stochasticity
+cv_env <- coeff_var_environ
 
+# Number of years
+nyr <- time_horzion
 
+# Number of age classes
+nac <- length(survivals)
 
+# Number of fatalities scenario (+1 because we include a base scenario of NO fatality)
+nsc <- length(fatalities_mean)
 
+# Initiate Pop Size (output) Array
+N <- array(NA, dim = c(nac, nyr, nsc, nsim), dimnames = list(paste0("age", 1:nac),
+                                                             paste0("year", 1:nyr),
+                                                             paste0("sc", (1:nsc)-1)
+))
+# object to store values of population growth drawn at each iteration
+lam_it <- rep(NA, nsim)
+sim=1
 
 
+##########################
 
+    ## PARAMETER UNCERTAINTY : draw values for each input
+    # 1. Nomber of fatalities
+    M <- NA
+    for(j in 1:nsc){
+        M[j] <- sample_gamma(1, mu = fatalities_mean[j], sd = fatalities_se[j])
+    }
 
-library(dplyr)
-library(ggplot2)
+    # 2. Population size : draw and distribute by age class
+    N0 <- sample_gamma(1, mu = pop_size_mean, sd =  pop_size_se) %>%
+      round %>%
+      pop_vector(pop_size_type = pop_size_type, s = survivals, f = fecundities)
 
-# Get metrics and dimensions
-out <- get_metrics(N)$scenario$impact_sc
-TH <- dim(N)[2]
-nsc <- dim(N)[3]
+    # Define K
+    K <- sum(pop_vector(pop_size = carrying_capacity, pop_size_type = pop_size_type, s = survivals, f = fecundities))
+    if(K < sum(N0)) K <- round(sum(N0)*1.05)
+    DD_params$K <- K
 
-# Build dataframe
-df <- as.data.frame(cbind(year = 1:nrow(out), out[,,1], scenario = 1))
-for(j in 2:dim(out)[3]) df <- rbind(df, cbind(year = 1:nrow(out), out[,,j], scenario = j))
 
-## Define Graphic Parameters
-size = 1.5
 
-# Plot lines
-p <-
-  ggplot(data = df, aes(x = year, y = avg)) +
-  geom_line(data = filter(df, scenario > 1), size = size, aes(colour = factor(scenario))) +
-  geom_line(data = filter(df, scenario == 1), size = size, colour = "black")
 
-# Plot CIs
-p <- p + geom_ribbon(data = filter(df, scenario > 1),
-                     aes(ymin = uci, ymax = lci, fill = factor(scenario)), linetype = 0, alpha = 0.100)
 
-# Add legend
-Legend <- "parc"
-nsc <- max(df$scenario)-1
-p <- p + labs(x = "Annee", y = "Impact relatif",
-              col = "Scenario", fill = "Scenario") +
-  scale_color_hue(labels = paste(Legend, 1:nsc), aesthetics = c("colour", "fill"))
+    if(pop_growth_se > 0){
 
+      # 3. Population Growth Rate
+      lam0 <- sample_gamma(1, mu = pop_growth_mean, sd = pop_growth_se)
 
+      # 4. Calibrate vital rates to match the the desired lambda
+      inits <- init_calib(s = survivals, f = fecundities, lam0 = lam0)
 
+      vr <- calibrate_params(inits = inits, f = fecundities, s = survivals, lam0 = lam0)
+      s <- head(vr, length(survivals))
+      f <- tail(vr, length(fecundities))
+      lam_it[sim] <- lambda(build_Leslie(s,f))
 
+    }else{
 
+      # No parameter uncertainty on population growth
+      s <- survivals
+      f <- fecundities
+      lam_it[sim] <- lambda(build_Leslie(s,f))
 
+    } # End if/else
 
 
+    lam0 > 1+rMAX_species
+    pop_growth_mean
 
 
+    model_demo = NULL
 
+    # Choose the model demographique to use (if choice was not forced)
+    if(is.null(model_demo)){
 
+      ## Define the complete model by default
+      model_demo <- M4_WithDD_WithDemoStoch
 
+      # DECLINING (or stable), but initially LARGE population
+      if(lam_it[sim] <= 1 & sum(N0) > 3000) model_demo <- M1_noDD_noDemoStoch
 
+      # DECLINING  (or stable), and initially SMALL population
+      if(lam_it[sim] <= 1 & sum(N0) <= 3000) model_demo <- M2_noDD_WithDemoStoch
 
 
+      # GROWING population...
+      if(lam_it[sim] > 1){
 
+        # Extract rMAX
+        DD_params$rMAX <- infer_rMAX(K = K, theta = theta,
+                                     pop_size_current = sum(N0), pop_growth_current = lam_it[sim],
+                                     rMAX_theoretical = rMAX_species)
 
-out <- get_metrics(N)$scenario$impact_sc
-TH <- dim(N)[2]
-nsc <- dim(N)[3]
+        # ... and initially LARGE population
+        if(sum(N0) > 500) model_demo <- M3_WithDD_noDemoStoch
 
-library(dplyr)
 
-df <- as.data.frame(cbind(year = 1:nrow(out), out[,,1], scenario = 1))
-for(j in 2:dim(out)[3]) df <- rbind(df, cbind(year = 1:nrow(out), out[,,j], scenario = j))
-dim(df)
-class(df)
-names(df)
+        # ... but initially SMALL population
+        if(sum(N0) <= 500) model_demo <- M4_WithDD_WithDemoStoch
 
-filter(df, scenario == 1)
-filter(df, scenario > 1)
+      } # if lam > 1
 
 
-library(ggplot2)
-library(plotly)
+    } # end if "is.null"
 
-## pars
-size = 1.5
 
-# Plot lines
-p <-
-  ggplot(data = df, aes(x = year, y = avg)) +
-  geom_line(data = filter(df, scenario > 1), size = size, aes(colour = factor(scenario))) +
-  geom_line(data = filter(df, scenario == 1), size = size, colour = "black")
 
-# Plot CIs
-p <- p + geom_ribbon(data = filter(df, scenario > 1),
-                     aes(ymin = uci, ymax = lci, fill = factor(scenario)), linetype = 0, alpha = 0.100)
 
-# Add legend
-Legend <- "parc"
-nsc <- max(df$scenario)-1
-p <- p + labs(x = "Annee", y = "Impact relatif",
-              col = "Scenario", fill = "Scenario") +
-  scale_color_hue(labels = paste(Legend, 1:nsc), aesthetics = c("colour", "fill"))
-p
+    fatalities = M
+#######################################################################
+    ##--------------------------------------------
+    ##  Pop project cumulated                               --
+    ##--------------------------------------------
 
-# Plot lines
-p <-
-  ggplot(data = df, aes(x = year, y = avg)) +
-  geom_line(data = filter(df, scenario > 1), size = size, aes(colour = factor(scenario))) +
-  geom_line(data = filter(df, scenario == 1), size = size, colour = "black")
 
-# Plot CIs
-p <- p + geom_ribbon(data = filter(df, scenario > 1),
-                     aes(ymin = uci, ymax = lci, fill = factor(scenario)), linetype = 0, alpha = 0.100)
 
-# Add legend
-Legend <- "parc"
-nsc <- max(df$scenario)-1
-p <- p + labs(x = "Annee", y = "Impact relatif",
-              col = "Scenario", fill = "Scenario") +
-  scale_color_hue(labels = paste(Legend, 1:nsc)) +
-  scale_fill_hue(labels = paste(Legend, 1:nsc))
+    ## Fatalities taking onset time into account
+    # Initiate matrix
+    Mi <- matrix(fatalities, nrow = length(fatalities), ncol = nyr)
 
-p
-ggplotly(p)
+    # Fatalities from each wind farm
+    for(j in 2:nrow(Mi)){
+      if(onset_time[j] > 1) Mi[j,1:(onset_time[j]-1)] <- 0
+    } # j
 
-rm(fig)
-fig <- ggplotly(p)
-fig
+    # Cumulated Fatalities
+    Mc <- Mi
+    for(j in 2:nrow(Mc)) Mc[j,] <- apply(Mc[(j-1):j,], 2, sum)
 
+    # Initiate Pop Size (output) Array
+    N <- array(0, dim = c(nac, nyr, nsc), dimnames = list(paste0("age", 1:nac),
+                                                           paste0("year", 1:nyr),
+                                                           paste0("scenario", 1:nsc)
+    ))
+    N[,1,] <-  N0
 
 
+    ## Loops over time (years)
+    for(t in 2:nyr){
 
+      # Environmental Stochasticity
+      ss = 1 - rnorm(nac, mean = qlogis(1-s), sd = cv_env/(s)) %>% plogis        ## sample thru the mortality rate : 1 - s
+      ff = rnorm(nac, mean = log(f), sd = cv_env) %>% exp
 
+      # Fatalities : constant number (M) or constant rate (h)
+      if(fatal_constant == "M"){
+        h <- Mc[,t-1]/apply(N[,t-1,], 2, sum)
+      } else {
+        h <- Mc[,t-1]/apply(N[,1,], 2, sum)
+      }
 
-#### Plotly
-p <-
-  ggplot(data = filter(df, scenario > 1), aes(x = year, y = avg)) +
-  geom_line(size = size, aes(colour = factor(scenario)))
+      # Sample a seed for RNG
+      seed <- runif(1, 0, 1e6)
 
+      ## Projection : apply the LESLIE matrix calculation forward
+      # Scenario 0
+      for(j in 1:nsc){
+        set.seed(seed)
+        N[,t,j] <- model_demo(N1 = N[,t-1,j], s = ss, f = ff, h = h[j], DD_params = DD_params)
+      } # j
 
-# Plot CIs
-p <- p + geom_ribbon(aes(ymin = uci, ymax = lci, fill = factor(scenario)),
-                     linetype = 0, alpha = 0.100)
+    } # t
 
-# Add legend
-Legend <- "parc"
-nsc <- max(df$scenario)-1
-p <- p + labs(x = "Annee", y = "Impact relatif",
-              col = "Scenario", fill = "Scenario") +
-  scale_color_hue(labels = paste(Legend, 1:nsc), aesthetics = c("colour", "fill"))
-p
 
-rm(fig)
-fig <- ggplotly(p)
-fig
 
 
-fig <- ggplotly(p)
-fig
 
 
+    t = 31
+    j = 4
 
 
 
-#### Plotly
+    ## M2_noDD_WithDemoStoch
 
-p <-
-  ggplot(data = df, aes(x = year, y = avg)) +
-  geom_line(size = size, aes(colour = factor(scenario)))
-p
+    t = t+1
 
-fig <- ggplotly(p, layerData = 1)
-fig
+    h = sapply(Mc[,t-1]/apply(N[,t-1,], 2, sum), min, 1)
+    h
 
+    #N1 = N[,t,j]
+    #N1 = N2
+    N1 = c(2,1,1,3)
 
-##################
+    # Number of age classes
+    nac = length(s)
 
+    # Survivors (to "natural mortality" (s) and Wind Turbine Fatalities (1-h))
+    S <- rbinom(nac, N1, (1-h)*s)
+    N2 <- c(rep(0, nac-1), tail(S,1)) + c(0, head(S,-1))
 
-p <- ggplot(data = df, aes(x = year, y = avg, colour = factor(scenario)))
-p <- p + geom_line(size = 2)
-p
+    # Births
+    N2[1] <- sum(rpois(nac, f*N2))
 
-p <- p + geom_ribbon(aes(ymin = uci, ymax = lci, fill = factor(scenario)), linetype = 0, alpha = 0.075)
-p
-
-
-#########
-p <- ggplot(data = df, aes(x = year, y = avg, colour = factor(scenario)))
-p <- p + geom_line(size = 2)
-p
+    N2
+    N[,t+1,j] = N2

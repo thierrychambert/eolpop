@@ -26,6 +26,8 @@
 #'
 M1_noDD_noDemoStoch <- function(N1, s, f, h, DD_params = NULL){
 
+  ## M1_noDD_noDemoStoch
+
   # Build the LESLIE matrix
   A <- build_Leslie(s = s, f = f)
 
@@ -67,6 +69,8 @@ M1_noDD_noDemoStoch <- function(N1, s, f, h, DD_params = NULL){
 #' M2_noDD_WithDemoStoch(N1, s, f, h)
 #'
 M2_noDD_WithDemoStoch <- function(N1, s, f, h, DD_params = NULL){
+
+  ## M2_noDD_WithDemoStoch
 
   # Number of age classes
   nac = length(s)
@@ -126,6 +130,8 @@ M2_noDD_WithDemoStoch <- function(N1, s, f, h, DD_params = NULL){
 #'
 M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params){
 
+  ## M3_WithDD_noDemoStoch
+
   # Extract DD parameters from list
   rMAX = DD_params$rMAX
   K = DD_params$K
@@ -142,6 +148,19 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params){
 
   s_Nt <- head(vr_Nt, length(s)) %>% sapply(min, 0.999)
   f_Nt <- tail(vr_Nt, length(f))
+
+
+  ## Check if approximation is close enough to desired lambda
+  if( abs((lambda(build_Leslie(s = s_Nt, f = f_Nt)) - lam_Nt) / lam_Nt) > 0.005 ){
+
+    # If difference is too large : Use optimisation function for better calibration
+    inits <- c(tail(vr_Nt, length(f)), head(vr_Nt, length(s)) %>% sapply(min, 0.999))
+    inits <- inits[inits != 0]
+    vr_calib <- calibrate_params(inits = inits, f = f_Nt, s = s_Nt, lam0 = lam_Nt)
+    s_Nt <- head(vr_calib, length(s_Nt))
+    f_Nt <- tail(vr_calib, length(f_Nt))
+
+  } # if
 
   # Build the LESLIE matrix
   A_Nt <- build_Leslie(s = s_Nt, f = f_Nt)
@@ -186,6 +205,8 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params){
 #'
 M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params){
 
+  ## M4_WithDD_WithDemoStoch
+
   # Extract DD parameters from list
   rMAX = DD_params$rMAX
   K = DD_params$K
@@ -202,6 +223,20 @@ M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params){
 
   s_Nt <- head(vr_Nt, length(s)) %>% sapply(min, 0.999)
   f_Nt <- tail(vr_Nt, length(f))
+
+
+  ## Check if approximation is close enough to desired lambda
+  if( abs((lambda(build_Leslie(s = s_Nt, f = f_Nt)) - lam_Nt) / lam_Nt) > 0.005 ){
+
+    # If difference is too large : Use optimisation function for better calibration
+    inits <- c(tail(vr_Nt, length(f)), head(vr_Nt, length(s)) %>% sapply(min, 0.999))
+    inits <- inits[inits != 0]
+    vr_calib <- calibrate_params(inits = inits, f = f_Nt, s = s_Nt, lam0 = lam_Nt)
+    s_Nt <- head(vr_calib, length(s_Nt))
+    f_Nt <- tail(vr_calib, length(f_Nt))
+
+  } # if
+
 
   # Number of age classes
   nac = length(s)

@@ -23,5 +23,6 @@ Imports:
     popbio,
     RColorBrewer,
     SHELF,
+    shiny,
     stats,
     utils
