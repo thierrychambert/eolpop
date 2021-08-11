@@ -8,7 +8,7 @@ library(tidyverse)
 library(eolpop)
 
 # source("./inst/ShinyApp/f_output.R")
-source("./inst/ShinyApp/param_fixes.R")
+# source("./inst/ShinyApp/param_fixes.R")
 
 
 species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")
@@ -347,5 +347,3 @@ ui <- fluidPage(
 ) # FluidPage
 
 # End UI
-
-shinyApp(ui = ui, server = server)
