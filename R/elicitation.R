@@ -44,6 +44,8 @@
 #'
 elicitation <- function(vals, Cp, weights = 1, lower = 0, upper = Inf){
 
+  vals[vals == 0] <- min(min(vals[vals != 0])/100, 0.0001)
+
   # Get probability of quantiles
   probs <- sapply(X = Cp, FUN = function(Cp) c((1-Cp)/2, 0.5, Cp+(1-Cp)/2))
 
