@@ -1,10 +1,12 @@
 Nom_espece,classes_age,survie,fecondite 
-Aigle botté,Juv 1,0.5,0
-Aigle botté,Juv 2,0.7,0
-Aigle botté,Juv 3,0.8,0.05
-Aigle botté,Adulte,0.95,0.55
-Aigle de Bonelli,Juv 1,0.4,0
-Aigle de Bonelli,Juv 2,0.55,0
-Aigle de Bonelli,Juv 3,0.6,0.05
-Aigle de Bonelli,Juv 4,0.65,0.3
-Aigle de Bonelli,Adulte,0.8,0.4
+Aigle de Bonelli,Juv 1,0.65,0
+Aigle de Bonelli,Juv 2,0.75,0
+Aigle de Bonelli,Juv 3,0.85,0.05
+Aigle de Bonelli,Adulte,0.94,0.4
+Aigle royal,Juv 1,0.5,0
+Aigle royal,Juv 2,0.6,0
+Aigle royal,Juv 3,0.75,0.05
+Aigle royal,Juv 4,0.8,0.35
+Aigle royal,Adulte,0.95,0.55
+Alouette des champs,Juv 1,0.5,0
+Alouette des champs,Adulte,0.5,2.5

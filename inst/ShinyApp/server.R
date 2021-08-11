@@ -545,25 +545,24 @@ server <- function(input, output, session){
 
   ## Update matrix cumulated impact
 
-  observeEvent({input$farm_number_cumulated}, {
-    rows_names <- function(n){
+  observeEvent({
+    input$farm_number_cumulated
+    }, {
+
+    park_names <- function(n){
       v <- c(paste0("Parc n°", c(1:n)))
       return(v)
-    }
+      }
 
-    nrow <- input$farm_number_cumulated
-    number_parks <- rows_names(nrow)
-    # data_fatalities_cumulated <- c(c(input$fatalities_mat_cumulated[,1]),
-    #                               c(input$fatalities_mat_cumulated[,2]),
-    #                               c(input$fatalities_mat_cumulated[,3]))
+    n_row <- input$farm_number_cumulated
 
     updateMatrixInput(session, inputId = "fatalities_mat_cumulated",
-                      value =  matrix("", nrow = nrow, 3,
-                                      dimnames = list(number_parks,
-                                                      c("Moyennes des mortalités annuelles",
-                                                        "Ecart-type des mortalités annuelles",
+                      value =  matrix(init_cumul, nrow = n_row, 3, byrow = TRUE,
+                                      dimnames = list(park_names(n_row),
+                                                      c("Moyenne",
+                                                        "Ecart-type",
                                                         "Année de mise en service du parc"))))
-  })
+    }) # end observEvent
 
   # Survivals and Fecundities
 
@@ -602,6 +601,5 @@ server <- function(input, output, session){
 }
 # End server
 
-shinyApp(ui, server)
 
 

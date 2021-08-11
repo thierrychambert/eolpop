@@ -1,25 +1,24 @@
 rm(list = ls(all.names = TRUE))
 
+## Load libraries
 library(shiny)
 library(shinyjs)
 library(shinyMatrix)
 library(tidyverse)
-
 library(eolpop)
+
 
 # source("./inst/ShinyApp/f_output.R")
 # source("./inst/ShinyApp/param_fixes.R")
 
-
+## Load species list
 species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")
-head(species_data)
+species_list <- unique(as.character(species_data$NomEspece))
+# species_list <- species_data$NomEspece
 
-# species_list <- unique(as.character(species_data$NomEspece))
-species_list <- species_data$NomEspece
-
+## Load survival and fecundities data
 data_sf <- read.csv("./inst/ShinyApp/survivals_fecundities_species.csv", sep = ",")#, encoding = "UTF-8")
-head(data_sf)
-
+(data_sf)
 
 # Fixed parameters (for now)
 nsim = 10
@@ -28,17 +27,48 @@ time_horzion = 30
 survivals <- c(0.5, 0.7, 0.8, 0.95)
 fecundities <- c(0, 0, 0.05, 0.55)
 
-# Data elicitation, fatalities for cumulated impacts, vital rates and DD_params
-data_eli = c("",1, 50, 70, 100, 0.80, "", 0.2, 200, 240, 280, 0.90, "", 0.2, 100, 180, 300, 0.90,"",  0.1, 120, 160, 220, 0.70)
-data_eli_trend = c("", 1, 0.60, 0.66, 0.78, 0.80, "", 0.2, 0.75, 0.83, 0.89, 0.90, "", 0.2, 0.56, 0.67, 0.77, 0.90, "", 0.1, 0.76, 0.89, 0.94, 0.70)
-data_fatalities = c(10, 5, 8, 0.05, 0.05, 0.05, 2010, 2015, 2018)
-data_vr = c(0.5, 0.7, 0.8, 0.95, 0, 0, 0.05, 0.55)
+## Data elicitation pre-fill data
+# fatalities
+eli_fatalities <- c("A", 1.0, 2, 5, 8,  0.80,
+                    "B", 0.2, 0, 3, 6,  0.90,
+                    "C", 0.2, 2, 4, 10, 0.90,
+                    "D", 0.1, 1, 3, 7,  0.70)
+
+# population size
+eli_pop_size <-   c("A", 1.0, 150, 200, 250, 0.80,
+                    "B", 0.5, 120, 180, 240, 0.90,
+                    "C", 0.8, 170, 250, 310, 0.90,
+                    "D", 0.3, 180, 200, 230, 0.70)
+
+# carrying capacity
+eli_carrying_cap <- c("A", 1.0, 500, 700, 1000, 0.80,
+                      "B", 0.5, 1000, 1500, 2000, 0.90,
+                      "C", 0.8, 800, 1200, 1600, 0.90,
+                      "D", 0.3, 100, 1200, 1500, 0.70)
+
+# population growth rate
+eli_pop_growth <- c("A", 1 , 0.95, 0.98, 1.00, 0.95,
+                   "B", 0.2, 0.97, 1.00, 1.01, 0.90,
+                   "C", 0.5, 0.92, 0.96, 0.99, 0.90,
+                   "D", 0.3, 0.90, 0.95, 0.98, 0.70)
+
+## Other pre-fill data
+# fatalities for several wind farms (cumulated impacts)
+init_cumul <- c(10, 5, 8,
+                          0.05, 0.05, 0.05,
+                          2010, 2015, 2018)
+init_cumul_add <- c(3, 0.05, 2020)
+
+
+
+# vital rates
+init_vr = c(survivals, fecundities)
 
 # DD parameters
 theta = 1
 
 # Define theoretical rMAX for the species
-rMAX_species <- rMAX_spp(surv = tail(survivals,1), afr = min(which(fecundities != 0)))
+rMAX_species <- rMAX_spp(surv = tail(survivals, 1), afr = min(which(fecundities != 0)))
 rMAX_species
 
 
@@ -53,7 +83,7 @@ ui <- fluidPage(
 
   wellPanel(
     selectInput(inputId = "species_list",
-                h4(strong("Sélection d'une espèce ou groupe d'espèces")),
+                h4(strong("Sélection d'une espèce")),
                 choices = species_list),
     radioButtons(inputId = "analysis_choice",
                  h4(strong("Sélectionner un type d'analyse")),
@@ -128,7 +158,10 @@ ui <- fluidPage(
 
       # Matrix for expert elicitation
       matrixInput(inputId = "fatalities_mat_expert",
-                  value = matrix(data = data_eli, 4, 6, dimnames = list(c("#1", "#2", "#3", "#4"), c("Nom", "Poids", "Min", "Meilleure Estimation", "Max", "IC (coverage)" )), byrow = TRUE),
+                  value = matrix(data = eli_fatalities, 4, 6,
+                                 dimnames = list(c("#1", "#2", "#3", "#4"),
+                                                 c("Nom", "Poids", "Min", "Best", "Max", "% IC" )),
+                                 byrow = TRUE),
                   class = "numeric",
                   rows = list(names = TRUE),
                   cols = list(names = TRUE)),
@@ -142,10 +175,10 @@ ui <- fluidPage(
                    value = 3, min = 2, max = Inf, step = 1),
 
       matrixInput(inputId = "fatalities_mat_cumulated",
-                  value = matrix(data_fatalities, 3, 3,
+                  value = matrix(init_cumul, 3, 3,
                                  dimnames = list(c(paste0("Parc n°", c(1:3))),
-                                                 c("Moyennes des mortalités annuelles",
-                                                   "Ecart-type des mortalités annuelles",
+                                                 c("Moyenne",
+                                                   "Ecart-type",
                                                    "Année de mise en service du parc"))),
                   class = "numeric",
                   rows = list(names = TRUE),
@@ -179,9 +212,9 @@ ui <- fluidPage(
                    min = 0, max = Inf, step = 1),
 
       matrixInput(inputId = "pop_size_mat_expert",
-                  value = matrix(data = data_eli, 4, 6,
+                  value = matrix(data = eli_pop_size, 4, 6,
                                  dimnames = list(c("#1", "#2", "#3", "#4"),
-                                                 c("Nom", "Poids", "Min", "Best", "Max", "IC" )),
+                                                 c("Nom", "Poids", "Min", "Best", "Max", "% IC" )),
                                  byrow = TRUE),
                   class = "numeric",
                   rows = list(names = TRUE),
@@ -208,7 +241,10 @@ ui <- fluidPage(
                    min = 0, max = Inf, step = 100),
 
       matrixInput(inputId = "carrying_cap_mat_expert",
-                  value = matrix(data = data_eli, 4, 6, dimnames = list(c("#1", "#2", "#3", "#4"), c("Nom", "Poids", "Min", "Meilleure Estimation", "Max", "IC (coverage)" )), byrow = TRUE),
+                  value = matrix(data = eli_carrying_cap, 4, 6,
+                                 dimnames = list(c("#1", "#2", "#3", "#4"),
+                                                 c("Nom", "Poids", "Min", "Best", "Max", "% IC" )),
+                                 byrow = TRUE),
                   class = "numeric",
                   rows = list(names = TRUE),
                   cols = list(names = TRUE)),
@@ -238,7 +274,10 @@ ui <- fluidPage(
                    min = 0, max = Inf, step = 0.01),
 
       matrixInput(inputId = "pop_growth_mat_expert",
-                  value = matrix(data = data_eli_trend, 4, 6, dimnames = list(c("#1", "#2", "#3", "#4"), c("Nom", "Poids", "Min", "Meilleure Estimation", "Max", "IC (coverage)" )), byrow = TRUE),
+                  value = matrix(data = eli_pop_growth, 4, 6,
+                                 dimnames = list(c("#1", "#2", "#3", "#4"),
+                                                 c("Nom", "Poids", "Min", "Best", "Max", "% IC" )),
+                                 byrow = TRUE),
                   class = "numeric",
                   rows = list(names = TRUE),
                   cols = list(names = TRUE)),
@@ -279,7 +318,7 @@ ui <- fluidPage(
                   cols = list(names = TRUE)),
 
       matrixInput(inputId = "mat_fill_vr",
-                  value = matrix(data = data_vr, 4, 2, dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "Fécondité"))),
+                  value = matrix(data = init_vr, 4, 2, dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "Fécondité"))),
                   class = "numeric",
                   rows = list(names = TRUE),
                   cols = list(names = TRUE))
@@ -347,3 +386,4 @@ ui <- fluidPage(
 ) # FluidPage
 
 # End UI
+
