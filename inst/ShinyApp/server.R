@@ -553,15 +553,14 @@ server <- function(input, output, session){
 
     nrow <- input$farm_number_cumulated
     number_parks <- rows_names(nrow)
-    # data_fatalities_cumulated <- c(c(input$fatalities_mat_cumulated[,1]),
-    #                               c(input$fatalities_mat_cumulated[,2]),
-    #                               c(input$fatalities_mat_cumulated[,3]))
+
+    init_cumul_new <- rep(init_cumul_add, nrow)
 
     updateMatrixInput(session, inputId = "fatalities_mat_cumulated",
-                      value =  matrix("", nrow = nrow, 3,
+                      value =  matrix(init_cumul_new, nrow = nrow, 3, byrow = TRUE,
                                       dimnames = list(number_parks,
-                                                      c("Moyennes des mortalités annuelles",
-                                                        "Ecart-type des mortalités annuelles",
+                                                      c("Moyenne",
+                                                        "Ecart-type",
                                                         "Année de mise en service du parc"))))
   })
 
