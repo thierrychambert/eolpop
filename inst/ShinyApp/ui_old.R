@@ -8,6 +8,9 @@ library(tidyverse)
 library(eolpop)
 
 
+# source("./inst/ShinyApp/f_output.R")
+# source("./inst/ShinyApp/param_fixes.R")
+
 ## Load species list
 species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")
 species_list <- unique(as.character(species_data$NomEspece))
@@ -23,10 +26,6 @@ coeff_var_environ = 0.10
 time_horzion = 30
 survivals <- c(0.5, 0.7, 0.8, 0.95)
 fecundities <- c(0, 0, 0.05, 0.55)
-
-#####################
-### Pre-fill data ###
-#####################
 
 ## Data elicitation pre-fill data
 # fatalities
@@ -49,28 +48,27 @@ eli_carrying_cap <- c("A", 1.0, 500, 700, 1000, 0.80,
 
 # population growth rate
 eli_pop_growth <- c("A", 1 , 0.95, 0.98, 1.00, 0.95,
-                    "B", 0.2, 0.97, 1.00, 1.01, 0.90,
-                    "C", 0.5, 0.92, 0.96, 0.99, 0.90,
-                    "D", 0.3, 0.90, 0.95, 0.98, 0.70)
+                   "B", 0.2, 0.97, 1.00, 1.01, 0.90,
+                   "C", 0.5, 0.92, 0.96, 0.99, 0.90,
+                   "D", 0.3, 0.90, 0.95, 0.98, 0.70)
 
 ## Other pre-fill data
 # fatalities for several wind farms (cumulated impacts)
 init_cumul <- c(10, 5, 8,
-                0.05, 0.05, 0.05,
-                2010, 2015, 2018)
-
+                          0.05, 0.05, 0.05,
+                          2010, 2015, 2018)
 init_cumul_add <- c(3, 0.05, 2020)
 
 
 
 # vital rates
-data_vr = c(survivals, fecundities)
+init_vr = c(survivals, fecundities)
 
 # DD parameters
 theta = 1
 
 # Define theoretical rMAX for the species
-rMAX_species <- rMAX_spp(surv = tail(survivals,1), afr = min(which(fecundities != 0)))
+rMAX_species <- rMAX_spp(surv = tail(survivals, 1), afr = min(which(fecundities != 0)))
 rMAX_species
 
 
@@ -85,7 +83,7 @@ ui <- fluidPage(
 
   wellPanel(
     selectInput(inputId = "species_list",
-                h4(strong("Sélection d'une espèce ou groupe d'espèces")),
+                h4(strong("Sélection d'une espèce")),
                 choices = species_list),
     radioButtons(inputId = "analysis_choice",
                  h4(strong("Sélectionner un type d'analyse")),
@@ -320,7 +318,7 @@ ui <- fluidPage(
                   cols = list(names = TRUE)),
 
       matrixInput(inputId = "mat_fill_vr",
-                  value = matrix(data = data_vr, 4, 2, dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "Fécondité"))),
+                  value = matrix(data = init_vr, 4, 2, dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "Fécondité"))),
                   class = "numeric",
                   rows = list(names = TRUE),
                   cols = list(names = TRUE))
@@ -388,3 +386,4 @@ ui <- fluidPage(
 ) # FluidPage
 
 # End UI
+
