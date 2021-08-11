@@ -100,7 +100,7 @@ server <- function(input, output, session){
         shinyjs::show("pop_growth_mat_expert")
         shinyjs::show("pop_growth_run_expert")
       }
-      if(input$lambda_input_type == "Tendance locale ou rÃ©gionale"){
+      if(input$lambda_input_type == "Tendance locale ou régionale"){
         shinyjs::show("pop_trend")
         shinyjs::show("pop_trend_strength")
       }
@@ -225,7 +225,7 @@ server <- function(input, output, session){
           param$onset_time = NULL
           param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE))
         } else {
-          print("#IntÃ©grer un message d'erreur")
+          print("#Intégrer un message d'erreur")
         }
       } else {
         param$fatalities_mean <- c(0, input$fatalities_mean)
@@ -249,7 +249,7 @@ server <- function(input, output, session){
         param$pop_size_mean <- round(param$pop_size_eli_result$mean)
         param$pop_size_se <- round(param$pop_size_eli_result$SE)
       } else {
-        print("#intÃ©grer un message d'erreur")
+        print("#intégrer un message d'erreur")
       }
     } else {
       param$pop_size_mean <- input$pop_size_mean
@@ -267,9 +267,9 @@ server <- function(input, output, session){
         param$pop_growth_mean <- round(min(1 + param$rMAX_species, round(param$pop_growth_eli_result$mean, 2)), 2)
         param$pop_growth_se <- round(param$pop_growth_eli_result$SE, 2)
       } else {
-        print("#intÃ©grer un message d'erreur")
+        print("#intégrer un message d'erreur")
       }
-    } else if(input$lambda_input_type == "Tendance locale ou rÃ©gionale"){
+    } else if(input$lambda_input_type == "Tendance locale ou régionale"){
       if(input$pop_trend == "Croissance") {
         if(input$pop_trend_strength == "Faible") {
           param$pop_growth_mean <- 1.01
@@ -278,7 +278,7 @@ server <- function(input, output, session){
         } else {
           param$pop_growth_mean <- 1.06
         }
-      } else if(input$pop_trend == "DÃ©clin"){
+      } else if(input$pop_trend == "Déclin"){
         if(input$pop_trend_strength == "Faible") {
           param$pop_growth_mean <- 0.99
         } else if(input$pop_trend_strength == "Moyen"){
@@ -335,7 +335,7 @@ server <- function(input, output, session){
       if(!(is.null(param$carrying_cap_eli_result))){
         param$carrying_capacity <- round(param$carrying_cap_eli_result$mean)
       } else {
-        print("#intÃ©grer un message d'erreur")
+        print("#intégrer un message d'erreur")
       }
     } else {
       param$carrying_capacity <- input$carrying_capacity
@@ -420,7 +420,7 @@ server <- function(input, output, session){
     else {
       info <- input$fatalities_mean
     }
-    paste0("Moyenne des mortalitÃ©s : ", info)
+    paste0("Moyenne des mortalités : ", info)
   })
 
   output$fatalities_se_info <- renderText({
@@ -432,7 +432,7 @@ server <- function(input, output, session){
     else {
       info <- input$fatalities_se
     }
-    paste0("Ecart-type des mortalitÃ©s : ", info)
+    paste0("Ecart-type des mortalités : ", info)
   })
 
   ## Poplutation size
@@ -480,7 +480,7 @@ server <- function(input, output, session){
     else {
       info <- input$carrying_capacity
     }
-    paste0("CapacitÃ© de charge du milieu : ", info)
+    paste0("Capacité de charge du milieu : ", info)
   })
 
   ## Population growth
@@ -492,7 +492,7 @@ server <- function(input, output, session){
       if(!(is.null(param$pop_growth_eli_result))){
         info <- round(param$pop_growth_eli_result$mean, 2)
       } else {info <- NA}
-    } else if(input$lambda_input_type == "Tendance locale ou rÃ©gionale"){
+    } else if(input$lambda_input_type == "Tendance locale ou régionale"){
         if(input$pop_trend == "Croissance") {
           if(input$pop_trend_strength == "Faible") {
             info <- 1.01
@@ -501,7 +501,7 @@ server <- function(input, output, session){
           } else {
             info <- 1.06
           }
-        } else if(input$pop_trend == "DÃ©clin"){
+        } else if(input$pop_trend == "Déclin"){
           if(input$pop_trend_strength == "Faible") {
             info <- 0.99
           } else if(input$pop_trend_strength == "Moyen"){
@@ -523,7 +523,7 @@ server <- function(input, output, session){
       if(!(is.null(param$pop_growth_eli_result))){
         info <- round(param$pop_growth_eli_result$SE, 2)
       } else {info <- NA}
-    } else if (input$lambda_input_type == "Tendance locale ou rÃ©gionale") {
+    } else if (input$lambda_input_type == "Tendance locale ou régionale") {
       info <- 0.03
     }
     else {
@@ -547,7 +547,7 @@ server <- function(input, output, session){
 
   observeEvent({input$farm_number_cumulated}, {
     rows_names <- function(n){
-      v <- c(paste0("Parc nÂ°", c(1:n)))
+      v <- c(paste0("Parc n°", c(1:n)))
       return(v)
     }
 
@@ -560,9 +560,9 @@ server <- function(input, output, session){
     updateMatrixInput(session, inputId = "fatalities_mat_cumulated",
                       value =  matrix("", nrow = nrow, 3,
                                       dimnames = list(number_parks,
-                                                      c("Moyennes des mortalitÃ©s annuelles",
-                                                        "Ecart-type des mortalitÃ©s annuelles",
-                                                        "AnnÃ©e de mise en service du parc"))))
+                                                      c("Moyennes des mortalités annuelles",
+                                                        "Ecart-type des mortalités annuelles",
+                                                        "Année de mise en service du parc"))))
   })
 
   # Survivals and Fecundities
@@ -575,7 +575,7 @@ server <- function(input, output, session){
   }
 
   observeEvent({input$species_list}, {
-    if(input$species_list == "EspÃ¨ce") {} else {
+    if(input$species_list == "Espèce") {} else {
       tab_species <- create.matrice(input$species_list)
 
       if(all(is.na(tab_species))) {
@@ -583,7 +583,7 @@ server <- function(input, output, session){
                           value = matrix(data = "",
                                          nrow = 4,
                                          ncol = 2,
-                                         dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "FÃ©conditÃ©"))))
+                                         dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "Fécondité"))))
 
       } else {
         number_age_class <- nrow(tab_species)
@@ -595,7 +595,7 @@ server <- function(input, output, session){
                           value = matrix(data = c(survivals, fecundities),
                                          nrow = number_age_class,
                                          ncol = 2,
-                                         dimnames = list(ages, c("Survie", "FÃ©conditÃ©"))))
+                                         dimnames = list(ages, c("Survie", "Fécondité"))))
       }
     }
   })
