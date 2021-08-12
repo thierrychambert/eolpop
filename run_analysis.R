@@ -1,6 +1,6 @@
 rm(list = ls(all.names = TRUE))
 graphics.off()
-
+library(popbio)
 
 ## Libraries
 library(eolpop)
@@ -14,7 +14,7 @@ fatalities_se = c(0, 0.05, 0.05, 0.05)
 pop_size_mean = 200
 pop_size_se = 25
 
-pop_growth_mean = 1
+pop_growth_mean = 1.1
 pop_growth_se = 0
 
 survivals <- c(0.5, 0.7, 0.8, 0.95)
@@ -23,8 +23,8 @@ fecundities <- c(0, 0, 0.05, 0.55)
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
 time_horzion = 50
 coeff_var_environ = 0.10
-fatal_constant = "M"
-pop_size_type = "Npair"
+fatal_constant = "h"
+pop_size_type = "Ntotal"
 
 cumulated_impacts = TRUE
 
@@ -60,7 +60,7 @@ vr_calibrated <- calibrate_params(inits = inits, f = fecundities, s = survivals,
 s_calibrated <- head(vr_calibrated, length(survivals))
 f_calibrated <- tail(vr_calibrated, length(fecundities))
 
-build_Leslie(s = s_calibrated, f = f_calibrated) %>% lambda
+lambda( build_Leslie(s = s_calibrated, f = f_calibrated) )
 
 
 
@@ -84,16 +84,3 @@ names(run0)
 N <- run0$N ; dim(N)
 plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
 abline(h = K)
-
-colSums(N[,,,]) %>% max
-
-plot_impact(N, onset_year = onset_year , xlab = "Annee", ylab = "Impact relatif")
-
-
-N <- run0$N
-output <- get_metrics(N, cumuated_impacts = cumulated_impacts)
-output$scenario$Pext
-
-#plot_impact(N = N, xlab = "year", ylab = "pop size")
-#source("draws_histog.R")
-#draws_histog(draws = run0$lambdas, mu = pop_growth_mean, se = pop_growth_se)

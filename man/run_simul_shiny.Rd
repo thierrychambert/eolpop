@@ -8,7 +8,7 @@ the simulation progress bar in Shiny (incProgress function)}
 \usage{
 run_simul_shiny(
   nsim,
-  cumuated_impacts,
+  cumulated_impacts,
   fatalities_mean,
   fatalities_se,
   onset_time,
@@ -31,7 +31,7 @@ run_simul_shiny(
 \arguments{
 \item{nsim}{number of simulation}
 
-\item{cumuated_impacts}{Logical. If TRUE, we used the projection model for cumulated impacts.}
+\item{cumulated_impacts}{Logical. If TRUE, we used the projection model for cumulated impacts.}
 
 \item{fatalities_mean}{a vector (numeric). Average number of fatalities, for each scenario.}
 

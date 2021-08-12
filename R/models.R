@@ -133,9 +133,9 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params){
   ## M3_WithDD_noDemoStoch
 
   # Extract DD parameters from list
-  rMAX = DD_params$rMAX
-  K = DD_params$K
-  theta = DD_params$theta
+  rMAX <- DD_params$rMAX
+  K <- DD_params$K
+  theta <- DD_params$theta
 
   # Apply density dependence effect
   lam_Nt <- 1 + rMAX*(1-(sum(N1)/K)^theta)
@@ -208,9 +208,9 @@ M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params){
   ## M4_WithDD_WithDemoStoch
 
   # Extract DD parameters from list
-  rMAX = DD_params$rMAX
-  K = DD_params$K
-  theta = DD_params$theta
+  rMAX <- DD_params$rMAX
+  K <- DD_params$K
+  theta <- DD_params$theta
 
   # Apply density dependence effect
   lam_Nt <- 1 + rMAX*(1-(sum(N1)/K)^theta)
