@@ -64,6 +64,12 @@ lambda( build_Leslie(s = s_calibrated, f = f_calibrated) )
 
 
 
+pop_size_mean = 200
+pop_growth_mean = 1.1
+fatal_constant = "M"
+pop_size_type = "Ntotal"
+carrying_capacity = 500
+
 
 ##==============================================================================
 ##                         Analyses (simulations)                             ==

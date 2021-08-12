@@ -20,8 +20,6 @@ data_sf <- read.csv("./inst/ShinyApp/survivals_fecundities_species.csv", sep = "
 nsim = 10
 coeff_var_environ = 0.10
 time_horzion = 30
-init_survivals <- c(0.5, 0.5, 0.5)
-init_fecundities <- c(0, 0.8, 1.2)
 
 #####################
 ### Pre-fill data ###
@@ -61,16 +59,11 @@ init_cumul <- c(10, 5, 8,
 init_cumul_add <- c(3, 0.05, 2020)
 
 
-
-# vital rates
-init_vr = c(init_survivals, init_fecundities)
-
 # DD parameters
 theta = 1
 
 # Define theoretical rMAX for the species
-rMAX_species <- rMAX_spp(surv = tail(init_survivals,1), afr = min(which(init_fecundities != 0)))
-rMAX_species
+#rMAX_species <- rMAX_spp(surv = tail(init_survivals,1), afr = min(which(init_fecundities != 0)))
 
 
 ##--------------------------------------------
@@ -327,7 +320,7 @@ ui <- fluidPage(
                    label = "Paramètres démographiques"),
 
       matrixInput(inputId = "mat_fill_vr",
-                  value = matrix(data = init_vr, 3, 2,
+                  value = matrix(data = NA, 3, 2,
                                  dimnames = list(c("Juv 1", "Juv 2", "Adulte"), c("Survie", "Fécondité"))),
                   class = "numeric",
                   rows = list(names = TRUE),

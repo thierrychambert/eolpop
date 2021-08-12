@@ -1,7 +1,9 @@
 server <- function(input, output, session){
 
-  # Hide all inputs excepted actionButtons
 
+  ##--------------------------------------------
+  ##  Hide all inputs excepted actionButtons  --
+  ##--------------------------------------------
   observe({
     shinyjs::hide("fatal_constant")
     shinyjs::hide("fatalities_input_type")
@@ -113,10 +115,10 @@ server <- function(input, output, session){
   }) # en observe show/hide
 
 
-
-
-  # Elicitation experts part
-
+  ##--------------------------------------------
+  ##  Functions                               --
+  ##--------------------------------------------
+  # Function to extract value from elicitation matrix and run the elication analysis
   func_eli <- function(mat_expert){
     t_mat_expert <- t(mat_expert)
     vals = t_mat_expert[3:5,]
@@ -127,12 +129,16 @@ server <- function(input, output, session){
     return(list(out = out, mean = out$mean_smooth, SE = sqrt(out$var_smooth)))
   }
 
+  # Function to plot output from elicitation analysis
   func_eli_plot <- function(out){
     plot_elicitation(out)
   }
 
-  ## Output
 
+
+  ##--------------------------------------------
+  ##  Reactive values                         --
+  ##--------------------------------------------
   param <- reactiveValues(N1 = NULL,
                           fatalities_mean = NULL,
                           fecundities = NULL,
@@ -144,7 +150,7 @@ server <- function(input, output, session){
                           onset_time = NULL,
                           onset_year = NULL,
                           carrying_capacity = NULL,
-                          rMAX_species = rMAX_species,
+                          rMAX_species = NULL,
                           theta = theta,
                           fatalities_eli_result = NULL,
                           pop_size_eli_result = NULL,
@@ -156,7 +162,9 @@ server <- function(input, output, session){
                           pop_growth_se = NULL,
                           carrying_cap_eli_result = NULL)
 
-  # Elicitation
+
+
+
 
   ## Fatalities
 
@@ -236,9 +244,8 @@ server <- function(input, output, session){
     }
   })
 
-  # Population size
+  # Observe pop size value
   ## Mean, se and type
-
   observeEvent({input$run},{
     if(input$pop_size_input_type == "Elicitation d'expert"){
       if(!(is.null(param$pop_size_eli_result))){
@@ -255,8 +262,6 @@ server <- function(input, output, session){
   })
 
   # Observe pop growth value
-  ##  Avoid unrealistic scenarios
-
   observeEvent({input$run}, {
     if(input$lambda_input_type == "Elicitation d'expert"){
       if(!(is.null(param$pop_growth_eli_result))){
@@ -298,19 +303,14 @@ server <- function(input, output, session){
   observeEvent({input$run}, {
       param$survivals <- input$mat_fill_vr[,1]
       param$fecundities <- input$mat_fill_vr[,2]
+      param$rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
   }) # end observeEvent
 
   # Survival and fecundity calibration
 
   observeEvent({
     input$run
-    # input$species_choice
-    # input$pop_growth_mean
   },{
-
-    ##  Avoid unrealistic scenarios
-    #param$pop_growth_mean <- min(1 + param$rMAX_species, input$pop_growth_mean)
-
     param$vr_calibrated <- calibrate_params(
       inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
       f = param$fecundities, s = param$survivals, lam0 = param$pop_growth_mean
@@ -349,7 +349,7 @@ server <- function(input, output, session){
     withProgress(message = 'Simulation progress', value = 0, {
 
       param$N1 <- run_simul_shiny(nsim = input$nsim,
-                                  cumuated_impacts = param$cumulated_impacts,
+                                  cumulated_impacts = param$cumulated_impacts,
 
                                   fatalities_mean = param$fatalities_mean,
                                   fatalities_se = param$fatalities_se,
