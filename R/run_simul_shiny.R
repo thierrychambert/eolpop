@@ -6,7 +6,7 @@
 #' the simulation progress bar in Shiny (incProgress function)
 #'
 #' @param nsim number of simulation
-#' @param cumuated_impacts Logical. If TRUE, we used the projection model for cumulated impacts.
+#' @param cumulated_impacts Logical. If TRUE, we used the projection model for cumulated impacts.
 #' @param fatalities_mean a vector (numeric). Average number of fatalities, for each scenario.
 #' @param fatalities_se a vector (numeric). Standard Error for the number of fatalities, for each scenario (= uncertainties around the values provided).
 #' @param onset_time a vector (numeric). The times at which each wind farm fatality starts applying.
@@ -51,7 +51,7 @@
 #' @importFrom shiny incProgress
 #'
 
-run_simul_shiny <- function(nsim, cumuated_impacts,
+run_simul_shiny <- function(nsim, cumulated_impacts,
                       fatalities_mean, fatalities_se, onset_time,
                       pop_size_mean, pop_size_se, pop_size_type,
                       pop_growth_mean, pop_growth_se,
@@ -181,7 +181,7 @@ run_simul_shiny <- function(nsim, cumuated_impacts,
 
 
       #
-      if(cumuated_impacts){
+      if(cumulated_impacts){
         fun_project <- pop_project_cumulated_impacts
       }else{
         fun_project <- pop_project
