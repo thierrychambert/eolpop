@@ -463,7 +463,7 @@ server <- function(input, output, session){
   ##  Display General information             --
   ##--------------------------------------------
 
-  output$species_name <- renderText({ paste0("Espèce sélectionnée : ", as.character(input$species_choice)) })
+  output$species_name <- renderText({ paste0("Espèce : ", as.character(input$species_choice)) })
 
 
   ## Fatalities
@@ -477,7 +477,7 @@ server <- function(input, output, session){
     else {
       info <- input$fatalities_mean
     }
-    paste0("Moyenne des mortalités : ", info)
+    paste0("Moyenne : ", info)
   })
 
   output$fatalities_se_info <- renderText({
@@ -489,16 +489,16 @@ server <- function(input, output, session){
     else {
       info <- input$fatalities_se
     }
-    paste0("Ecart-type des mortalités : ", info)
+    paste0("Erreur-type : ", info)
   })
 
   ## Poplutation size
 
   output$pop_size_type_info <- renderText({
     if(input$pop_size_type == "Npair"){
-      paste0("Type de taille de pop : ", "Nombre de couple")
+      paste0("Nombre de couple")
     } else {
-      paste0("Type de taille de pop : ", "Effectif total")
+      paste0("Effectif total")
     }
   })
 
@@ -511,7 +511,7 @@ server <- function(input, output, session){
     else {
       info <- input$pop_size_mean
     }
-    paste0("Moyenne de la taille de la population : ", info)
+    paste0("Moyenne : ", info)
   })
 
   output$pop_size_se_info <- renderText({
@@ -523,7 +523,7 @@ server <- function(input, output, session){
     else {
       info <- input$pop_size_se
     }
-    paste0("Ecart-type de la taille de la population : ", info)
+    paste0("Erreur-type : ", info)
   })
 
   ## Carrying capacity
@@ -537,7 +537,7 @@ server <- function(input, output, session){
     else {
       info <- input$carrying_capacity
     }
-    paste0("Capacité de charge du milieu : ", info)
+    paste0("Valeur : ", info)
   })
 
   ## Population growth
@@ -572,7 +572,7 @@ server <- function(input, output, session){
     } else {
         info <- input$pop_growth_mean
     }
-    paste0("Moyenne de la croissance de la population : ", info)
+    paste0("Moyenne : ", info)
   })
 
   output$pop_growth_se_info <- renderText({
@@ -586,7 +586,7 @@ server <- function(input, output, session){
     else {
       info <- input$pop_growth_se
     }
-    paste0("Ecart-type de  la croissance de la population : ", info)
+    paste0("Erreur-type : ", info)
   })
 
 
@@ -617,7 +617,7 @@ server <- function(input, output, session){
                       value =  matrix(init_cumul_new, nrow = nrow, 3, byrow = TRUE,
                                       dimnames = list(number_parks,
                                                       c("Moyenne",
-                                                        "Ecart-type",
+                                                        "Erreur-type",
                                                         "Année de mise en service du parc"))))
   })
 

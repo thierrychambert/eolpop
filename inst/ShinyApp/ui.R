@@ -93,12 +93,10 @@ ui <- fluidPage(
   ##--------------------------------------------
 
   wellPanel(
-    h2("Valeurs sélectionnées"),
+    h2("Valeurs actuelles"),
 
     fluidRow(
       column(width = 4,
-        #h3("Espèce sélectionnée"),
-        #strong(textOutput("prepDataMsg1"), style="color:green; font-size:14px", align = "left"),
         div( textOutput(outputId = "species_name") ,
              style="color:black; font-size:18px; font-weight: bold", align = "left"),
       )
@@ -108,12 +106,12 @@ ui <- fluidPage(
       column(width = 4,
 
              br(),
-             h4("Mortalités"),
+             h3("Mortalités"),
              textOutput(outputId = "fatalities_mean_info"),
              textOutput(outputId = "fatalities_se_info"),
 
              br(),
-             h4("Taille de la population"),
+             h3("Taille de la population"),
              textOutput(outputId = "pop_size_type_info"),
              textOutput(outputId = "pop_size_mean_info"),
              textOutput(outputId = "pop_size_se_info")),
@@ -121,11 +119,11 @@ ui <- fluidPage(
         column(width = 4,
 
                br(),
-               h4("Capacité de charge"),
+               h3("Capacité de charge"),
                textOutput(outputId = "carrying_capacity_info"),
 
                br(),
-               h4("Tendance de la population"),
+               h3("Tendance de la population"),
                textOutput(outputId = "pop_trend_type_info"),
                textOutput(outputId = "pop_growth_mean_info"),
                textOutput(outputId = "pop_growth_se_info")),
@@ -133,7 +131,7 @@ ui <- fluidPage(
           column(width = 4,
 
                  br(),
-                 h4("Paramètres démographiques"),
+                 h3("Paramètres démographiques"),
                  tableOutput(outputId = "vital_rates_info"))
 
     ) # # End wellPanel
@@ -145,12 +143,17 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
 
+      h2("Modifier les paramètres"),
+
+      br(" "),
       ##--------------------------------------------
       ##  1. Fatalities                           --
       ##--------------------------------------------
-
+      tags$style(HTML('#button_fatalities{background-color:#C2C8D3}')),
       actionButton(inputId = "button_fatalities",
-                   label = "Mortalités"),
+                   label = tags$span("Mortalités annuelles", style = "font-weight: bold; font-size: 18px;")
+      ),
+
       radioButtons(inputId = "fatal_constant",
                    label = h4("Modélisation"),
                    choices = c("Taux de mortalités (h) constant" = "h",
@@ -159,7 +162,7 @@ ui <- fluidPage(
       ### Part for non-cumulated impacts
       # Input type
       radioButtons(inputId = "fatalities_input_type",
-                   label = h4("Source des données"),
+                   label = h4("Type de saisie"),
                    choices = c("Valeurs", "Elicitation d'expert")),
 
       # Values
@@ -168,7 +171,7 @@ ui <- fluidPage(
                    value = 5,
                    min = 0, max = Inf, step = 0.5),
       numericInput(inputId = "fatalities_se",
-                   label = "Ecart-type des mortalités annuelles",
+                   label = "Erreur-type des mortalités annuelles",
                    value = 0.05,
                    min = 0, max = Inf, step = 0.1),
 
@@ -194,20 +197,21 @@ ui <- fluidPage(
                   value = matrix(init_cumul, 3, 3,
                                  dimnames = list(c(paste0("Parc n°", c(1:3))),
                                                  c("Moyenne",
-                                                   "Ecart-type",
+                                                   "Erreur-type",
                                                    "Année de mise en service du parc"))),
                   class = "numeric",
                   rows = list(names = TRUE),
                   cols = list(names = TRUE)),
 
 
+      hr(),
       ##--------------------------------------------
       ##  2. Population Size                      --
       ##--------------------------------------------
-
-      br(" "),
+      tags$style(HTML('#button_pop_size{background-color:#C2C8D3}')),
       actionButton(inputId = "button_pop_size",
-                   label = "Taille de la population"),
+                   label = tags$span("Taille de la population", style = "font-weight: bold; font-size: 18px;")
+      ),
 
       radioButtons(inputId = "pop_size_type",
                    label = h4("Unité"),
@@ -223,7 +227,7 @@ ui <- fluidPage(
                    min = 0, max = Inf, step = 50),
 
       numericInput(inputId = "pop_size_se",
-                   label = "Ecart-type de la taille de la population",
+                   label = "Erreur-type de la taille de la population",
                    value = 25,
                    min = 0, max = Inf, step = 1),
 
@@ -239,16 +243,17 @@ ui <- fluidPage(
       actionButton(inputId = "pop_size_run_expert", label = "Analyse"),
 
 
+      hr(),
       ##--------------------------------------------
       ##  3. Carrying capacity                    --
       ##--------------------------------------------
-
-      br(" "),
+      tags$style(HTML('#button_carrying_cap{background-color:#C2C8D3}')),
       actionButton(inputId = "button_carrying_cap",
-                   label = "Capacité de charge"),
+                   label = tags$span("Capacité de charge", style = "font-weight: bold; font-size: 18px;")
+      ),
 
       radioButtons(inputId = "carrying_cap_input_type",
-                   label = h4("Type d'unité"),
+                   label = h4("Type de saisie"),
                    choices = c("Valeurs", "Elicitation d'expert")),
 
       numericInput(inputId = "carrying_capacity",
@@ -267,14 +272,15 @@ ui <- fluidPage(
 
       actionButton(inputId = "carrying_cap_run_expert", label = "Utiliser valeurs experts"),
 
+
+      hr(),
       ##--------------------------------------------
       ##  4. Population Trend                     --
       ##--------------------------------------------
-
-      br(" "),
-      br(" "),
+      tags$style(HTML('#button_pop_trend{background-color:#C2C8D3}')),
       actionButton(inputId = "button_pop_trend",
-                   label = "Tendance de la population"),
+                   label = tags$span("Tendance de la population", style = "font-weight: bold; font-size: 18px;")
+                   ),
 
       radioButtons(inputId = "lambda_input_type",
                    label = h4("Type de saisie"),
@@ -286,7 +292,7 @@ ui <- fluidPage(
                    min = 0, max = Inf, step = 0.01),
 
       numericInput(inputId = "pop_growth_se",
-                   label = "Ecart-type de la croissance de la population",
+                   label = "Erreur-type de la croissance de la population",
                    value = 0,
                    min = 0, max = Inf, step = 0.01),
 
@@ -312,15 +318,18 @@ ui <- fluidPage(
       # tags$style("#pop_trend_strength {position:fixed; top: 600px; right: 100px;}"),
 
 
+      hr(),
       ##--------------------------------------------
       ##  5. Vital rates                         --
       ##--------------------------------------------
-
-      br(" "),
+      tags$style(HTML('#button_vital_rates{background-color:#C2C8D3}')),
       actionButton(inputId = "button_vital_rates",
-                   label = "Paramètres démographiques"),
+                   label = tags$span("Paramètres démographiques", style = "font-weight: bold; font-size: 18px;")
+      ),
 
+      br(),
       matrixInput(inputId = "mat_fill_vr",
+                  label = "",
                   value = matrix(data = NA, 3, 2,
                                  dimnames = list(c("Juv 1", "Juv 2", "Adulte"), c("Survie", "Fécondité"))),
                   class = "numeric",
