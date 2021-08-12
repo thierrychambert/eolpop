@@ -28,8 +28,6 @@ server <- function(input, output, session){
     shinyjs::hide("pop_growth_run_expert")
     shinyjs::hide("pop_trend")
     shinyjs::hide("pop_trend_strength")
-    shinyjs::hide("fill_type_vr")
-    shinyjs::hide("mat_display_vr")
     shinyjs::hide("mat_fill_vr")
 
     # Show fatalities part
@@ -109,15 +107,13 @@ server <- function(input, output, session){
     # Show inputs vital rates part
 
     if(input$button_vital_rates%%2 == 1){
-      shinyjs::show("fill_type_vr")
-      if(input$fill_type_vr == "Automatique"){
-        shinyjs::show("mat_display_vr")
-      }
-      if(input$fill_type_vr == "Manuelle"){
         shinyjs::show("mat_fill_vr")
-      }
     }
-  })
+
+  }) # en observe show/hide
+
+
+
 
   # Elicitation experts part
 
@@ -300,14 +296,9 @@ server <- function(input, output, session){
   # Survivals and fecundities
 
   observeEvent({input$run}, {
-    if(input$fill_type_vr == "Manuelle"){
       param$survivals <- input$mat_fill_vr[,1]
       param$fecundities <- input$mat_fill_vr[,2]
-    } else {
-      param$survivals <- survivals
-      param$fecundities <- fecundities
-    }
-  })
+  }) # end observeEvent
 
   # Survival and fecundity calibration
 
@@ -407,7 +398,15 @@ server <- function(input, output, session){
   })
   # End simulations
 
-  # General informations output
+
+
+
+
+  ##--------------------------------------------
+  ##  Display General information             --
+  ##--------------------------------------------
+
+  #output$species_name <- renderText({ input$species_choice})
 
   ## Fatalities
 
@@ -532,16 +531,16 @@ server <- function(input, output, session){
     paste0("Ecart-type de  la croissance de la population : ", info)
   })
 
+
   ## Vital rates
 
   output$vital_rates_info <- renderTable({
-    if(input$fill_type_vr == "Automatique"){
-      input$mat_display_vr
-    } else {
-      input$mat_fill_vr
-    }
-  })
+    input$mat_fill_vr
+    }, rownames = TRUE)
+
   # End genral informations output
+
+
 
   ## Update matrix cumulated impact
 
@@ -566,20 +565,24 @@ server <- function(input, output, session){
 
   # Survivals and Fecundities
 
-  create.matrice <- function(species){
-    tab_test <- data_sf %>%
+  create.matrice <- function(data_sf, species){
+    out_mat <- data_sf %>%
       filter(species == data_sf$Nom_espece) %>%
       select(classes_age, survie, fecondite)
-    return(tab_test)
+    return(out_mat)
   }
 
-  observeEvent({input$species_list}, {
-    if(input$species_list == "Espèce") {} else {
-      tab_species <- create.matrice(input$species_list)
+
+## Update the vital rate matrix when changing species in the list
+  observeEvent({input$species_choice}, {
+
+    if(input$species_choice == "Espèce générique") {} else {
+
+      tab_species <- create.matrice(data_sf = data_sf, species = input$species_choice)
 
       if(all(is.na(tab_species))) {
         updateMatrixInput(session, inputId = "mat_fill_vr",
-                          value = matrix(data = "",
+                          value = matrix(data = NA,
                                          nrow = 4,
                                          ncol = 2,
                                          dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "Fécondité"))))
@@ -595,9 +598,12 @@ server <- function(input, output, session){
                                          nrow = number_age_class,
                                          ncol = 2,
                                          dimnames = list(ages, c("Survie", "Fécondité"))))
-      }
-    }
-  })
-}
-# End server
+      } # end if 2
+    } # end if 1
+
+  }) # end observeEvent species_list
+
+
+###################################################################################
+} # End server
 

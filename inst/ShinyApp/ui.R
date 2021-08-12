@@ -11,7 +11,6 @@ library(eolpop)
 ## Load species list
 species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")
 species_list <- unique(as.character(species_data$NomEspece))
-# species_list <- species_data$NomEspece
 
 ## Load survival and fecundities data
 data_sf <- read.csv("./inst/ShinyApp/survivals_fecundities_species.csv", sep = ",")#, encoding = "UTF-8")
@@ -21,8 +20,8 @@ data_sf <- read.csv("./inst/ShinyApp/survivals_fecundities_species.csv", sep = "
 nsim = 10
 coeff_var_environ = 0.10
 time_horzion = 30
-survivals <- c(0.5, 0.7, 0.8, 0.95)
-fecundities <- c(0, 0, 0.05, 0.55)
+init_survivals <- c(0.5, 0.5, 0.5)
+init_fecundities <- c(0, 0.8, 1.2)
 
 #####################
 ### Pre-fill data ###
@@ -64,13 +63,13 @@ init_cumul_add <- c(3, 0.05, 2020)
 
 
 # vital rates
-data_vr = c(survivals, fecundities)
+init_vr = c(init_survivals, init_fecundities)
 
 # DD parameters
 theta = 1
 
 # Define theoretical rMAX for the species
-rMAX_species <- rMAX_spp(surv = tail(survivals,1), afr = min(which(fecundities != 0)))
+rMAX_species <- rMAX_spp(surv = tail(init_survivals,1), afr = min(which(init_fecundities != 0)))
 rMAX_species
 
 
@@ -81,15 +80,18 @@ ui <- fluidPage(
   useShinyjs(),
   titlePanel("eolpop : Impact demographique des éoliennes"),
 
-  # Creation of the first page (select species, analysis type choice)
 
+  # Creation of the first page (select species, analysis type choice)
   wellPanel(
-    selectInput(inputId = "species_list",
+
+    selectInput(inputId = "species_choice", selected = 1,
                 h4(strong("Sélection d'une espèce ou groupe d'espèces")),
                 choices = species_list),
+
     radioButtons(inputId = "analysis_choice",
                  h4(strong("Sélectionner un type d'analyse")),
                  choices = c("Impacts non cumulés" = "scenario", "Impacts cumulés" = "cumulated"))
+
   ), # End wellPanel
 
 
@@ -98,32 +100,44 @@ ui <- fluidPage(
   ##--------------------------------------------
 
   wellPanel(
+    h2("Valeurs sélectionnées"),
+
     fluidRow(
+      textOutput(outputId = "species_name"),
+
       column(width = 4,
-             textOutput(outputId = "specie_name"),
+
+             br(),
              h4("Mortalités"),
              textOutput(outputId = "fatalities_mean_info"),
              textOutput(outputId = "fatalities_se_info"),
+
+             br(),
              h4("Taille de la population"),
              textOutput(outputId = "pop_size_type_info"),
              textOutput(outputId = "pop_size_mean_info"),
              textOutput(outputId = "pop_size_se_info")),
-      fluidRow(
+
         column(width = 4,
+
+               br(),
                h4("Capacité de charge"),
                textOutput(outputId = "carrying_capacity_info"),
+
+               br(),
                h4("Tendance de la population"),
                textOutput(outputId = "pop_trend_type_info"),
                textOutput(outputId = "pop_growth_mean_info"),
                textOutput(outputId = "pop_growth_se_info")),
-        fluidRow(
+
           column(width = 4,
+
+                 br(),
                  h4("Paramètres démographiques"),
                  tableOutput(outputId = "vital_rates_info"))
-        )
-      )
-    )
-  ), # End wellPanel
+
+    ) # # End wellPanel
+  ), # End fluidRow
 
 
   # Paramter Inputs (fatalities, pop size, carrying capacity, pop trend and vital rates).
@@ -262,7 +276,7 @@ ui <- fluidPage(
                    label = "Tendance de la population"),
 
       radioButtons(inputId = "lambda_input_type",
-                   label = h4("Type de tendance"),
+                   label = h4("Type de saisie"),
                    choices = c("Taux de croissance", "Elicitation d'expert", "Tendance locale ou régionale")),
 
       numericInput(inputId = "pop_growth_mean",
@@ -286,8 +300,6 @@ ui <- fluidPage(
 
       actionButton(inputId = "pop_growth_run_expert", label = "Analyse"),
 
-      h4("Tendance de la population"),
-
       radioButtons(inputId = "pop_trend",
                    label = NULL,
                    choices = c("Croissance", "Stable", "Déclin")),
@@ -307,20 +319,9 @@ ui <- fluidPage(
       actionButton(inputId = "button_vital_rates",
                    label = "Paramètres démographiques"),
 
-      radioButtons(inputId = "fill_type_vr",
-                   label = "Type de saisie",
-                   choices = c("Automatique", "Manuelle")),
-
-      # tableOutput(outputId = "mat_display_vr"),
-
-      matrixInput(inputId = "mat_display_vr",
-                  value = matrix("", 4, 2, dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "Fécondité"))),
-                  class = "numeric",
-                  rows = list(names = TRUE),
-                  cols = list(names = TRUE)),
-
       matrixInput(inputId = "mat_fill_vr",
-                  value = matrix(data = data_vr, 4, 2, dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "Fécondité"))),
+                  value = matrix(data = init_vr, 3, 2,
+                                 dimnames = list(c("Juv 1", "Juv 2", "Adulte"), c("Survie", "Fécondité"))),
                   class = "numeric",
                   rows = list(names = TRUE),
                   cols = list(names = TRUE))
