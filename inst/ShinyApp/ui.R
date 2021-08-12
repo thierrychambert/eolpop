@@ -85,7 +85,7 @@ ui <- fluidPage(
   wellPanel(
 
     selectInput(inputId = "species_choice", selected = 1,
-                h4(strong("Sélection d'une espèce ou groupe d'espèces")),
+                h4(strong("Sélectionner une espèce")),
                 choices = species_list),
 
     radioButtons(inputId = "analysis_choice",
@@ -103,8 +103,15 @@ ui <- fluidPage(
     h2("Valeurs sélectionnées"),
 
     fluidRow(
-      textOutput(outputId = "species_name"),
+      column(width = 4,
+        #h3("Espèce sélectionnée"),
+        #strong(textOutput("prepDataMsg1"), style="color:green; font-size:14px", align = "left"),
+        div( textOutput(outputId = "species_name") ,
+             style="color:black; font-size:18px; font-weight: bold", align = "left"),
+      )
+    ),
 
+    fluidRow(
       column(width = 4,
 
              br(),

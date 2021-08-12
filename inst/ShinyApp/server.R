@@ -399,14 +399,12 @@ server <- function(input, output, session){
   # End simulations
 
 
-
-
-
   ##--------------------------------------------
   ##  Display General information             --
   ##--------------------------------------------
 
-  #output$species_name <- renderText({ input$species_choice})
+  output$species_name <- renderText({ paste0("Espèce sélectionnée : ", as.character(input$species_choice)) })
+
 
   ## Fatalities
 
