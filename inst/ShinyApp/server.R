@@ -116,14 +116,14 @@ server <- function(input, output, session){
 
 
   ##--------------------------------------------
-  ##  Functions                               --
+  ##  Some functions for elicitation stuff    --
   ##--------------------------------------------
   # Function to extract value from elicitation matrix and run the elication analysis
   func_eli <- function(mat_expert){
     t_mat_expert <- t(mat_expert)
-    vals = t_mat_expert[3:5,]
-    Cp = t_mat_expert[6,]
-    weights = t_mat_expert[2,]
+    vals = t_mat_expert[2:4,]
+    Cp = t_mat_expert[5,]
+    weights = t_mat_expert[1,]
 
     out <- elicitation(vals, Cp, weights)
     return(list(out = out, mean = out$mean_smooth, SE = sqrt(out$var_smooth)))
@@ -137,7 +137,7 @@ server <- function(input, output, session){
 
 
   ##--------------------------------------------
-  ##  Reactive values                         --
+  ##  Reactive value : simulation inputs      --
   ##--------------------------------------------
   param <- reactiveValues(N1 = NULL,
                           fatalities_mean = NULL,
@@ -166,83 +166,144 @@ server <- function(input, output, session){
 
 
 
-  ## Fatalities
+  ##--------------------------------------------
+  ##  Run expert elicitation                  --
+  ##--------------------------------------------
+  ## Fatalities ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  observeEvent({
+    input$fatalities_run_expert
+  }, {
+    if( all(!is.na(input$fatalities_mat_expert)) ) {
 
-  observeEvent({input$fatalities_run_expert}, {
-    if(all(is.na(input$fatalities_mat_expert))) {} else {
+      ## run elicitation analysis
       param$fatalities_eli_result <- func_eli(input$fatalities_mat_expert)
 
-      ### Plot fatalities
-      output$fatalities_expert_plot <- renderPlot({func_eli_plot(param$fatalities_eli_result$out)})}
-  })
+      ## plot distribution
+      output$fatalities_expert_plot <- renderPlot({ func_eli_plot(param$fatalities_eli_result$out) })
 
-  ## Population size
+    } else {
+      print("missing value")
+    } # end if
+  }) # end observeEvent
 
-  observeEvent({input$pop_size_run_expert}, {
-    if(all(is.na(input$pop_size_mat_expert))) {} else {
+
+  ## Population size ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  observeEvent({
+    input$pop_size_run_expert
+  }, {
+    if(all(!is.na(input$pop_size_mat_expert))) {
+
+      ## run elicitation analysis
       param$pop_size_eli_result <- func_eli(input$pop_size_mat_expert)
 
-      ### Plot pop size
-      output$pop_size_expert_plot <- renderPlot({func_eli_plot(param$pop_size_eli_result$out)})}
-  })
+      ## plot distribution
+      output$pop_size_expert_plot <- renderPlot({func_eli_plot(param$pop_size_eli_result$out)})
 
-  ## Population growth
+    } else {
+      print("missing value")
+    } # end if
+  }) # end observeEvent
 
-  observeEvent({input$pop_growth_run_expert},{
-    if(all(is.na(input$pop_growth_mat_expert))) {} else {
+
+  ## Population growth ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  observeEvent({
+    input$pop_growth_run_expert
+  },{
+    if(all(!is.na(input$pop_growth_mat_expert))) {
+
+      ## run elicitation analysis
       param$pop_growth_eli_result <- func_eli(input$pop_growth_mat_expert)
 
-      ### plot pop growth
+      ## plot distribution
       output$pop_growth_expert_plot <- renderPlot({func_eli_plot(param$pop_growth_eli_result$out)})
-    }
-  })
 
-  ## Carrying capacity
+    } else {
+      print("missing value")
+    } # end if
+  }) # end observeEvent
 
-  observeEvent({input$carrying_cap_run_expert},{
-    if(all(is.na(input$carrying_cap_mat_expert))) {} else {
+
+  ## Carrying capacity ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  observeEvent({
+    input$carrying_cap_run_expert
+  },{
+    if(all(!is.na(input$carrying_cap_mat_expert))) {
+
       param$carrying_cap_eli_result <- func_eli(input$carrying_cap_mat_expert)
 
-      ### Plot carrying capacity
+      ## run elicitation analysis
       output$carrying_cap_expert_plot <- renderPlot({func_eli_plot(param$carrying_cap_eli_result$out)})
-    }
-  })
 
-  # Reactive values (cumulated impacts, fatalities mean, fatalities se, onset_time, survivals mean, fecundities mean)
+    } else {
+      print("missing value")
+    } # end if
+  }) # end observeEvent
 
-  observeEvent({input$run}, {
+
+
+
+
+
+
+  ##--------------------------------------------
+  ##  Observe input and report values         --
+  ##--------------------------------------------
+  ## Cumulated impacts or not ?
+  observeEvent({
+    input$run
+  }, {
     if(input$analysis_choice == "scenario"){
       param$cumulated_impacts = FALSE
     } else {
       param$cumulated_impacts = TRUE
-    }
-  })
+    } # end if
+  }) # end observeEvent
 
-  # Fatalities
-  ## onset time, mean and se
 
-  observeEvent({input$run}, {
+
+
+
+  ### Plot distribution
+
+
+
+
+
+
+  ##--------------------------------------------
+  ## Select parameter values for simulations  --
+  ##--------------------------------------------
+  ## Fatalities ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  observeEvent({
+    input$run
+  }, {
+    # Case 1 : Not cumulated effects (if1)
     if(input$analysis_choice == "scenario"){
+
+      # Case 1.1 : Values from expert elicitation (if2)
       if(input$fatalities_input_type == "Elicitation d'expert"){
-        if(!(is.null(param$fatalities_eli_result))) {
-          param$fatalities_mean <- c(0, round(param$fatalities_eli_result$mean))
-          param$onset_time = NULL
-          param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE))
-        } else {
-          print("#Intégrer un message d'erreur")
-        }
+        param$fatalities_mean <- c(0, round(param$fatalities_eli_result$mean))
+        param$onset_time <- NULL
+        param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE))
+
       } else {
+
+        # Case 1.2 : Values directly provided (i.e., not from expert elicitation)
         param$fatalities_mean <- c(0, input$fatalities_mean)
         param$onset_time = NULL
         param$fatalities_se <- c(0, input$fatalities_se)
-      }
+      } # end (if2)
+
+      # Case 2 : Cumulated effects (if-else 1)
     } else {
       param$fatalities_mean <- c(0, input$fatalities_mat_cumulated[,1])
+      param$fatalities_se <- c(0, input$fatalities_mat_cumulated[,2])
       param$onset_year <- c(min(input$fatalities_mat_cumulated[,3]), input$fatalities_mat_cumulated[,3])
       param$onset_time <- param$onset_year - min(param$onset_year) + 1
-      param$fatalities_se <- c(0, input$fatalities_mat_cumulated[,2])
-    }
-  })
+    } # end (if1)
+
+  }) # end observeEvent
+
 
   # Observe pop size value
   ## Mean, se and type
@@ -299,15 +360,14 @@ server <- function(input, output, session){
   })
 
   # Survivals and fecundities
-
   observeEvent({input$run}, {
       param$survivals <- input$mat_fill_vr[,1]
       param$fecundities <- input$mat_fill_vr[,2]
       param$rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
   }) # end observeEvent
 
-  # Survival and fecundity calibration
 
+  # Survival and fecundity calibration
   observeEvent({
     input$run
   },{
