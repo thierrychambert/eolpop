@@ -614,7 +614,7 @@ server <- function(input, output, session){
     init_cumul_new <- rep(init_cumul_add, nrow)
 
     updateMatrixInput(session, inputId = "fatalities_mat_cumulated",
-                      value =  matrix(init_cumul_new, nrow = nrow, 3, byrow = TRUE,
+                      value =  matrix(init_cumul_new, nrow = nrow, ncol = 3, byrow = TRUE,
                                       dimnames = list(number_parks,
                                                       c("Moyenne",
                                                         "Erreur-type",

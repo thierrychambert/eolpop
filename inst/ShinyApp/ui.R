@@ -177,7 +177,7 @@ ui <- fluidPage(
 
       # Matrix for expert elicitation
       matrixInput(inputId = "fatalities_mat_expert",
-                  value = matrix(data = eli_fatalities, 4, 5,
+                  value = matrix(data = eli_fatalities, nrow = 4, ncol = 5,
                                  dimnames = list(c("#1", "#2", "#3", "#4"),
                                                  c("Poids", "Min", "Best", "Max", "% IC" )),
                                  byrow = TRUE),
@@ -232,7 +232,7 @@ ui <- fluidPage(
                    min = 0, max = Inf, step = 1),
 
       matrixInput(inputId = "pop_size_mat_expert",
-                  value = matrix(data = eli_pop_size, 4, 5,
+                  value = matrix(data = eli_pop_size, nrow = 4, ncol = 5,
                                  dimnames = list(c("#1", "#2", "#3", "#4"),
                                                  c("Poids", "Min", "Best", "Max", "% IC" )),
                                  byrow = TRUE),
@@ -262,7 +262,7 @@ ui <- fluidPage(
                    min = 0, max = Inf, step = 100),
 
       matrixInput(inputId = "carrying_cap_mat_expert",
-                  value = matrix(data = eli_carrying_cap, 4, 5,
+                  value = matrix(data = eli_carrying_cap, nrow = 4, ncol = 5,
                                  dimnames = list(c("#1", "#2", "#3", "#4"),
                                                  c("Poids", "Min", "Best", "Max", "% IC" )),
                                  byrow = TRUE),
@@ -297,7 +297,7 @@ ui <- fluidPage(
                    min = 0, max = Inf, step = 0.01),
 
       matrixInput(inputId = "pop_growth_mat_expert",
-                  value = matrix(data = eli_pop_growth, 4, 5,
+                  value = matrix(data = eli_pop_growth, nrow = 4, ncol = 5,
                                  dimnames = list(c("#1", "#2", "#3", "#4"),
                                                  c("Poids", "Min", "Best", "Max", "% IC" )),
                                  byrow = TRUE),
