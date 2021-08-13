@@ -134,30 +134,62 @@ server <- function(input, output, session){
   ##  Reactive value : simulation inputs      --
   ##--------------------------------------------
   param <- reactiveValues(N1 = NULL,
+                          nsim = NULL,
+                          cumulated_impacts = NULL,
+
                           fatalities_mean = NULL,
+                          fatalities_se = NULL,
+                          onset_time = NULL,
+                          onset_year = NULL,
+
+                          pop_size_mean = NULL,
+                          pop_size_se = NULL,
+                          pop_size_type = NULL,
+
+                          pop_growth_mean = NULL,
+                          pop_growth_se = NULL,
+
                           fecundities = NULL,
                           survivals = NULL,
                           s_calibrated = NULL,
                           f_calibrated = NULL,
                           vr_calibrated = NULL,
-                          cumulated_impacts = NULL,
-                          onset_time = NULL,
-                          onset_year = NULL,
+
                           carrying_capacity = NULL,
+                          theta = NULL,
                           rMAX_species = NULL,
-                          theta = theta,
+
+                          model_demo = NULL,
+                          time_horzion = NULL,
+                          coeff_var_environ = NULL,
+                          fatal_constant = NULL,
+
                           fatalities_eli_result = NULL,
                           pop_size_eli_result = NULL,
-                          pop_size_mean = NULL,
-                          pop_size_se = NULL,
-                          pop_size_type = NULL,
                           pop_growth_eli_result = NULL,
-                          pop_growth_mean = NULL,
-                          pop_growth_se = NULL,
-                          carrying_cap_eli_result = NULL)
+                          carrying_cap_eli_result = NULL
+                          )
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
-  observe(param)
+
+  ##----------------------------------------------------------
+  ## Observe parameter values to be used in simulations run --
+  ##----------------------------------------------------------
+  observe({
+    param # required to ensure up-to-date values are run
+
+    # simple inputs
+    param$nsim <- input$nsim
+    param$fatal_constant <- input$fatal_constant
+
+    # fixed in global environment (for now)
+    param$theta = theta
+    param$time_horzion = time_horzion
+    param$coeff_var_environ = coeff_var_environ
+
+    }) # end observe
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
+
 
   ##--------------------------------------------
   ##  Display parameter distribution          --
@@ -451,7 +483,7 @@ server <- function(input, output, session){
 
     withProgress(message = 'Simulation progress', value = 0, {
 
-      param$N1 <- run_simul_shiny(nsim = input$nsim,
+      param$N1 <- run_simul_shiny(nsim = param$nsim,
                                   cumulated_impacts = param$cumulated_impacts,
 
                                   fatalities_mean = param$fatalities_mean,
@@ -469,13 +501,13 @@ server <- function(input, output, session){
                                   fecundities = param$f_calibrated,
 
                                   carrying_capacity = param$carrying_capacity,
-                                  theta = theta,
+                                  theta = param$theta,
                                   rMAX_species = param$rMAX_species,
 
                                   model_demo = NULL,
-                                  time_horzion = time_horzion,
-                                  coeff_var_environ = coeff_var_environ,
-                                  fatal_constant = input$fatal_constant)
+                                  time_horzion = param$time_horzion,
+                                  coeff_var_environ = param$coeff_var_environ,
+                                  fatal_constant = param$fatal_constant)
     }) # Close withProgress
   }) # Close observEvent
 
