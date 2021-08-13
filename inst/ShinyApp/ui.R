@@ -185,7 +185,7 @@ ui <- fluidPage(
                   rows = list(names = TRUE),
                   cols = list(names = TRUE)),
 
-      actionButton(inputId = "fatalities_run_expert", label = "Analyse"),
+      actionButton(inputId = "fatalities_run_expert", label = "Utiliser valeurs experts"),
 
       ### Part for cumulated impacts
 
@@ -240,7 +240,7 @@ ui <- fluidPage(
                   rows = list(names = TRUE),
                   cols = list(names = TRUE)),
 
-      actionButton(inputId = "pop_size_run_expert", label = "Analyse"),
+      actionButton(inputId = "pop_size_run_expert", label = "Utiliser valeurs experts"),
 
 
       hr(),
@@ -305,7 +305,7 @@ ui <- fluidPage(
                   rows = list(names = TRUE),
                   cols = list(names = TRUE)),
 
-      actionButton(inputId = "pop_growth_run_expert", label = "Analyse"),
+      actionButton(inputId = "pop_growth_run_expert", label = "Utiliser valeurs experts"),
 
       radioButtons(inputId = "pop_trend",
                    label = NULL,

@@ -121,19 +121,13 @@ server <- function(input, output, session){
   # Function to extract value from elicitation matrix and run the elication analysis
   func_eli <- function(mat_expert){
     t_mat_expert <- t(mat_expert)
-    vals = t_mat_expert[2:4,]
-    Cp = t_mat_expert[5,]
-    weights = t_mat_expert[1,]
+    vals <- t_mat_expert[2:4,]
+    Cp <- t_mat_expert[5,]
+    weights <- t_mat_expert[1,]
 
     out <- elicitation(vals, Cp, weights)
     return(list(out = out, mean = out$mean_smooth, SE = sqrt(out$var_smooth)))
   }
-
-  # Function to plot output from elicitation analysis
-  func_eli_plot <- function(out){
-    plot_elicitation(out)
-  }
-
 
 
   ##--------------------------------------------
@@ -179,7 +173,7 @@ server <- function(input, output, session){
       param$fatalities_eli_result <- func_eli(input$fatalities_mat_expert)
 
       ## plot distribution
-      output$fatalities_expert_plot <- renderPlot({ func_eli_plot(param$fatalities_eli_result$out) })
+      output$fatalities_expert_plot <- renderPlot({ plot_elicitation(param$fatalities_eli_result$out) })
 
     } else {
       print("missing value")
@@ -197,7 +191,7 @@ server <- function(input, output, session){
       param$pop_size_eli_result <- func_eli(input$pop_size_mat_expert)
 
       ## plot distribution
-      output$pop_size_expert_plot <- renderPlot({func_eli_plot(param$pop_size_eli_result$out)})
+      output$pop_size_expert_plot <- renderPlot({plot_elicitation(param$pop_size_eli_result$out)})
 
     } else {
       print("missing value")
@@ -215,7 +209,7 @@ server <- function(input, output, session){
       param$pop_growth_eli_result <- func_eli(input$pop_growth_mat_expert)
 
       ## plot distribution
-      output$pop_growth_expert_plot <- renderPlot({func_eli_plot(param$pop_growth_eli_result$out)})
+      output$pop_growth_expert_plot <- renderPlot({plot_elicitation(param$pop_growth_eli_result$out)})
 
     } else {
       print("missing value")
@@ -232,7 +226,7 @@ server <- function(input, output, session){
       param$carrying_cap_eli_result <- func_eli(input$carrying_cap_mat_expert)
 
       ## run elicitation analysis
-      output$carrying_cap_expert_plot <- renderPlot({func_eli_plot(param$carrying_cap_eli_result$out)})
+      output$carrying_cap_expert_plot <- renderPlot({plot_elicitation(param$carrying_cap_eli_result$out)})
 
     } else {
       print("missing value")
