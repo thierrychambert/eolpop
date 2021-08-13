@@ -69,6 +69,7 @@ lambda( build_Leslie(s = s_calibrated, f = f_calibrated) )
 #fatal_constant = "M"
 #cumulated_impacts = FALSE
 
+pop_growth_mean = 1.1
 pop_size_type = "Ntotal"
 carrying_capacity = 500
 

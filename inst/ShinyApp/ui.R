@@ -219,7 +219,8 @@ ui <- fluidPage(
 
       radioButtons(inputId = "pop_size_type",
                    label = h4("Unité"),
-                   choices = c("Nombre de couple" = "Npair", "Effectif total" = "Ntotal")),
+                   choices = c("Nombre de couple" = "Npair", "Effectif total" = "Ntotal"),
+                   selected = "Ntotal"),
 
       radioButtons(inputId = "pop_size_input_type",
                    label = h4("Type de saisie"),
@@ -265,7 +266,7 @@ ui <- fluidPage(
 
       numericInput(inputId = "pop_growth_mean",
                    label = "Moyenne de la croissance de la population",
-                   value = 1,
+                   value = 1.1,
                    min = 0, max = Inf, step = 0.01),
 
       numericInput(inputId = "pop_growth_se",
@@ -311,7 +312,7 @@ ui <- fluidPage(
 
       numericInput(inputId = "carrying_capacity",
                    label = "Capacité de charge",
-                   value = 1000,
+                   value = 500,
                    min = 0, max = Inf, step = 100),
 
       matrixInput(inputId = "carrying_cap_mat_expert",

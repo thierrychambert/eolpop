@@ -1,3 +1,4 @@
+library(eolpop)
 source("./inst/ShinyApp/ui.R")
 source("./inst/ShinyApp/server.R")
 

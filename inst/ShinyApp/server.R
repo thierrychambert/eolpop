@@ -157,6 +157,7 @@ server <- function(input, output, session){
                           carrying_cap_eli_result = NULL)
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
+  observe(param)
 
   ##--------------------------------------------
   ##  Display parameter distribution          --
@@ -192,7 +193,6 @@ server <- function(input, output, session){
   ##  Run expert elicitation                  --
   ##--------------------------------------------
   plot_expert <- function(out, show_se = TRUE, ...){
-    #plot_elicitation(out, ylab = "Densité de probabilité", xlab = "Valeur du paramètre", cex.lab = 1.2)
     plot_elicitation(out, ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2, yaxt = "n")
     mtext(text = "Densité de probabilité", side = 2, line = 2, cex = 1.2)
 
@@ -354,6 +354,17 @@ server <- function(input, output, session){
 
 
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
+  ## Survivals, fecundities and rMAX_species ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  observeEvent({input$run}, {
+    param$survivals <- input$mat_fill_vr[,1]
+    param$fecundities <- input$mat_fill_vr[,2]
+    param$rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
+  }) # end observeEvent
+
+
+
+
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
   ## Population growth ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
   observeEvent({
     input$run
@@ -398,14 +409,6 @@ server <- function(input, output, session){
       param$pop_growth_se <- input$pop_growth_se
     }
   })
-
-  # Survivals and fecundities
-  observeEvent({input$run}, {
-      param$survivals <- input$mat_fill_vr[,1]
-      param$fecundities <- input$mat_fill_vr[,2]
-      param$rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
-  }) # end observeEvent
-
 
   # Survival and fecundity calibration
   observeEvent({
@@ -466,7 +469,7 @@ server <- function(input, output, session){
                                   fecundities = param$f_calibrated,
 
                                   carrying_capacity = param$carrying_capacity,
-                                  theta = param$theta,
+                                  theta = theta,
                                   rMAX_species = param$rMAX_species,
 
                                   model_demo = NULL,
