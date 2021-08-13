@@ -20,6 +20,7 @@ data_sf <- read.csv("./inst/ShinyApp/survivals_fecundities_species.csv", sep = "
 nsim = 10
 coeff_var_environ = 0.10
 time_horzion = 30
+theta = 1 # DD parameter theta
 
 #####################
 ### Pre-fill data ###
@@ -58,17 +59,15 @@ init_cumul <- c(10, 5, 8,
 
 init_cumul_add <- c(3, 0.05, 2020)
 
-
-# DD parameters
-theta = 1
-
-# Define theoretical rMAX for the species
-#rMAX_species <- rMAX_spp(surv = tail(init_survivals,1), afr = min(which(init_fecundities != 0)))
+###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
+
+###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 ##--------------------------------------------
 ##  User Interface                          --
 ##--------------------------------------------
+###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 ui <- fluidPage(
   useShinyjs(),
   titlePanel("eolpop : Impact demographique des éoliennes"),
@@ -136,10 +135,14 @@ ui <- fluidPage(
 
     ) # # End wellPanel
   ), # End fluidRow
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
-  # Paramter Inputs (fatalities, pop size, carrying capacity, pop trend and vital rates).
 
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  ##--------------------------------------------
+  ##  Paramter Inputs                         --
+  ##--------------------------------------------
   sidebarLayout(
     sidebarPanel(
 
@@ -203,6 +206,7 @@ ui <- fluidPage(
                   rows = list(names = TRUE),
                   cols = list(names = TRUE)),
 
+      ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
       hr(),
       ##--------------------------------------------
@@ -241,11 +245,58 @@ ui <- fluidPage(
                   cols = list(names = TRUE)),
 
       actionButton(inputId = "pop_size_run_expert", label = "Utiliser valeurs experts"),
+      ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
       hr(),
       ##--------------------------------------------
-      ##  3. Carrying capacity                    --
+      ##  3. Population Growth                    --
+      ##--------------------------------------------
+      tags$style(HTML('#button_pop_trend{background-color:#C2C8D3}')),
+      actionButton(inputId = "button_pop_trend",
+                   label = tags$span("Tendance de la population", style = "font-weight: bold; font-size: 18px;")
+                   ),
+
+      radioButtons(inputId = "pop_growth_input_type",
+                   label = h4("Type de saisie"),
+                   choices = c("Taux de croissance", "Elicitation d'expert", "Tendance locale ou régionale")),
+
+      numericInput(inputId = "pop_growth_mean",
+                   label = "Moyenne de la croissance de la population",
+                   value = 1,
+                   min = 0, max = Inf, step = 0.01),
+
+      numericInput(inputId = "pop_growth_se",
+                   label = "Erreur-type de la croissance de la population",
+                   value = 0.01,
+                   min = 0, max = Inf, step = 0.01),
+
+      matrixInput(inputId = "pop_growth_mat_expert",
+                  value = matrix(data = eli_pop_growth, nrow = 4, ncol = 5,
+                                 dimnames = list(c("#1", "#2", "#3", "#4"),
+                                                 c("Poids", "Min", "Best", "Max", "% IC" )),
+                                 byrow = TRUE),
+                  class = "numeric",
+                  rows = list(names = TRUE),
+                  cols = list(names = TRUE)),
+
+      actionButton(inputId = "pop_growth_run_expert", label = "Utiliser valeurs experts"),
+
+      radioButtons(inputId = "pop_trend",
+                   label = NULL,
+                   choices = c("Croissance", "Stable", "Déclin")),
+
+      radioButtons(inputId = "pop_trend_strength",
+                   label = NULL,
+                   choices = c("Faible", "Moyen", "Fort")),
+
+
+      ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
+
+
+      hr(),
+      ##--------------------------------------------
+      ##  4. Carrying capacity                    --
       ##--------------------------------------------
       tags$style(HTML('#button_carrying_cap{background-color:#C2C8D3}')),
       actionButton(inputId = "button_carrying_cap",
@@ -272,50 +323,7 @@ ui <- fluidPage(
 
       actionButton(inputId = "carrying_cap_run_expert", label = "Utiliser valeurs experts"),
 
-
-      hr(),
-      ##--------------------------------------------
-      ##  4. Population Trend                     --
-      ##--------------------------------------------
-      tags$style(HTML('#button_pop_trend{background-color:#C2C8D3}')),
-      actionButton(inputId = "button_pop_trend",
-                   label = tags$span("Tendance de la population", style = "font-weight: bold; font-size: 18px;")
-                   ),
-
-      radioButtons(inputId = "lambda_input_type",
-                   label = h4("Type de saisie"),
-                   choices = c("Taux de croissance", "Elicitation d'expert", "Tendance locale ou régionale")),
-
-      numericInput(inputId = "pop_growth_mean",
-                   label = "Moyenne de la croissance de la population",
-                   value = 1,
-                   min = 0, max = Inf, step = 0.01),
-
-      numericInput(inputId = "pop_growth_se",
-                   label = "Erreur-type de la croissance de la population",
-                   value = 0,
-                   min = 0, max = Inf, step = 0.01),
-
-      matrixInput(inputId = "pop_growth_mat_expert",
-                  value = matrix(data = eli_pop_growth, nrow = 4, ncol = 5,
-                                 dimnames = list(c("#1", "#2", "#3", "#4"),
-                                                 c("Poids", "Min", "Best", "Max", "% IC" )),
-                                 byrow = TRUE),
-                  class = "numeric",
-                  rows = list(names = TRUE),
-                  cols = list(names = TRUE)),
-
-      actionButton(inputId = "pop_growth_run_expert", label = "Utiliser valeurs experts"),
-
-      radioButtons(inputId = "pop_trend",
-                   label = NULL,
-                   choices = c("Croissance", "Stable", "Déclin")),
-
-      radioButtons(inputId = "pop_trend_strength",
-                   label = NULL,
-                   choices = c("Faible", "Moyen", "Fort")),
-
-      # tags$style("#pop_trend_strength {position:fixed; top: 600px; right: 100px;}"),
+      ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
       hr(),
@@ -347,6 +355,31 @@ ui <- fluidPage(
 
     mainPanel(
       tabsetPanel(
+        tabPanel(title = "Distribution paramètres",
+                 br(),
+                 hr(),
+
+                 h3("Mortalités annuelles", align = "center"),
+                 plotOutput(outputId = "fatalities_distri_plot"),
+                 br(""),
+                 hr(),
+
+                 h3("Taille de la population", align = "center"),
+                 plotOutput(outputId = "pop_size_distri_plot"),
+                 br(""),
+                 hr(),
+
+                 h3("Taux de croissance de la population", align = "center"),
+                 plotOutput(outputId = "pop_growth_distri_plot"),
+                 br(""),
+                 hr(),
+
+                 h3("Capacité de charge: Elicitation d'expert", align = "center"),
+                 plotOutput(outputId = "carrying_cap_distri_plot"),
+
+        ), # End tabPanel
+
+
         tabPanel(title = "Impact population",
                  strong(span(textOutput("message"), style="color:blue; font-size:24px", align = "center")),
                  br(),
@@ -359,23 +392,9 @@ ui <- fluidPage(
                  plotOutput("graph_impact", width = "100%", height = "550px"),
                  hr(),
                  h4("Graphique : Trajectoire démographique", align = "center"),
-                 plotOutput("graph_traj", width = "100%", height = "550px")),
+                 plotOutput("graph_traj", width = "100%", height = "550px")
+        ), # End tabPanel
 
-        tabPanel(title = "Distribution paramètres",
-                 br(),
-                 hr(),
-                 h4("#Graphe élicitation d'expert pour les mortalités", align = "center"),
-                 plotOutput(outputId = "fatalities_expert_plot"),
-                 hr(),
-                 h4("#Graphe élicitation d'expert pour la taille de la population", align = "center"),
-                 plotOutput(outputId = "pop_size_expert_plot"),
-                 hr(),
-                 h4("#Graphe élicitation d'expert pour la capacité de charge", align = "center"),
-                 plotOutput(outputId = "carrying_cap_expert_plot"),
-                 hr(),
-                 h4("#Graphe élicitation d'expert pour la tendance de la population", align = "center"),
-                 plotOutput(outputId = "pop_growth_expert_plot"),
-        ),
 
         tabPanel(title = "Rapport",
                  br(),
@@ -393,8 +412,10 @@ ui <- fluidPage(
                               value = 1, min = 0, max = Inf, step = 1)
 
         ) # End tabPanel
+
       ) # End tabSetPanel
     ) # End mainPanel
+
   ) # sidebarLayout
 ) # FluidPage
 

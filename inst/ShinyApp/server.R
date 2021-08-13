@@ -23,7 +23,7 @@ server <- function(input, output, session){
     shinyjs::hide("carrying_capacity")
     shinyjs::hide("carrying_cap_mat_expert")
     shinyjs::hide("carrying_cap_run_expert")
-    shinyjs::hide("lambda_input_type")
+    shinyjs::hide("pop_growth_input_type")
     shinyjs::hide("pop_growth_mean")
     shinyjs::hide("pop_growth_se")
     shinyjs::hide("pop_growth_mat_expert")
@@ -91,16 +91,16 @@ server <- function(input, output, session){
     # Show inputs for population trend part
 
     if(input$button_pop_trend%%2 == 1){
-      shinyjs::show("lambda_input_type")
-      if(input$lambda_input_type == "Taux de croissance"){
+      shinyjs::show("pop_growth_input_type")
+      if(input$pop_growth_input_type == "Taux de croissance"){
         shinyjs::show("pop_growth_mean")
         shinyjs::show("pop_growth_se")
       }
-      if(input$lambda_input_type == "Elicitation d'expert"){
+      if(input$pop_growth_input_type == "Elicitation d'expert"){
         shinyjs::show("pop_growth_mat_expert")
         shinyjs::show("pop_growth_run_expert")
       }
-      if(input$lambda_input_type == "Tendance locale ou régionale"){
+      if(input$pop_growth_input_type == "Tendance locale ou régionale"){
         shinyjs::show("pop_trend")
         shinyjs::show("pop_trend_strength")
       }
@@ -113,11 +113,11 @@ server <- function(input, output, session){
     }
 
   }) # en observe show/hide
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
-
-  ##--------------------------------------------
-  ##  Some functions for elicitation stuff    --
-  ##--------------------------------------------
+  ##----------------------------------------------
+  ##  Function to run the elicitation analysis  --
+  ##----------------------------------------------
   # Function to extract value from elicitation matrix and run the elication analysis
   func_eli <- function(mat_expert){
     t_mat_expert <- t(mat_expert)
@@ -128,7 +128,7 @@ server <- function(input, output, session){
     out <- elicitation(vals, Cp, weights)
     return(list(out = out, mean = out$mean_smooth, SE = sqrt(out$var_smooth)))
   }
-
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
   ##--------------------------------------------
   ##  Reactive value : simulation inputs      --
@@ -155,14 +155,56 @@ server <- function(input, output, session){
                           pop_growth_mean = NULL,
                           pop_growth_se = NULL,
                           carrying_cap_eli_result = NULL)
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
+  ##--------------------------------------------
+  ##  Display parameter distribution          --
+  ##--------------------------------------------
+  plot_distri <- function(mu, se) curve(dnorm(x, mu, se), from = mu-3*se, to = mu+3*se, lwd = 3, col = "darkblue",
+                                        ylab = "Densité de probabilité", xlab = "Valeur du paramètre", cex.lab = 1.2)
+
+  ## Fatalities ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  observeEvent({
+    input$fatalities_input_type
+  },{
+  output$fatalities_distri_plot <- renderPlot({ plot_distri(mu = input$fatalities_mean, se = input$fatalities_se) })
+  })
+
+  ## Population size ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  observeEvent({
+    input$pop_size_input_type
+  },{
+    output$pop_size_distri_plot <- renderPlot({ plot_distri(mu = input$pop_size_mean, se = input$pop_size_se) })
+  })
+
+  ## Population growth ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  observeEvent({
+    input$pop_growth_input_type
+  },{
+    output$pop_growth_distri_plot <- renderPlot({ plot_distri(mu = input$pop_growth_mean, se = input$pop_growth_se) })
+  })
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
 
   ##--------------------------------------------
   ##  Run expert elicitation                  --
   ##--------------------------------------------
+  plot_expert <- function(out, show_se = TRUE, ...){
+    #plot_elicitation(out, ylab = "Densité de probabilité", xlab = "Valeur du paramètre", cex.lab = 1.2)
+    plot_elicitation(out, ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2, yaxt = "n")
+    mtext(text = "Densité de probabilité", side = 2, line = 2, cex = 1.2)
+
+    y2 <- dgamma(x = out$mean_smooth, shape = out$shape_smooth, rate = out$rate_smooth)
+    xx <- qgamma(p = c(0.01,0.99), shape = out$shape_smooth, rate = out$rate_smooth)
+    clip(xx[1], xx[2], -100, y2)
+    abline(v = out$mean_smooth, lwd = 3, col = "darkblue")
+
+    mtext(text = paste("Moyenne = ", round(out$mean_smooth,2)), side = 3, line = 2.5, cex = 1.2, adj = 0)
+    if(show_se) mtext(text = paste("Erreur-type = ", round(sqrt(out$var_smooth), 2)), side = 3, line = 1, cex = 1.2, adj = 0)
+  }
+
   ## Fatalities ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
   observeEvent({
     input$fatalities_run_expert
@@ -173,7 +215,7 @@ server <- function(input, output, session){
       param$fatalities_eli_result <- func_eli(input$fatalities_mat_expert)
 
       ## plot distribution
-      output$fatalities_expert_plot <- renderPlot({ plot_elicitation(param$fatalities_eli_result$out) })
+      output$fatalities_distri_plot <- renderPlot({ plot_expert(param$fatalities_eli_result$out) })
 
     } else {
       print("missing value")
@@ -191,7 +233,7 @@ server <- function(input, output, session){
       param$pop_size_eli_result <- func_eli(input$pop_size_mat_expert)
 
       ## plot distribution
-      output$pop_size_expert_plot <- renderPlot({plot_elicitation(param$pop_size_eli_result$out)})
+      output$pop_size_distri_plot <- renderPlot({ plot_expert(param$pop_size_eli_result$out) })
 
     } else {
       print("missing value")
@@ -209,7 +251,7 @@ server <- function(input, output, session){
       param$pop_growth_eli_result <- func_eli(input$pop_growth_mat_expert)
 
       ## plot distribution
-      output$pop_growth_expert_plot <- renderPlot({plot_elicitation(param$pop_growth_eli_result$out)})
+      output$pop_growth_distri_plot <- renderPlot({ plot_expert(param$pop_growth_eli_result$out) })
 
     } else {
       print("missing value")
@@ -226,13 +268,15 @@ server <- function(input, output, session){
       param$carrying_cap_eli_result <- func_eli(input$carrying_cap_mat_expert)
 
       ## run elicitation analysis
-      output$carrying_cap_expert_plot <- renderPlot({plot_elicitation(param$carrying_cap_eli_result$out)})
+      output$carrying_cap_distri_plot <- renderPlot({
+        plot_expert(param$carrying_cap_eli_result$out, show_se = FALSE)
+        })
 
     } else {
       print("missing value")
     } # end if
   }) # end observeEvent
-
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
 
@@ -318,14 +362,14 @@ server <- function(input, output, session){
 
   # Observe pop growth value
   observeEvent({input$run}, {
-    if(input$lambda_input_type == "Elicitation d'expert"){
+    if(input$pop_growth_input_type == "Elicitation d'expert"){
       if(!(is.null(param$pop_growth_eli_result))){
         param$pop_growth_mean <- round(min(1 + param$rMAX_species, round(param$pop_growth_eli_result$mean, 2)), 2)
         param$pop_growth_se <- round(param$pop_growth_eli_result$SE, 2)
       } else {
         print("#intégrer un message d'erreur")
       }
-    } else if(input$lambda_input_type == "Tendance locale ou régionale"){
+    } else if(input$pop_growth_input_type == "Tendance locale ou régionale"){
       if(input$pop_trend == "Croissance") {
         if(input$pop_trend_strength == "Faible") {
           param$pop_growth_mean <- 1.01
@@ -465,7 +509,7 @@ server <- function(input, output, session){
   output$fatalities_mean_info <- renderText({
     if(input$fatalities_input_type == "Elicitation d'expert"){
       if(!(is.null(param$fatalities_eli_result))){
-        info <- round(param$fatalities_eli_result$mean)
+        info <- round(param$fatalities_eli_result$mean, 2)
       } else {info <- NA}
     }
     else {
@@ -536,14 +580,14 @@ server <- function(input, output, session){
 
   ## Population growth
 
-  output$pop_trend_type_info <- renderText({paste0("Type de Tendance de pop : ", input$lambda_input_type)})
+  output$pop_trend_type_info <- renderText({paste0("Type de Tendance de pop : ", input$pop_growth_input_type)})
 
   output$pop_growth_mean_info <- renderText({
-    if(input$lambda_input_type == "Elicitation d'expert"){
+    if(input$pop_growth_input_type == "Elicitation d'expert"){
       if(!(is.null(param$pop_growth_eli_result))){
         info <- round(param$pop_growth_eli_result$mean, 2)
       } else {info <- NA}
-    } else if(input$lambda_input_type == "Tendance locale ou régionale"){
+    } else if(input$pop_growth_input_type == "Tendance locale ou régionale"){
         if(input$pop_trend == "Croissance") {
           if(input$pop_trend_strength == "Faible") {
             info <- 1.01
@@ -570,11 +614,11 @@ server <- function(input, output, session){
   })
 
   output$pop_growth_se_info <- renderText({
-    if(input$lambda_input_type == "Elicitation d'expert"){
+    if(input$pop_growth_input_type == "Elicitation d'expert"){
       if(!(is.null(param$pop_growth_eli_result))){
         info <- round(param$pop_growth_eli_result$SE, 2)
       } else {info <- NA}
-    } else if (input$lambda_input_type == "Tendance locale ou régionale") {
+    } else if (input$pop_growth_input_type == "Tendance locale ou régionale") {
       info <- 0.03
     }
     else {

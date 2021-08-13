@@ -91,6 +91,8 @@ elicitation <- function(vals, Cp, weights = 1, lower = 0, upper = Inf){
 #' Function to plot the expert elicitation curves
 #'
 #' @param out the output list from the elicitation function
+#' @param ... additional graphical parameters passed onto the classic "plot" function
+#'
 #'
 #' @return a plot of the estimated distirbution (elitation curves) of elicited parameters
 #' @export
@@ -114,7 +116,7 @@ elicitation <- function(vals, Cp, weights = 1, lower = 0, upper = Inf){
 #' ## Plot it
 #' plot_elicitation(out)
 #'
-plot_elicitation <- function(out){
+plot_elicitation <- function(out, ...){
 
   fit_raw = out$fit_raw
 
@@ -142,13 +144,24 @@ plot_elicitation <- function(out){
 
 
   # Plot
+  xlim <- qgamma(p = c(0.001,0.999), shape = out$shape_smooth, rate = out$rate_smooth)
   ylim = c(min(c(Y_i, Y_smooth, LP$y)), max(c(Y_i, Y_smooth, LP$y)))
-  plot(x = LP$x, y = LP$f, type = "l", col = "darkblue", lwd = 3, ylim = ylim,
-       ylab = "Density", xlab = "x")
-  points(x = LP$x, y = Y_smooth, type = "l", col = "green", lwd = 3)
-  for(i in 1:nrow(fit_raw$Gamma)) points(x = X_i[i,], y = Y_i[i,], type = "l", col = i, lwd = 1, lty = 2)
 
-} # End of function
+  plot(x = LP$x, y = Y_smooth, type = "l", col = "darkblue", lwd = 3, ylim = ylim, xlim = xlim, ...)
+  for(i in 1:n_experts) points(x = X_i[i,], y = Y_i[i,], type = "l", col = i, lwd = 1, lty = 2)
+
+  # lengend
+  legend(x = xlim[2], y = max(Y_smooth, Y_i), xjust = 1,
+         legend = c(paste0("Expert #", 1:n_experts), "Estimation globale"),
+         lty = c(rep(3, n_experts), 1), lwd = c(rep(1, n_experts), 3),
+         col = c(1:n_experts, "darkblue"),
+         text.col = c(1:n_experts, "darkblue"), text.font = c(rep(1, n_experts), 2),
+         bty = "n", y.intersp = 1.5
+  )
+
+  # points(x = LP$x, y = LP$f, type = "l", col = "green", lwd = 3)
+
+  } # End of function
 ################################################################################
 
 
