@@ -64,9 +64,11 @@ lambda( build_Leslie(s = s_calibrated, f = f_calibrated) )
 
 
 
-pop_size_mean = 200
-pop_growth_mean = 1.1
-fatal_constant = "M"
+#pop_size_mean = 200
+#pop_growth_mean = 1.1
+#fatal_constant = "M"
+#cumulated_impacts = FALSE
+
 pop_size_type = "Ntotal"
 carrying_capacity = 500
 
@@ -74,16 +76,34 @@ carrying_capacity = 500
 ##==============================================================================
 ##                         Analyses (simulations)                             ==
 ##==============================================================================
-run0 <- run_simul(nsim, cumulated_impacts,
-                  fatalities_mean, fatalities_se, onset_time,
-                  pop_size_mean, pop_size_se, pop_size_type,
-                  pop_growth_mean, pop_growth_se,
-                  survivals = s_calibrated, fecundities = f_calibrated,
-                  carrying_capacity = carrying_capacity, theta = theta,
-                  rMAX_species = rMAX_species,
-                  model_demo, time_horzion, coeff_var_environ, fatal_constant)
+run0 <- run_simul(nsim = nsim,
+                            cumulated_impacts = cumulated_impacts,
+
+                            fatalities_mean = fatalities_mean,
+                            fatalities_se = fatalities_se,
+                            onset_time = onset_time,
+
+                            pop_size_mean = pop_size_mean,
+                            pop_size_se = pop_size_se,
+                            pop_size_type = pop_size_type,
+
+                            pop_growth_mean = pop_growth_mean,
+                            pop_growth_se = pop_growth_se,
+
+                            survivals = s_calibrated,
+                            fecundities = f_calibrated,
+
+                            carrying_capacity = carrying_capacity,
+                            theta = theta,
+                            rMAX_species = rMAX_species,
+
+                            model_demo = NULL,
+                            time_horzion = time_horzion,
+                            coeff_var_environ = coeff_var_environ,
+                            fatal_constant = fatal_constant)
 
 
+#####################################################
 
 
 names(run0)

@@ -41,11 +41,11 @@ server <- function(input, output, session){
 
       if(input$analysis_choice == "scenario"){
         shinyjs::show("fatalities_input_type")
-        if(input$fatalities_input_type == "Valeurs"){
+        if(input$fatalities_input_type == "val"){
           shinyjs::show("fatalities_mean")
           shinyjs::show("fatalities_se")
         }
-        if(input$fatalities_input_type == "Elicitation d'expert"){
+        if(input$fatalities_input_type == "eli_exp"){
           shinyjs::show("fatalities_mat_expert")
           shinyjs::show("fatalities_run_expert")
         }
@@ -65,11 +65,11 @@ server <- function(input, output, session){
     if(input$button_pop_size%%2 == 1){
       shinyjs::show("pop_size_type")
       shinyjs::show("pop_size_input_type")
-      if(input$pop_size_input_type == "Valeurs"){
+      if(input$pop_size_input_type == "val"){
         shinyjs::show("pop_size_mean")
         shinyjs::show("pop_size_se")
       }
-      if(input$pop_size_input_type == "Elicitation d'expert"){
+      if(input$pop_size_input_type == "eli_exp"){
         shinyjs::show("pop_size_mat_expert")
         shinyjs::show("pop_size_run_expert")
       }
@@ -79,10 +79,10 @@ server <- function(input, output, session){
 
     if(input$button_carrying_cap%%2 == 1){
       shinyjs::show("carrying_cap_input_type")
-      if(input$carrying_cap_input_type == "Valeurs"){
+      if(input$carrying_cap_input_type == "val"){
         shinyjs::show("carrying_capacity")
       }
-      if(input$carrying_cap_input_type == "Elicitation d'expert"){
+      if(input$carrying_cap_input_type == "eli_exp"){
         shinyjs::show("carrying_cap_mat_expert")
         shinyjs::show("carrying_cap_run_expert")
       }
@@ -92,15 +92,15 @@ server <- function(input, output, session){
 
     if(input$button_pop_trend%%2 == 1){
       shinyjs::show("pop_growth_input_type")
-      if(input$pop_growth_input_type == "Taux de croissance"){
+      if(input$pop_growth_input_type == "val"){
         shinyjs::show("pop_growth_mean")
         shinyjs::show("pop_growth_se")
       }
-      if(input$pop_growth_input_type == "Elicitation d'expert"){
+      if(input$pop_growth_input_type == "eli_exp"){
         shinyjs::show("pop_growth_mat_expert")
         shinyjs::show("pop_growth_run_expert")
       }
-      if(input$pop_growth_input_type == "Tendance locale ou régionale"){
+      if(input$pop_growth_input_type == "trend"){
         shinyjs::show("pop_trend")
         shinyjs::show("pop_trend_strength")
       }
@@ -280,13 +280,11 @@ server <- function(input, output, session){
 
 
 
-
-
-
   ##--------------------------------------------
-  ##  Observe input and report values         --
+  ## Select parameter values for simulations  --
   ##--------------------------------------------
-  ## Cumulated impacts or not ?
+
+  ## Cumulated impacts or not ? ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
   observeEvent({
     input$run
   }, {
@@ -298,19 +296,7 @@ server <- function(input, output, session){
   }) # end observeEvent
 
 
-
-
-
-  ### Plot distribution
-
-
-
-
-
-
-  ##--------------------------------------------
-  ## Select parameter values for simulations  --
-  ##--------------------------------------------
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
   ## Fatalities ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
   observeEvent({
     input$run
@@ -319,7 +305,7 @@ server <- function(input, output, session){
     if(input$analysis_choice == "scenario"){
 
       # Case 1.1 : Values from expert elicitation (if2)
-      if(input$fatalities_input_type == "Elicitation d'expert"){
+      if(input$fatalities_input_type == "eli_exp"){
         param$fatalities_mean <- c(0, round(param$fatalities_eli_result$mean))
         param$onset_time <- NULL
         param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE))
@@ -341,18 +327,24 @@ server <- function(input, output, session){
     } # end (if1)
 
   }) # end observeEvent
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  ## Population size ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  observeEvent({
+    input$run
+  },{
 
-  # Observe pop size value
-  ## Mean, se and type
-  observeEvent({input$run},{
-    if(input$pop_size_input_type == "Elicitation d'expert"){
+    # Case 1 : Values from expert elicitation
+    if(input$pop_size_input_type == "eli_exp"){
       if(!(is.null(param$pop_size_eli_result))){
         param$pop_size_mean <- round(param$pop_size_eli_result$mean)
         param$pop_size_se <- round(param$pop_size_eli_result$SE)
       } else {
-        print("#intégrer un message d'erreur")
+        print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
       }
+
+    # Case 2 : Values directly provided (i.e., not from expert elicitation)
     } else {
       param$pop_size_mean <- input$pop_size_mean
       param$pop_size_se <- input$pop_size_se
@@ -360,16 +352,25 @@ server <- function(input, output, session){
     param$pop_size_type <- input$pop_size_type
   })
 
-  # Observe pop growth value
-  observeEvent({input$run}, {
-    if(input$pop_growth_input_type == "Elicitation d'expert"){
+
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
+  ## Population growth ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  observeEvent({
+    input$run
+  }, {
+
+    # Case 1 : Values from expert elicitation
+    if(input$pop_growth_input_type == "eli_exp"){
       if(!(is.null(param$pop_growth_eli_result))){
         param$pop_growth_mean <- round(min(1 + param$rMAX_species, round(param$pop_growth_eli_result$mean, 2)), 2)
         param$pop_growth_se <- round(param$pop_growth_eli_result$SE, 2)
       } else {
-        print("#intégrer un message d'erreur")
+        print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
       }
-    } else if(input$pop_growth_input_type == "Tendance locale ou régionale"){
+
+    # Case 2 : Trend information
+    } else if(input$pop_growth_input_type == "trend"){
+
       if(input$pop_trend == "Croissance") {
         if(input$pop_trend_strength == "Faible") {
           param$pop_growth_mean <- 1.01
@@ -390,8 +391,9 @@ server <- function(input, output, session){
         param$pop_growth_mean <- 1
       }
       param$pop_growth_se <- 0.03
-    }
-    else {
+
+    # Case 3 : Values directly provided (i.e., not from expert elicitation)
+    } else {
       param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 2)
       param$pop_growth_se <- input$pop_growth_se
     }
@@ -420,7 +422,7 @@ server <- function(input, output, session){
 
   # Observe carrying capacity
   observeEvent({input$run}, {
-    if(input$carrying_cap_input_type == "Elicitation d'expert"){
+    if(input$carrying_cap_input_type == "eli_exp"){
       if(!(is.null(param$carrying_cap_eli_result))){
         param$carrying_capacity <- round(param$carrying_cap_eli_result$mean)
       } else {
@@ -505,12 +507,13 @@ server <- function(input, output, session){
 
 
   ## Fatalities
-
   output$fatalities_mean_info <- renderText({
-    if(input$fatalities_input_type == "Elicitation d'expert"){
+    if(input$fatalities_input_type == "eli_exp"){
       if(!(is.null(param$fatalities_eli_result))){
         info <- round(param$fatalities_eli_result$mean, 2)
-      } else {info <- NA}
+      } else {
+        info <- NA
+      }
     }
     else {
       info <- input$fatalities_mean
@@ -519,16 +522,27 @@ server <- function(input, output, session){
   })
 
   output$fatalities_se_info <- renderText({
-    if(input$fatalities_input_type == "Elicitation d'expert"){
+    if(input$fatalities_input_type == "eli_exp"){
       if(!(is.null(param$fatalities_eli_result))){
-        info <- round(param$fatalities_eli_result$SE)
-      } else {info <- NA}
+        info <- round(param$fatalities_eli_result$SE, 2)
+      } else {
+        info <- NA
+      }
     }
     else {
       info <- input$fatalities_se
     }
     paste0("Erreur-type : ", info)
   })
+
+
+
+
+
+
+
+
+
 
   ## Poplutation size
 
@@ -541,7 +555,7 @@ server <- function(input, output, session){
   })
 
   output$pop_size_mean_info <- renderText({
-    if(input$pop_size_input_type == "Elicitation d'expert"){
+    if(input$pop_size_input_type == "eli_exp"){
       if(!(is.null(param$pop_size_eli_result))){
         info <- round(param$pop_size_eli_result$mean)
       } else {info <- NA}
@@ -553,7 +567,7 @@ server <- function(input, output, session){
   })
 
   output$pop_size_se_info <- renderText({
-    if(input$pop_size_input_type == "Elicitation d'expert"){
+    if(input$pop_size_input_type == "eli_exp"){
       if(!(is.null(param$pop_size_eli_result))){
         info <- round(param$pop_size_eli_result$SE)
       } else {info <- NA}
@@ -567,7 +581,7 @@ server <- function(input, output, session){
   ## Carrying capacity
 
   output$carrying_capacity_info <- renderText({
-    if(input$carrying_cap_input_type == "Elicitation d'expert"){
+    if(input$carrying_cap_input_type == "eli_exp"){
       if(!(is.null(param$carrying_cap_eli_result))){
         info <- round(param$carrying_cap_eli_result$mean)
       } else {info <- NA}
@@ -583,11 +597,11 @@ server <- function(input, output, session){
   output$pop_trend_type_info <- renderText({paste0("Type de Tendance de pop : ", input$pop_growth_input_type)})
 
   output$pop_growth_mean_info <- renderText({
-    if(input$pop_growth_input_type == "Elicitation d'expert"){
+    if(input$pop_growth_input_type == "eli_exp"){
       if(!(is.null(param$pop_growth_eli_result))){
         info <- round(param$pop_growth_eli_result$mean, 2)
       } else {info <- NA}
-    } else if(input$pop_growth_input_type == "Tendance locale ou régionale"){
+    } else if(input$pop_growth_input_type == "trend"){
         if(input$pop_trend == "Croissance") {
           if(input$pop_trend_strength == "Faible") {
             info <- 1.01
@@ -614,11 +628,11 @@ server <- function(input, output, session){
   })
 
   output$pop_growth_se_info <- renderText({
-    if(input$pop_growth_input_type == "Elicitation d'expert"){
+    if(input$pop_growth_input_type == "eli_exp"){
       if(!(is.null(param$pop_growth_eli_result))){
         info <- round(param$pop_growth_eli_result$SE, 2)
       } else {info <- NA}
-    } else if (input$pop_growth_input_type == "Tendance locale ou régionale") {
+    } else if (input$pop_growth_input_type == "trend") {
       info <- 0.03
     }
     else {

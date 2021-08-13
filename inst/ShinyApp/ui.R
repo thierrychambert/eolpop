@@ -166,7 +166,7 @@ ui <- fluidPage(
       # Input type
       radioButtons(inputId = "fatalities_input_type",
                    label = h4("Type de saisie"),
-                   choices = c("Valeurs", "Elicitation d'expert")),
+                   choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
 
       # Values
       numericInput(inputId = "fatalities_mean",
@@ -223,7 +223,7 @@ ui <- fluidPage(
 
       radioButtons(inputId = "pop_size_input_type",
                    label = h4("Type de saisie"),
-                   choices = c("Valeurs", "Elicitation d'expert")),
+                   choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
 
       numericInput(inputId = "pop_size_mean",
                    label = "Moyenne de la taille de la population",
@@ -259,7 +259,9 @@ ui <- fluidPage(
 
       radioButtons(inputId = "pop_growth_input_type",
                    label = h4("Type de saisie"),
-                   choices = c("Taux de croissance", "Elicitation d'expert", "Tendance locale ou régionale")),
+                   choices = c("Taux de croissance" = "val",
+                               "Elicitation d'expert" = "eli_exp",
+                               "Tendance locale ou régionale" = "trend")),
 
       numericInput(inputId = "pop_growth_mean",
                    label = "Moyenne de la croissance de la population",
@@ -305,7 +307,7 @@ ui <- fluidPage(
 
       radioButtons(inputId = "carrying_cap_input_type",
                    label = h4("Type de saisie"),
-                   choices = c("Valeurs", "Elicitation d'expert")),
+                   choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
 
       numericInput(inputId = "carrying_capacity",
                    label = "Capacité de charge",
