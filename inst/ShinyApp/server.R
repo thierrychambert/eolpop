@@ -280,23 +280,29 @@ server <- function(input, output, session){
   ## Fatalities ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
   observeEvent({
     input$fatalities_input_type
+    input$button_fatalities
   },{
-    output$fatalities_distri_plot <- renderPlot({ plot_gamma(mu = input$fatalities_mean, se = input$fatalities_se) })
-  })
+    output$title_distri_plot <- renderText({ "Mortalités annuelles"  })
+    output$distri_plot <- renderPlot({ plot_gamma(mu = input$fatalities_mean, se = input$fatalities_se) })
+  }, ignoreInit = TRUE)
 
   ## Population size ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
   observeEvent({
     input$pop_size_input_type
+    input$button_pop_size
   },{
-    output$pop_size_distri_plot <- renderPlot({ plot_gamma(mu = input$pop_size_mean, se = input$pop_size_se) })
-  })
+    output$title_distri_plot <- renderText({ "Taille de population"  })
+    output$distri_plot <- renderPlot({ plot_gamma(mu = input$pop_size_mean, se = input$pop_size_se) })
+  }, ignoreInit = TRUE)
 
   ## Population growth ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
   observeEvent({
     input$pop_growth_input_type
+    input$button_pop_growth
   },{
-    output$pop_growth_distri_plot <- renderPlot({ plot_gamma(mu = input$pop_growth_mean, se = input$pop_growth_se) })
-  })
+    output$title_distri_plot <- renderText({ "Taux de croissance de la population"  })
+    output$distri_plot <- renderPlot({ plot_gamma(mu = input$pop_growth_mean, se = input$pop_growth_se) })
+  }, ignoreInit = TRUE)
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
@@ -327,7 +333,8 @@ server <- function(input, output, session){
       param$fatalities_eli_result <- func_eli(input$fatalities_mat_expert)
 
       ## plot distribution
-      output$fatalities_distri_plot <- renderPlot({ plot_expert(param$fatalities_eli_result$out) })
+      output$title_distri_plot <- renderText({ "Mortalités annuelles"  })
+      output$distri_plot <- renderPlot({ plot_expert(param$fatalities_eli_result$out) })
 
     } else {
       print("missing value")
@@ -345,7 +352,8 @@ server <- function(input, output, session){
       param$pop_size_eli_result <- func_eli(input$pop_size_mat_expert)
 
       ## plot distribution
-      output$pop_size_distri_plot <- renderPlot({ plot_expert(param$pop_size_eli_result$out) })
+      output$title_distri_plot <- renderText({ "Taille de population"  })
+      output$distri_plot <- renderPlot({ plot_expert(param$pop_size_eli_result$out) })
 
     } else {
       print("missing value")
@@ -363,7 +371,8 @@ server <- function(input, output, session){
       param$pop_growth_eli_result <- func_eli(input$pop_growth_mat_expert)
 
       ## plot distribution
-      output$pop_growth_distri_plot <- renderPlot({ plot_expert(param$pop_growth_eli_result$out) })
+      output$title_distri_plot <- renderText({ "Taux de croissance de la population"  })
+      output$distri_plot <- renderPlot({ plot_expert(param$pop_growth_eli_result$out) })
 
     } else {
       print("missing value")
@@ -380,9 +389,8 @@ server <- function(input, output, session){
       param$carrying_cap_eli_result <- func_eli(input$carrying_cap_mat_expert)
 
       ## run elicitation analysis
-      output$carrying_cap_distri_plot <- renderPlot({
-        plot_expert(param$carrying_cap_eli_result$out, show_se = FALSE)
-      })
+      output$title_distri_plot <- renderText({ "Capacité de charge"  })
+      output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out, show_se = FALSE) })
 
     } else {
       print("missing value")

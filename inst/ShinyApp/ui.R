@@ -278,6 +278,7 @@ rm(list = ls(all.names = TRUE))
                                                                     "Elicitation d'expert" = "eli_exp",
                                                                     "Tendance locale ou régionale" = "trend")),
 
+                                           ## Input values: mean and se
                                            numericInput(inputId = "pop_growth_mean",
                                                         label = "Moyenne de la croissance de la population",
                                                         value = 1.1,
@@ -288,6 +289,7 @@ rm(list = ls(all.names = TRUE))
                                                         value = 0.01,
                                                         min = 0, max = Inf, step = 0.01),
 
+                                           ## Input expert elicitation: table
                                            matrixInput(inputId = "pop_growth_mat_expert",
                                                        value = matrix(data = eli_pop_growth, nrow = 4, ncol = 5,
                                                                       dimnames = list(c("#1", "#2", "#3", "#4"),
@@ -299,13 +301,22 @@ rm(list = ls(all.names = TRUE))
 
                                            actionButton(inputId = "pop_growth_run_expert", label = "Utiliser valeurs experts"),
 
-                                           radioButtons(inputId = "pop_trend",
-                                                        label = NULL,
-                                                        choices = c("Croissance", "Stable", "Déclin")),
+                                           ## Input trend: radio buttons
+                                           {fluidRow(
+                                             # Trend
+                                             column(6,
+                                                    radioButtons(inputId = "pop_trend",
+                                                                 label = "Tendance",
+                                                                 choices = c("Croissance", "Stable", "Déclin")),
+                                             ),
 
-                                           radioButtons(inputId = "pop_trend_strength",
-                                                        label = NULL,
-                                                        choices = c("Faible", "Moyen", "Fort")),
+                                             # Strength of trend
+                                             column(6,
+                                                    radioButtons(inputId = "pop_trend_strength",
+                                                                 label = "Force",
+                                                                 choices = c("Faible", "Moyen", "Fort")),
+                                             ),
+                                           )}, # close fluidRow
 
                                 )}, # close wellPanel
 
@@ -423,23 +434,9 @@ rm(list = ls(all.names = TRUE))
                  br(),
                  hr(),
 
-                 h3("Mortalités annuelles", align = "center"),
-                 plotOutput(outputId = "fatalities_distri_plot"),
-                 br(""),
-                 hr(),
-
-                 h3("Taille de la population", align = "center"),
-                 plotOutput(outputId = "pop_size_distri_plot"),
-                 br(""),
-                 hr(),
-
-                 h3("Taux de croissance de la population", align = "center"),
-                 plotOutput(outputId = "pop_growth_distri_plot"),
-                 br(""),
-                 hr(),
-
-                 h3("Capacité de charge: Elicitation d'expert", align = "center"),
-                 plotOutput(outputId = "carrying_cap_distri_plot"),
+                 #h3("Mortalités annuelles", align = "center"),
+                 span(textOutput(outputId = "title_distri_plot"), style="font-size:24px; font-weight:bold"),
+                 plotOutput(outputId = "distri_plot"),
 
         ), # End tabPanel
 
