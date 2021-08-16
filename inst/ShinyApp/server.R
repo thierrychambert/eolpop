@@ -194,28 +194,47 @@ server <- function(input, output, session){
   ##--------------------------------------------
   ##  Display parameter distribution          --
   ##--------------------------------------------
-  plot_distri <- function(mu, se) curve(dnorm(x, mu, se), from = mu-3*se, to = mu+3*se, lwd = 3, col = "darkblue",
-                                        ylab = "Densité de probabilité", xlab = "Valeur du paramètre", cex.lab = 1.2)
+
+  ## Function to plot a gamma distribution
+  plot_gamma <- function(mu, se, show_se = TRUE, ...){
+
+    ## Define shape and scale parameter of gamma distribution
+    shape = (mu/se)^2
+    scale = se^2/mu
+
+    ## Plot the curve
+    curve(dgamma(x, shape=shape, scale=scale), from = max(0,mu-3*se), to = mu+4*se, lwd = 3, col = "darkblue", yaxt = "n",
+          ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2)
+    mtext(text = "Densité de probabilité", side = 2, line = 2, cex = 1.2)
+
+    y2 <- dgamma(x = mu, shape = shape, scale = scale)
+    xx <- qgamma(p = c(0.01,0.99), shape = shape, scale = scale)
+    clip(xx[1], xx[2], -100, y2)
+    abline(v = mu, lwd = 3, col = "darkblue")
+
+    mtext(text = paste("Moyenne = ", round(mu, 2)), side = 3, line = 2.5, cex = 1.2, adj = 0)
+    if(show_se) mtext(text = paste("Erreur-type = ", round(se, 2)), side = 3, line = 1, cex = 1.2, adj = 0)
+  }
 
   ## Fatalities ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
   observeEvent({
     input$fatalities_input_type
   },{
-  output$fatalities_distri_plot <- renderPlot({ plot_distri(mu = input$fatalities_mean, se = input$fatalities_se) })
+  output$fatalities_distri_plot <- renderPlot({ plot_gamma(mu = input$fatalities_mean, se = input$fatalities_se) })
   })
 
   ## Population size ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
   observeEvent({
     input$pop_size_input_type
   },{
-    output$pop_size_distri_plot <- renderPlot({ plot_distri(mu = input$pop_size_mean, se = input$pop_size_se) })
+    output$pop_size_distri_plot <- renderPlot({ plot_gamma(mu = input$pop_size_mean, se = input$pop_size_se) })
   })
 
   ## Population growth ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
   observeEvent({
     input$pop_growth_input_type
   },{
-    output$pop_growth_distri_plot <- renderPlot({ plot_distri(mu = input$pop_growth_mean, se = input$pop_growth_se) })
+    output$pop_growth_distri_plot <- renderPlot({ plot_gamma(mu = input$pop_growth_mean, se = input$pop_growth_se) })
   })
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
