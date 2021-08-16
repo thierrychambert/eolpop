@@ -2,8 +2,20 @@ server <- function(input, output, session){
 
 
   ##--------------------------------------------
-  ##  Hide all inputs excepted actionButtons  --
+  ##  Hide/Show : level 1
   ##--------------------------------------------
+
+  ## Fatalities
+  output$hide_fatalities <- eventReactive({
+    input$button_fatalities
+  },{
+    if(input$button_fatalities%%2 == 1) TRUE else FALSE
+  }, ignoreInit = TRUE)
+
+  outputOptions(output, "hide_fatalities", suspendWhenHidden = FALSE)
+
+
+  ## Population Size
   output$hide_pop_size <- eventReactive({
     input$button_pop_size
   },{
@@ -13,13 +25,42 @@ server <- function(input, output, session){
   outputOptions(output, "hide_pop_size", suspendWhenHidden = FALSE)
 
 
+  ## Population Growth
+  output$hide_pop_growth <- eventReactive({
+    input$button_pop_growth
+  },{
+    if(input$button_pop_growth%%2 == 1) TRUE else FALSE
+  }, ignoreInit = TRUE)
+
+  outputOptions(output, "hide_pop_growth", suspendWhenHidden = FALSE)
+
+
+  ## Carrying capacity
+  output$hide_carrying_cap <- eventReactive({
+    input$button_carrying_cap
+  },{
+    if(input$button_carrying_cap%%2 == 1) TRUE else FALSE
+  }, ignoreInit = TRUE)
+
+  outputOptions(output, "hide_carrying_cap", suspendWhenHidden = FALSE)
+
+  # Display Carrying capacity Unit Info
+  output$carrying_cap_unit_info <- renderText({
+    if(input$pop_size_unit == "Npair"){
+      paste0("Nombre de couple")
+    } else {
+      paste0("Effectif total")
+    }
+  })
+
+
   ##--------------------------------------------
-  ##  Hide all inputs excepted actionButtons  --
+  ##  Hide/Show : level 2
   ##--------------------------------------------
   observe({
 
     #shinyjs::hide("fatal_constant")
-    shinyjs::hide("fatalities_input_type")
+    #shinyjs::hide("fatalities_input_type")
     shinyjs::hide("fatalities_mean")
     shinyjs::hide("fatalities_se")
     shinyjs::hide("fatalities_mat_expert")
@@ -28,24 +69,25 @@ server <- function(input, output, session){
     shinyjs::hide("fatalities_mat_cumulated")
 
     #shinyjs::hide("pop_size_unit")
-    shinyjs::hide("pop_size_input_type")
+    #shinyjs::hide("pop_size_input_type")
     shinyjs::hide("pop_size_mean")
     shinyjs::hide("pop_size_se")
     shinyjs::hide("pop_size_mat_expert")
     shinyjs::hide("pop_size_run_expert")
 
-    shinyjs::hide("carrying_cap_input_type")
-    shinyjs::hide("carrying_capacity")
-    shinyjs::hide("carrying_cap_mat_expert")
-    shinyjs::hide("carrying_cap_run_expert")
-
-    shinyjs::hide("pop_growth_input_type")
+    #shinyjs::hide("pop_growth_input_type")
     shinyjs::hide("pop_growth_mean")
     shinyjs::hide("pop_growth_se")
     shinyjs::hide("pop_growth_mat_expert")
     shinyjs::hide("pop_growth_run_expert")
     shinyjs::hide("pop_trend")
     shinyjs::hide("pop_trend_strength")
+
+
+    #shinyjs::hide("carrying_cap_input_type")
+    shinyjs::hide("carrying_capacity")
+    shinyjs::hide("carrying_cap_mat_expert")
+    shinyjs::hide("carrying_cap_run_expert")
 
     shinyjs::hide("mat_fill_vr")
 
@@ -109,7 +151,7 @@ server <- function(input, output, session){
 
     # Show inputs for population trend part
 
-    if(input$button_pop_trend%%2 == 1){
+    if(input$button_pop_growth%%2 == 1){
       shinyjs::show("pop_growth_input_type")
       if(input$pop_growth_input_type == "val"){
         shinyjs::show("pop_growth_mean")
@@ -614,7 +656,6 @@ server <- function(input, output, session){
 
 
   ## Poplutation size
-
   output$pop_size_unit_info <- renderText({
     if(input$pop_size_unit == "Npair"){
       paste0("Nombre de couple")

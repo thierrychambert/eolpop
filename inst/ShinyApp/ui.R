@@ -142,55 +142,61 @@ rm(list = ls(all.names = TRUE))
       {column(width = 3,
 
               tags$style(HTML('#button_fatalities{background-color:#C2C8D3}')),
-              actionButton(inputId = "button_fatalities",
+              actionButton(inputId = "button_fatalities", width = '100%',
                            label = tags$span("Mortalités annuelles", style = "font-weight: bold; font-size: 18px;")
               ),
 
-              br(""),
-
               ### Part for non-cumulated impacts
               # Input type
-              radioButtons(inputId = "fatalities_input_type",
-                           label = "Type de saisie",
-                           choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
+              {conditionalPanel("output.hide_fatalities",
+                                br(),
 
-              # Values
-              numericInput(inputId = "fatalities_mean",
-                           label = "Moyenne des mortalités annuelles",
-                           value = 5,
-                           min = 0, max = Inf, step = 0.5),
-              numericInput(inputId = "fatalities_se",
-                           label = "Erreur-type des mortalités annuelles",
-                           value = 0.05,
-                           min = 0, max = Inf, step = 0.1),
+                                {wellPanel(style = "background:#F0F8FF",
 
-              # Matrix for expert elicitation
-              matrixInput(inputId = "fatalities_mat_expert",
-                          value = matrix(data = eli_fatalities, nrow = 4, ncol = 5,
-                                         dimnames = list(c("#1", "#2", "#3", "#4"),
-                                                         c("Poids", "Min", "Best", "Max", "% IC" )),
-                                         byrow = TRUE),
-                          class = "numeric",
-                          rows = list(names = TRUE),
-                          cols = list(names = TRUE)),
+                                           radioButtons(inputId = "fatalities_input_type",
+                                                        label = "Type de saisie",
+                                                        choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
 
-              actionButton(inputId = "fatalities_run_expert", label = "Utiliser valeurs experts"),
+                                           # Values
+                                           numericInput(inputId = "fatalities_mean",
+                                                        label = "Moyenne des mortalités annuelles",
+                                                        value = 5,
+                                                        min = 0, max = Inf, step = 0.5),
+                                           numericInput(inputId = "fatalities_se",
+                                                        label = "Erreur-type des mortalités annuelles",
+                                                        value = 0.05,
+                                                        min = 0, max = Inf, step = 0.1),
 
-              ### Part for cumulated impacts
+                                           # Matrix for expert elicitation
+                                           matrixInput(inputId = "fatalities_mat_expert",
+                                                       value = matrix(data = eli_fatalities, nrow = 4, ncol = 5,
+                                                                      dimnames = list(c("#1", "#2", "#3", "#4"),
+                                                                                      c("Poids", "Min", "Best", "Max", "% IC" )),
+                                                                      byrow = TRUE),
+                                                       class = "numeric",
+                                                       rows = list(names = TRUE),
+                                                       cols = list(names = TRUE)),
 
-              numericInput(inputId = "farm_number_cumulated",
-                           label = "Nombre de parcs éoliens",
-                           value = 3, min = 2, max = Inf, step = 1),
+                                           actionButton(inputId = "fatalities_run_expert", label = "Utiliser valeurs experts"),
 
-              matrixInput(inputId = "fatalities_mat_cumulated",
-                          value = matrix(init_cumul, 3, 3,
-                                         dimnames = list(c(paste0("Parc n°", c(1:3))),
-                                                         c("Moyenne",
-                                                           "Erreur-type",
-                                                           "Année de mise en service du parc"))),
-                          class = "numeric",
-                          rows = list(names = TRUE),
-                          cols = list(names = TRUE)),
+                                           ### Part for cumulated impacts
+
+                                           numericInput(inputId = "farm_number_cumulated",
+                                                        label = "Nombre de parcs éoliens",
+                                                        value = 3, min = 2, max = Inf, step = 1),
+
+                                           matrixInput(inputId = "fatalities_mat_cumulated",
+                                                       value = matrix(init_cumul, 3, 3,
+                                                                      dimnames = list(c(paste0("Parc n°", c(1:3))),
+                                                                                      c("Moyenne",
+                                                                                        "Erreur-type",
+                                                                                        "Année de mise en service du parc"))),
+                                                       class = "numeric",
+                                                       rows = list(names = TRUE),
+                                                       cols = list(names = TRUE)),
+                                )}, # close wellPanel
+
+              )}, # close conditional panel
 
       )}, # end column "mortalité"
 
@@ -203,45 +209,49 @@ rm(list = ls(all.names = TRUE))
       {column(width = 3,
 
               tags$style(HTML('#button_pop_size{background-color:#C2C8D3}')),
-              actionButton(inputId = "button_pop_size",
+              actionButton(inputId = "button_pop_size", width = '100%',
                            label = tags$span("Taille de la population", style = "font-weight: bold; font-size: 18px;")
               ),
 
-              br(""),
+              {conditionalPanel("output.hide_pop_size",
+                              br(),
 
-              conditionalPanel("output.hide_pop_size",
-                               wellPanel(style = "background:#FFF8DC",
+                              {wellPanel(style = "background:#FFF8DC",
                                  radioButtons(inputId = "pop_size_unit", inline = TRUE,
                                               label = "Unité",
                                               choices = c("Nombre de couple" = "Npair", "Effectif total" = "Ntotal"),
                                               selected = "Ntotal"),
-                               ),
-              ),
+                              )}, # close wellPanel 1
 
-              radioButtons(inputId = "pop_size_input_type",
-                           label = "Type de saisie",
-                           choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
+                              {wellPanel(style = "background:#F0F8FF",
 
-              numericInput(inputId = "pop_size_mean",
-                           label = "Moyenne de la taille de la population",
-                           value = 200,
-                           min = 0, max = Inf, step = 50),
+                                         radioButtons(inputId = "pop_size_input_type",
+                                                      label = "Type de saisie",
+                                                      choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
 
-              numericInput(inputId = "pop_size_se",
-                           label = "Erreur-type de la taille de la population",
-                           value = 25,
-                           min = 0, max = Inf, step = 1),
+                                         numericInput(inputId = "pop_size_mean",
+                                                      label = "Moyenne de la taille de la population",
+                                                      value = 200,
+                                                      min = 0, max = Inf, step = 50),
 
-              matrixInput(inputId = "pop_size_mat_expert",
-                          value = matrix(data = eli_pop_size, nrow = 4, ncol = 5,
-                                         dimnames = list(c("#1", "#2", "#3", "#4"),
-                                                         c("Poids", "Min", "Best", "Max", "% IC" )),
-                                         byrow = TRUE),
-                          class = "numeric",
-                          rows = list(names = TRUE),
-                          cols = list(names = TRUE)),
+                                         numericInput(inputId = "pop_size_se",
+                                                      label = "Erreur-type de la taille de la population",
+                                                      value = 25,
+                                                      min = 0, max = Inf, step = 1),
 
-              actionButton(inputId = "pop_size_run_expert", label = "Utiliser valeurs experts"),
+                                         matrixInput(inputId = "pop_size_mat_expert",
+                                                     value = matrix(data = eli_pop_size, nrow = 4, ncol = 5,
+                                                                    dimnames = list(c("#1", "#2", "#3", "#4"),
+                                                                                    c("Poids", "Min", "Best", "Max", "% IC" )),
+                                                                    byrow = TRUE),
+                                                     class = "numeric",
+                                                     rows = list(names = TRUE),
+                                                     cols = list(names = TRUE)),
+
+                                         actionButton(inputId = "pop_size_run_expert", label = "Utiliser valeurs experts"),
+                              )}, # close wellPanel 2
+
+              )}, # close conditional panel
 
       )}, # end column "mortalité"
       ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
@@ -252,46 +262,55 @@ rm(list = ls(all.names = TRUE))
       ##~~~~~~~~~~~~~~~~~~~~~~~~~
       {column(width = 3,
 
-              tags$style(HTML('#button_pop_trend{background-color:#C2C8D3}')),
-              actionButton(inputId = "button_pop_trend",
+              tags$style(HTML('#button_pop_growth{background-color:#C2C8D3}')),
+              actionButton(inputId = "button_pop_growth", width = '100%',
                            label = tags$span("Tendance de la population", style = "font-weight: bold; font-size: 18px;")
               ),
 
-              br(""),
-              radioButtons(inputId = "pop_growth_input_type",
-                           label = "Type de saisie",
-                           choices = c("Taux de croissance" = "val",
-                                       "Elicitation d'expert" = "eli_exp",
-                                       "Tendance locale ou régionale" = "trend")),
+              {conditionalPanel("output.hide_pop_growth",
+                                br(),
 
-              numericInput(inputId = "pop_growth_mean",
-                           label = "Moyenne de la croissance de la population",
-                           value = 1.1,
-                           min = 0, max = Inf, step = 0.01),
+                                {wellPanel(style = "background:#F0F8FF",
 
-              numericInput(inputId = "pop_growth_se",
-                           label = "Erreur-type de la croissance de la population",
-                           value = 0.01,
-                           min = 0, max = Inf, step = 0.01),
+                                           radioButtons(inputId = "pop_growth_input_type",
+                                                        label = "Type de saisie",
+                                                        choices = c("Taux de croissance" = "val",
+                                                                    "Elicitation d'expert" = "eli_exp",
+                                                                    "Tendance locale ou régionale" = "trend")),
 
-              matrixInput(inputId = "pop_growth_mat_expert",
-                          value = matrix(data = eli_pop_growth, nrow = 4, ncol = 5,
-                                         dimnames = list(c("#1", "#2", "#3", "#4"),
-                                                         c("Poids", "Min", "Best", "Max", "% IC" )),
-                                         byrow = TRUE),
-                          class = "numeric",
-                          rows = list(names = TRUE),
-                          cols = list(names = TRUE)),
+                                           numericInput(inputId = "pop_growth_mean",
+                                                        label = "Moyenne de la croissance de la population",
+                                                        value = 1.1,
+                                                        min = 0, max = Inf, step = 0.01),
 
-              actionButton(inputId = "pop_growth_run_expert", label = "Utiliser valeurs experts"),
+                                           numericInput(inputId = "pop_growth_se",
+                                                        label = "Erreur-type de la croissance de la population",
+                                                        value = 0.01,
+                                                        min = 0, max = Inf, step = 0.01),
 
-              radioButtons(inputId = "pop_trend",
-                           label = NULL,
-                           choices = c("Croissance", "Stable", "Déclin")),
+                                           matrixInput(inputId = "pop_growth_mat_expert",
+                                                       value = matrix(data = eli_pop_growth, nrow = 4, ncol = 5,
+                                                                      dimnames = list(c("#1", "#2", "#3", "#4"),
+                                                                                      c("Poids", "Min", "Best", "Max", "% IC" )),
+                                                                      byrow = TRUE),
+                                                       class = "numeric",
+                                                       rows = list(names = TRUE),
+                                                       cols = list(names = TRUE)),
 
-              radioButtons(inputId = "pop_trend_strength",
-                           label = NULL,
-                           choices = c("Faible", "Moyen", "Fort")),
+                                           actionButton(inputId = "pop_growth_run_expert", label = "Utiliser valeurs experts"),
+
+                                           radioButtons(inputId = "pop_trend",
+                                                        label = NULL,
+                                                        choices = c("Croissance", "Stable", "Déclin")),
+
+                                           radioButtons(inputId = "pop_trend_strength",
+                                                        label = NULL,
+                                                        choices = c("Faible", "Moyen", "Fort")),
+
+                                )}, # close wellPanel
+
+              )}, # close conditional panel
+
       )}, # end column "mortalité"
       ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
@@ -302,30 +321,43 @@ rm(list = ls(all.names = TRUE))
       {column(width = 3,
 
               tags$style(HTML('#button_carrying_cap{background-color:#C2C8D3}')),
-              actionButton(inputId = "button_carrying_cap",
+              actionButton(inputId = "button_carrying_cap", width = '100%',
                            label = tags$span("Capacité de charge", style = "font-weight: bold; font-size: 18px;")
               ),
 
-              br(""),
-              radioButtons(inputId = "carrying_cap_input_type",
-                           label = "Type de saisie",
-                           choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
+              {conditionalPanel("output.hide_carrying_cap",
+                                br(),
 
-              numericInput(inputId = "carrying_capacity",
-                           label = "Capacité de charge",
-                           value = 500,
-                           min = 0, max = Inf, step = 100),
+                                {wellPanel(style = "background:#FFF8DC",
+                                           span(textOutput(outputId = "carrying_cap_unit_info"), style="font-size:16px"),
 
-              matrixInput(inputId = "carrying_cap_mat_expert",
-                          value = matrix(data = eli_carrying_cap, nrow = 4, ncol = 5,
-                                         dimnames = list(c("#1", "#2", "#3", "#4"),
-                                                         c("Poids", "Min", "Best", "Max", "% IC" )),
-                                         byrow = TRUE),
-                          class = "numeric",
-                          rows = list(names = TRUE),
-                          cols = list(names = TRUE)),
+                                )}, # close wellPanel 1
 
-              actionButton(inputId = "carrying_cap_run_expert", label = "Utiliser valeurs experts"),
+                                {wellPanel(style = "background:#F0F8FF",
+
+                                           radioButtons(inputId = "carrying_cap_input_type",
+                                                        label = "Type de saisie",
+                                                        choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
+
+                                           numericInput(inputId = "carrying_capacity",
+                                                        label = "Capacité de charge",
+                                                        value = 500,
+                                                        min = 0, max = Inf, step = 100),
+
+                                           matrixInput(inputId = "carrying_cap_mat_expert",
+                                                       value = matrix(data = eli_carrying_cap, nrow = 4, ncol = 5,
+                                                                      dimnames = list(c("#1", "#2", "#3", "#4"),
+                                                                                      c("Poids", "Min", "Best", "Max", "% IC" )),
+                                                                      byrow = TRUE),
+                                                       class = "numeric",
+                                                       rows = list(names = TRUE),
+                                                       cols = list(names = TRUE)),
+
+                                           actionButton(inputId = "carrying_cap_run_expert", label = "Utiliser valeurs experts"),
+
+                                )}, # close wellPanel 2
+
+              )}, # close conditional panel
 
       )}, # end column "mortalité"
       ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
