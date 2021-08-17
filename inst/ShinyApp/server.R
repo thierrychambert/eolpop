@@ -283,17 +283,28 @@ server <- function(input, output, session){
   ## Fatalities
   ##----------------------
   observeEvent({
-    #req(input$button_fatalities%%2 == 1)
-    #req(input$fatalities_input_type == "val")
     input$fatalities_input_type
     input$button_fatalities
   },{
+    # Show from input values: if button is ON and input_type is set on "value"
     if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "val"){
       output$title_distri_plot <- renderText({ "Mortalités annuelles"  })
       output$distri_plot <- renderPlot({ plot_gamma(mu = input$fatalities_mean, se = input$fatalities_se) })
     } else {
-      output$title_distri_plot <- NULL
-      output$distri_plot <- NULL
+      # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
+      if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "eli_exp"){
+        if(!is.null(param$fatalities_eli_result)){
+          output$title_distri_plot <- renderText({ "Mortalités annuelles"  })
+          output$distri_plot <- renderPlot({ plot_expert(param$fatalities_eli_result$out) })
+        } else {
+          output$title_distri_plot <- NULL
+          output$distri_plot <- NULL
+        }
+      # Hide otherwise (when button is OFF)
+      }else{
+        output$title_distri_plot <- NULL
+        output$distri_plot <- NULL
+      }
     }
   }, ignoreInit = FALSE)
 
