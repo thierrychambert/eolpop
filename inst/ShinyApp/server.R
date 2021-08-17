@@ -512,9 +512,10 @@ server <- function(input, output, session){
   ##-------------------------------
   ## Cumulated impacts or not ?
   ##-------------------------------
-  observeEvent({
-    input$run
-  }, {
+  #observeEvent({
+   # input$run
+  #}, {
+  observe({
     if(input$analysis_choice == "scenario"){
       param$cumulated_impacts = FALSE
     } else {
@@ -740,7 +741,13 @@ server <- function(input, output, session){
   }
 
   # Display result (text)
-  output$impact_text <- renderText({ print_out() })
+  output$impact_text <- renderText({
+    if(!param$cumulated_impacts){
+      print_out()
+    } else{
+      NULL
+    }
+  })
 
   # Plot Impacts
   plot_out_impact <- function(){
