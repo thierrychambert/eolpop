@@ -59,6 +59,9 @@ server <- function(input, output, session){
   ##--------------------------------------------
   observe({
 
+    #------------
+    # Hide all
+    #------------
     #shinyjs::hide("fatal_constant")
     #shinyjs::hide("fatalities_input_type")
     shinyjs::hide("fatalities_mean")
@@ -91,9 +94,10 @@ server <- function(input, output, session){
 
     shinyjs::hide("mat_fill_vr")
 
-
-    # Show fatalities part
-
+    #------------
+    # Show some
+    #------------
+    # Show inputs for fatalities part
     if(input$button_fatalities%%2 == 1){
       #shinyjs::show("fatal_constant")
 
@@ -122,7 +126,6 @@ server <- function(input, output, session){
     }
 
     # Show inputs for population size part
-
     if(input$button_pop_size%%2 == 1){
       #shinyjs::show("pop_size_unit")
       shinyjs::show("pop_size_input_type")
@@ -136,21 +139,7 @@ server <- function(input, output, session){
       }
     }
 
-    # Show inputs for carrying capacity part
-
-    if(input$button_carrying_cap%%2 == 1){
-      shinyjs::show("carrying_cap_input_type")
-      if(input$carrying_cap_input_type == "val"){
-        shinyjs::show("carrying_capacity")
-      }
-      if(input$carrying_cap_input_type == "eli_exp"){
-        shinyjs::show("carrying_cap_mat_expert")
-        shinyjs::show("carrying_cap_run_expert")
-      }
-    }
-
-    # Show inputs for population trend part
-
+    # Show inputs for population trend/growth part
     if(input$button_pop_growth%%2 == 1){
       shinyjs::show("pop_growth_input_type")
       if(input$pop_growth_input_type == "val"){
@@ -163,12 +152,25 @@ server <- function(input, output, session){
       }
       if(input$pop_growth_input_type == "trend"){
         shinyjs::show("pop_trend")
-        shinyjs::show("pop_trend_strength")
+        if(input$pop_trend != "stable"){
+          shinyjs::show("pop_trend_strength")
+        }
+      }
+    }
+
+    # Show inputs for carrying capacity part
+    if(input$button_carrying_cap%%2 == 1){
+      shinyjs::show("carrying_cap_input_type")
+      if(input$carrying_cap_input_type == "val"){
+        shinyjs::show("carrying_capacity")
+      }
+      if(input$carrying_cap_input_type == "eli_exp"){
+        shinyjs::show("carrying_cap_mat_expert")
+        shinyjs::show("carrying_cap_run_expert")
       }
     }
 
     # Show inputs vital rates part
-
     if(input$button_vital_rates%%2 == 1){
       shinyjs::show("mat_fill_vr")
     }
@@ -254,6 +256,8 @@ server <- function(input, output, session){
   }) # end observe
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
+
+  #####
 
   ##--------------------------------------------
   ##  Display parameter distribution
@@ -396,6 +400,9 @@ server <- function(input, output, session){
 
 
 
+
+  #####
+
   ##--------------------------------------------
   ##  Run expert elicitation                  --
   ##--------------------------------------------
@@ -480,6 +487,7 @@ server <- function(input, output, session){
   },{
     if(all(!is.na(input$carrying_cap_mat_expert))) {
 
+      ## run elicitation analysis
       param$carrying_cap_eli_result <- func_eli(input$carrying_cap_mat_expert)
 
       ## run elicitation analysis
@@ -490,15 +498,18 @@ server <- function(input, output, session){
       print("missing value")
     } # end if
   }) # end observeEvent
+
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
-
+  #####
 
   ##--------------------------------------------
   ## Select parameter values for simulations  --
   ##--------------------------------------------
 
-  ## Cumulated impacts or not ? ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  ##-------------------------------
+  ## Cumulated impacts or not ?
+  ##-------------------------------
   observeEvent({
     input$run
   }, {
@@ -510,8 +521,9 @@ server <- function(input, output, session){
   }) # end observeEvent
 
 
-  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
-  ## Fatalities ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  ##-------------------------------
+  ## Fatalities
+  ##-------------------------------
   observeEvent({
     input$run
   }, {
@@ -596,18 +608,18 @@ server <- function(input, output, session){
       # Case 2 : Trend information
     } else if(input$pop_growth_input_type == "trend"){
 
-      if(input$pop_trend == "Croissance") {
-        if(input$pop_trend_strength == "Faible") {
+      if(input$pop_trend == "growth") {
+        if(input$pop_trend_strength == "weak") {
           param$pop_growth_mean <- 1.01
-        } else if(input$pop_trend_strength == "Moyen"){
+        } else if(input$pop_trend_strength == "average"){
           param$pop_growth_mean <- 1.03
         } else {
           param$pop_growth_mean <- 1.06
         }
-      } else if(input$pop_trend == "Déclin"){
-        if(input$pop_trend_strength == "Faible") {
+      } else if(input$pop_trend == "decline"){
+        if(input$pop_trend_strength == "weak") {
           param$pop_growth_mean <- 0.99
-        } else if(input$pop_trend_strength == "Moyen"){
+        } else if(input$pop_trend_strength == "average"){
           param$pop_growth_mean <- 0.97
         } else {
           param$pop_growth_mean <- 0.94

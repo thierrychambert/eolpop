@@ -131,7 +131,6 @@ rm(list = ls(all.names = TRUE))
   # Head Panel 2 : Model parameters
   {wellPanel(
 
-    #h2("Saisie des paramètres"),
     p("Saisie des paramètres", style="font-size:28px"),
 
     {fluidRow(
@@ -187,7 +186,7 @@ rm(list = ls(all.names = TRUE))
 
                                            matrixInput(inputId = "fatalities_mat_cumulated",
                                                        value = matrix(init_cumul, 3, 3,
-                                                                      dimnames = list(c(paste0("Parc n°", c(1:3))),
+                                                                      dimnames = list(c(paste0("Parc num.", c(1:3))),
                                                                                       c("Moyenne",
                                                                                         "Erreur-type",
                                                                                         "Année de mise en service du parc"))),
@@ -253,7 +252,7 @@ rm(list = ls(all.names = TRUE))
 
               )}, # close conditional panel
 
-      )}, # end column "mortalité"
+      )}, # end column "mortalite"
       ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
@@ -307,14 +306,18 @@ rm(list = ls(all.names = TRUE))
                                              column(6,
                                                     radioButtons(inputId = "pop_trend",
                                                                  label = "Tendance",
-                                                                 choices = c("Croissance", "Stable", "Déclin")),
+                                                                 choices = c("Croissance" = "growth",
+                                                                             "Stable" = "stable",
+                                                                             "Déclin" = "decline")),
                                              ),
 
                                              # Strength of trend
                                              column(6,
                                                     radioButtons(inputId = "pop_trend_strength",
                                                                  label = "Force",
-                                                                 choices = c("Faible", "Moyen", "Fort")),
+                                                                 choices = c("Faible" = "weak",
+                                                                             "Moyen" = "average",
+                                                                             "Fort" = "strong")),
                                              ),
                                            )}, # close fluidRow
 
@@ -322,7 +325,7 @@ rm(list = ls(all.names = TRUE))
 
               )}, # close conditional panel
 
-      )}, # end column "mortalité"
+      )}, # end column "mortalite"
       ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
@@ -370,7 +373,7 @@ rm(list = ls(all.names = TRUE))
 
               )}, # close conditional panel
 
-      )}, # end column "mortalité"
+      )}, # end column "fatalities"
       ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
@@ -388,7 +391,7 @@ rm(list = ls(all.names = TRUE))
 
       p("Valeurs utilisées", style="font-size:28px"),
 
-      # Mortalités annuelles
+      # Mortalites annuelles
       {wellPanel(style = "background:#DCDCDC",
                  p("Mortalités annuelles", style="font-size:20px; font-weight: bold"),
                  span(textOutput(outputId = "fatalities_mean_info"), style="font-size:16px"),
@@ -412,7 +415,7 @@ rm(list = ls(all.names = TRUE))
                  span(textOutput(outputId = "pop_growth_se_info"), style="font-size:16px"),
       )},
 
-      # Capacité de charge
+      # Capacite de charge
       {wellPanel(style = "background:#DCDCDC",
                  p("Capacité de charge", style="font-size:20px; font-weight: bold"),
                  span(textOutput(outputId = "carrying_capacity_info"), style="font-size:16px"),
@@ -434,7 +437,7 @@ rm(list = ls(all.names = TRUE))
                  br(),
                  hr(),
 
-                 #h3("Mortalités annuelles", align = "center"),
+                 #h3("Mortalites annuelles", align = "center"),
                  span(textOutput(outputId = "title_distri_plot"), style="font-size:24px; font-weight:bold"),
                  plotOutput(outputId = "distri_plot"),
 
