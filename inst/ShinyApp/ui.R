@@ -443,15 +443,14 @@ rm(list = ls(all.names = TRUE))
 
         tabPanel(title = "Impact population",
 
+                 br(""),
                  numericInput(inputId = "nsim", label = "Nombre de simulations",
                               value = 10, min = 0, max = Inf, step = 10),
 
-                 ###### A DEPLACER #############
                  radioButtons(inputId = "fatal_constant",
                               label = h4("Modélisation"),
                               choices = c("Taux de mortalités (h) constant" = "h",
                                           "Nombre de mortalités (M) constant" = "M")),
-                 ###############################
 
                  br(),
 
@@ -473,13 +472,10 @@ rm(list = ls(all.names = TRUE))
                  radioButtons(inputId = "lifestyle",
                               h4("Mode de vie de l'espèce"),
                               choices = c("Sédentaire", "Non-sédentaire nicheur", "Non-sédentaire hivernant", "Migrateur de passage")),
-                 numericInput(inputId = "wind_turbines",
-                              h4("Nombre d'éoliennes"),
-                              value = 5, min = 0, max = Inf, step = 1),
-                 numericInput(inputId = "farm_number",
+                 numericInput(inputId = "wind_farm_nb",
                               h4("Nombre de parcs"),
                               value = 1, min = 0, max = Inf, step = 1),
-                 numericInput(inputId = "wind_turbines_2",
+                 numericInput(inputId = "wind_turbine_nb",
                               h4("Nombre d'éoliennes"),
                               value = 1, min = 0, max = Inf, step = 1)
 
