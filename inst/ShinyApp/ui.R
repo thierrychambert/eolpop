@@ -446,25 +446,28 @@ rm(list = ls(all.names = TRUE))
 
         tabPanel(title = "Impact population",
 
-                 br(""),
-                 numericInput(inputId = "nsim", label = "Nombre de simulations",
+                 br(),
+                 numericInput(inputId = "nsim",
+                              label = "Nombre de simulations",
                               value = 10, min = 0, max = Inf, step = 10),
 
                  radioButtons(inputId = "fatal_constant",
-                              label = h4("Modélisation"),
+                              label = "Modélisation",
                               choices = c("Taux de mortalités (h) constant" = "h",
                                           "Nombre de mortalités (M) constant" = "M")),
 
                  br(),
 
-                 strong(span(textOutput("message"), style="color:blue; font-size:24px", align = "center")),
+                 strong(span(textOutput("impact_text"), style="color:blue; font-size:24px", align = "left")),
                  br(),
 
                  actionButton(inputId = "run", label = "Lancer l'analyse"),
                  hr(),
-                 h4("Graphique : Impact relatif de chaque scénario", align = "center"),
-                 plotOutput("graph_impact", width = "100%", height = "550px"),
+
+                 tags$h4(textOutput("title_impact_plot"), align = "center"),
+                 plotOutput("impact_plot", width = "100%", height = "550px"),
                  hr(),
+
                  h4("Graphique : Trajectoire démographique", align = "center"),
                  plotOutput("graph_traj", width = "100%", height = "550px")
         ), # End tabPanel

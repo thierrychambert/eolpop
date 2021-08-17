@@ -196,8 +196,10 @@ server <- function(input, output, session){
 
 
   ##--------------------------------------------
-  ##  Reactive value : simulation inputs
+  ##  Reactive value
   ##--------------------------------------------
+  out <- reactiveValues(run = NULL)
+
   param <- reactiveValues(N1 = NULL,
                           nsim = NULL,
                           cumulated_impacts = NULL,
@@ -681,7 +683,7 @@ server <- function(input, output, session){
 
     withProgress(message = 'Simulation progress', value = 0, {
 
-      param$N1 <- run_simul_shiny(nsim = param$nsim,
+      out$run <- run_simul_shiny(nsim = param$nsim,
                                   cumulated_impacts = param$cumulated_impacts,
 
                                   fatalities_mean = param$fatalities_mean,
@@ -710,26 +712,63 @@ server <- function(input, output, session){
   }) # Close observEvent
 
 
-  # Plot Impacts
 
-  plot_out_impact <- function(){
-    if(is.null(param$N1)) {} else {plot_impact(N = param$N1$N, xlab = "year", ylab = "pop size")}
+
+
+
+
+  ##--------------------------------------------------------------------------##
+  ##                                OUTPUTS
+  ##--------------------------------------------------------------------------##
+
+
+  ##--------------------------------------------
+  # Show result : impact text
+  ##--------------------------------------------
+  ## Two Functions to print the output
+  # print_it
+  print_it <- function(impact, lci, uci){
+    paste0("Impact sur la taille de population : ", round(impact, 2)*100, "%",
+           "[", round(lci, 2)*100, "% ; ", round(uci, 2)*100, "%]")
   }
 
-  output$graph_impact <- renderPlot({
+  # print_out
+  print_out <- function() if(is.null(out$run$N)) {} else {
+    print_it(impact = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "avg",-1],
+             lci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "lci",-1],
+             uci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "uci",-1])
+  }
+
+  # Display result (text)
+  output$impact_text <- renderText({ print_out() })
+
+  # Plot Impacts
+  plot_out_impact <- function(){
+    if(is.null(out$run)) {} else {plot_impact(N = out$run$N, xlab = "year", ylab = "pop size")}
+  }
+
+  output$title_impact_plot <- renderText({
+    if(input$run > 0){
+      "Résultat : Impact relatif au cours du temps"
+    }
+  })
+
+  output$impact_plot <- renderPlot({
     plot_out_impact()
   })
 
   # Plot trajectories
-
   plot_out_traj <- function(){
-    if(is.null(param$N1)) {} else {plot_traj(N = param$N1$N, xlab = "year", ylab = "pop size")}
+    if(is.null(out$run)) {} else {plot_traj(N = out$run$N, xlab = "year", ylab = "pop size")}
   }
 
   output$graph_traj <- renderPlot({
     plot_out_traj()
   })
-  # End simulations
+
+
+
+
 
 
   ##--------------------------------------------
