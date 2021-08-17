@@ -634,139 +634,53 @@ server <- function(input, output, session){
 
 
   ## Fatalities
-  output$fatalities_mean_info <- renderText({
-    if(input$fatalities_input_type == "eli_exp"){
-      if(!(is.null(param$fatalities_eli_result))){
-        info <- round(param$fatalities_eli_result$mean, 2)
-      } else {
-        info <- NA
-      }
-    }
-    else {
-      info <- input$fatalities_mean
-    }
-    paste0("Moyenne : ", info)
-  })
-
-  output$fatalities_se_info <- renderText({
-    if(input$fatalities_input_type == "eli_exp"){
-      if(!(is.null(param$fatalities_eli_result))){
-        info <- round(param$fatalities_eli_result$SE, 2)
-      } else {
-        info <- NA
-      }
-    }
-    else {
-      info <- input$fatalities_se
-    }
-    paste0("Erreur-type : ", info)
-  })
+  output$fatalities_mean_info <- renderText({  paste0("Moyenne : ", tail(param$fatalities_mean, 1)) })
+  output$fatalities_se_info <- renderText({  paste0("Erreur-type : ", tail(param$fatalities_se, 1)) })
 
 
-  ## Poplutation size
+  ## Poplutation size UNIT information
   output$pop_size_unit_info <- renderText({
-    if(input$pop_size_unit == "Npair"){
-      paste0("Nombre de couple")
-    } else {
-      paste0("Effectif total")
+    if(!is.null(param$pop_size_unit)){
+      if(param$pop_size_unit == "Npair"){
+        paste0("Nombre de couple")
+      } else {
+        paste0("Effectif total")
+      }
     }
   })
 
-  output$pop_size_mean_info <- renderText({
-    if(input$pop_size_input_type == "eli_exp"){
-      if(!(is.null(param$pop_size_eli_result))){
-        info <- round(param$pop_size_eli_result$mean)
-      } else {info <- NA}
-    }
-    else {
-      info <- input$pop_size_mean
-    }
-    paste0("Moyenne : ", info)
-  })
 
-  output$pop_size_se_info <- renderText({
-    if(input$pop_size_input_type == "eli_exp"){
-      if(!(is.null(param$pop_size_eli_result))){
-        info <- round(param$pop_size_eli_result$SE)
-      } else {info <- NA}
-    }
-    else {
-      info <- input$pop_size_se
-    }
-    paste0("Erreur-type : ", info)
-  })
+  ## Poplutation size information
+  output$pop_size_mean_info <- renderText({  paste0("Moyenne : ", param$pop_size_mean) })
+  output$pop_size_se_info <- renderText({  paste0("Erreur-type : ", param$pop_size_se) })
+
+
+  ## Population growth information
+  output$pop_growth_mean_info <- renderText({  paste0("Moyenne : ", param$pop_growth_mean) })
+  output$pop_growth_se_info <- renderText({  paste0("Erreur-type : ", param$pop_growth_se) })
+
+
 
   ## Carrying capacity
-
   output$carrying_capacity_info <- renderText({
 
-    # N type
-    if(input$pop_size_unit == "Npair"){
-      info1 <- paste0("Nombre de couple : ")
-    } else {
-      info1 <- paste0("Effectif total : ")
-    }
+    # Source info "unit"
+    if(is.null(param$pop_size_unit)){
+        unit1 <- input$pop_size_unit
+      }else{
+        unit1 <- param$pop_size_unit
+      }
 
-    # value of K
-    if(input$carrying_cap_input_type == "eli_exp"){
-      if(!(is.null(param$carrying_cap_eli_result))){
-        info2 <- round(param$carrying_cap_eli_result$mean)
-      } else {info <- NA}
-    }
-    else {
-      info2 <- input$carrying_capacity
+    # N type
+    if(unit1 == "Npair"){
+      info1 <- paste0("Nombre de couple")
+    } else {
+      info1 <- paste0("Effectif total")
     }
 
     # paste for printing
-    paste0(info1, info2)
+    paste0(info1, " : ", param$carrying_capacity)
   })
-
-  ## Population growth
-  output$pop_growth_mean_info <- renderText({
-    if(input$pop_growth_input_type == "eli_exp"){
-      if(!(is.null(param$pop_growth_eli_result))){
-        info <- round(param$pop_growth_eli_result$mean, 2)
-      } else {info <- NA}
-    } else if(input$pop_growth_input_type == "trend"){
-      if(input$pop_trend == "Croissance") {
-        if(input$pop_trend_strength == "Faible") {
-          info <- 1.01
-        } else if(input$pop_trend_strength == "Moyen"){
-          info <- 1.03
-        } else {
-          info <- 1.06
-        }
-      } else if(input$pop_trend == "Déclin"){
-        if(input$pop_trend_strength == "Faible") {
-          info <- 0.99
-        } else if(input$pop_trend_strength == "Moyen"){
-          info <- 0.97
-        } else {
-          info <- 0.94
-        }
-      } else {
-        info <- 1.00
-      }
-    } else {
-      info <- input$pop_growth_mean
-    }
-    paste0("Moyenne : ", info)
-  })
-
-  output$pop_growth_se_info <- renderText({
-    if(input$pop_growth_input_type == "eli_exp"){
-      if(!(is.null(param$pop_growth_eli_result))){
-        info <- round(param$pop_growth_eli_result$SE, 2)
-      } else {info <- NA}
-    } else if (input$pop_growth_input_type == "trend") {
-      info <- 0.03
-    }
-    else {
-      info <- input$pop_growth_se
-    }
-    paste0("Erreur-type : ", info)
-  })
-
 
   ## Vital rates
   output$vital_rates_info <- renderTable({

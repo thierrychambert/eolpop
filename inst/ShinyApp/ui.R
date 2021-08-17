@@ -386,7 +386,7 @@ rm(list = ls(all.names = TRUE))
   {sidebarLayout(
     {sidebarPanel(
 
-      p("Valeurs saisies", style="font-size:28px"),
+      p("Valeurs utilisées", style="font-size:28px"),
 
       # Mortalités annuelles
       {wellPanel(style = "background:#DCDCDC",
@@ -444,7 +444,7 @@ rm(list = ls(all.names = TRUE))
         tabPanel(title = "Impact population",
 
                  numericInput(inputId = "nsim", label = "Nombre de simulations",
-                              value = 50, min = 0, max = Inf, step = 10),
+                              value = 10, min = 0, max = Inf, step = 10),
 
                  ###### A DEPLACER #############
                  radioButtons(inputId = "fatal_constant",
