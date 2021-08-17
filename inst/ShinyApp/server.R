@@ -1,6 +1,6 @@
 server <- function(input, output, session){
 
-
+  ##--------------------------------------------
   ##  Hide/Show : level 1
   ##--------------------------------------------
 
@@ -54,6 +54,7 @@ server <- function(input, output, session){
 
 
 
+  ##--------------------------------------------
   ##  Hide/Show : level 2
   ##--------------------------------------------
   observe({
@@ -176,6 +177,7 @@ server <- function(input, output, session){
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
+  ##--------------------------------------------
   ##  Function to run the elicitation analysis
   ##----------------------------------------------
   # Function to extract value from elicitation matrix and run the elication analysis
@@ -191,6 +193,7 @@ server <- function(input, output, session){
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
+  ##--------------------------------------------
   ##  Reactive value : simulation inputs
   ##--------------------------------------------
   param <- reactiveValues(N1 = NULL,
@@ -233,6 +236,7 @@ server <- function(input, output, session){
 
 
 
+  ##--------------------------------------------
   ## Observe parameter values to be used in simulations run
   ##----------------------------------------------------------
   observe({
@@ -251,7 +255,7 @@ server <- function(input, output, session){
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
-
+  ##--------------------------------------------
   ##  Display parameter distribution
   ##--------------------------------------------
 
@@ -276,10 +280,7 @@ server <- function(input, output, session){
     if(show_se) mtext(text = paste("Erreur-type = ", round(se, 2)), side = 3, line = 1, cex = 1.2, adj = 0)
   }
 
-
-
-
-
+  ##----------------------
   ## Fatalities
   ##----------------------
   observeEvent({
@@ -288,13 +289,13 @@ server <- function(input, output, session){
   },{
     # Show from input values: if button is ON and input_type is set on "value"
     if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "val"){
-      output$title_distri_plot <- renderText({ "Mortalités annuelles"  })
+      output$title_distri_plot <- renderText({ "Mortalités annuelles" })
       output$distri_plot <- renderPlot({ plot_gamma(mu = input$fatalities_mean, se = input$fatalities_se) })
     } else {
       # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
       if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "eli_exp"){
         if(!is.null(param$fatalities_eli_result)){
-          output$title_distri_plot <- renderText({ "Mortalités annuelles"  })
+          output$title_distri_plot <- renderText({ "Mortalités annuelles" })
           output$distri_plot <- renderPlot({ plot_expert(param$fatalities_eli_result$out) })
         } else {
           output$title_distri_plot <- NULL
@@ -309,24 +310,69 @@ server <- function(input, output, session){
   }, ignoreInit = FALSE)
 
 
-
-  ## Population size ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  ##----------------------
+  ## Population size
+  ##----------------------
   observeEvent({
     input$pop_size_input_type
     input$button_pop_size
   },{
-    output$title_distri_plot <- renderText({ "Taille de population"  })
-    output$distri_plot <- renderPlot({ plot_gamma(mu = input$pop_size_mean, se = input$pop_size_se) })
-  }, ignoreInit = TRUE)
+    # Show from input values: if button is ON and input_type is set on "value"
+    if(input$button_pop_size%%2 == 1 & input$pop_size_input_type == "val"){
+      output$title_distri_plot <- renderText({ "Taille initiale de la population" })
+      output$distri_plot <- renderPlot({ plot_gamma(mu = input$pop_size_mean, se = input$pop_size_se) })
+    } else {
+      # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
+      if(input$button_pop_size%%2 == 1 & input$pop_size_input_type == "eli_exp"){
+        if(!is.null(param$pop_size_eli_result)){
+          output$title_distri_plot <- renderText({ "Taille initiale de la population" })
+          output$distri_plot <- renderPlot({ plot_expert(param$pop_size_eli_result$out) })
+        } else {
+          output$title_distri_plot <- NULL
+          output$distri_plot <- NULL
+        }
+        # Hide otherwise (when button is OFF)
+      }else{
+        output$title_distri_plot <- NULL
+        output$distri_plot <- NULL
+      }
+    }
+  }, ignoreInit = FALSE)
 
-  ## Population growth ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+
+  ##----------------------
+  ## Population growth
+  ##----------------------
   observeEvent({
     input$pop_growth_input_type
     input$button_pop_growth
   },{
-    output$title_distri_plot <- renderText({ "Taux de croissance de la population"  })
-    output$distri_plot <- renderPlot({ plot_gamma(mu = input$pop_growth_mean, se = input$pop_growth_se) })
-  }, ignoreInit = TRUE)
+    # Show from input values: if button is ON and input_type is set on "value"
+    if(input$button_pop_growth%%2 == 1 & input$pop_growth_input_type == "val"){
+      output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
+      output$distri_plot <- renderPlot({ plot_gamma(mu = input$pop_growth_mean, se = input$pop_growth_se) })
+    } else {
+      # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
+      if(input$button_pop_growth%%2 == 1 & input$pop_growth_input_type == "eli_exp"){
+        if(!is.null(param$pop_growth_eli_result)){
+          output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
+          output$distri_plot <- renderPlot({ plot_expert(param$pop_growth_eli_result$out) })
+        } else {
+          output$title_distri_plot <- NULL
+          output$distri_plot <- NULL
+        }
+        # Hide otherwise (when button is OFF)
+      }else{
+        output$title_distri_plot <- NULL
+        output$distri_plot <- NULL
+      }
+    }
+  }, ignoreInit = FALSE)
+
+
+
+
+  ##----------------------
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
@@ -357,7 +403,7 @@ server <- function(input, output, session){
       param$fatalities_eli_result <- func_eli(input$fatalities_mat_expert)
 
       ## plot distribution
-      output$title_distri_plot <- renderText({ "Mortalités annuelles"  })
+      output$title_distri_plot <- renderText({ "Mortalités annuelles" })
       output$distri_plot <- renderPlot({ plot_expert(param$fatalities_eli_result$out) })
 
     } else {
@@ -376,7 +422,7 @@ server <- function(input, output, session){
       param$pop_size_eli_result <- func_eli(input$pop_size_mat_expert)
 
       ## plot distribution
-      output$title_distri_plot <- renderText({ "Taille de population"  })
+      output$title_distri_plot <- renderText({ "Taille de population" })
       output$distri_plot <- renderPlot({ plot_expert(param$pop_size_eli_result$out) })
 
     } else {
@@ -395,7 +441,7 @@ server <- function(input, output, session){
       param$pop_growth_eli_result <- func_eli(input$pop_growth_mat_expert)
 
       ## plot distribution
-      output$title_distri_plot <- renderText({ "Taux de croissance de la population"  })
+      output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
       output$distri_plot <- renderPlot({ plot_expert(param$pop_growth_eli_result$out) })
 
     } else {
@@ -413,7 +459,7 @@ server <- function(input, output, session){
       param$carrying_cap_eli_result <- func_eli(input$carrying_cap_mat_expert)
 
       ## run elicitation analysis
-      output$title_distri_plot <- renderText({ "Capacité de charge"  })
+      output$title_distri_plot <- renderText({ "Capacité de charge" })
       output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out, show_se = FALSE) })
 
     } else {
