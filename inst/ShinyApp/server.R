@@ -369,10 +369,29 @@ server <- function(input, output, session){
     }
   }, ignoreInit = FALSE)
 
-
-
-
   ##----------------------
+  ## Carrying capacity
+  ##----------------------
+  observeEvent({
+    input$carrying_cap_input_type
+    input$button_carrying_cap
+  },{
+      # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
+      if(input$button_carrying_cap%%2 == 1 & input$carrying_cap_input_type == "eli_exp"){
+        if(!is.null(param$carrying_cap_eli_result)){
+          output$title_distri_plot <- renderText({ "Capacité de charge" })
+          output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out) })
+        } else {
+          output$title_distri_plot <- NULL
+          output$distri_plot <- NULL
+        }
+        # Hide otherwise (when button is OFF)
+      }else{
+        output$title_distri_plot <- NULL
+        output$distri_plot <- NULL
+      }
+  }, ignoreInit = FALSE)
+
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
@@ -393,7 +412,9 @@ server <- function(input, output, session){
     if(show_se) mtext(text = paste("Erreur-type = ", round(sqrt(out$var_smooth), 2)), side = 3, line = 1, cex = 1.2, adj = 0)
   }
 
-  ## Fatalities ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  ##----------------------
+  ## Fatalities
+  ##----------------------
   observeEvent({
     input$fatalities_run_expert
   }, {
@@ -411,8 +432,9 @@ server <- function(input, output, session){
     } # end if
   }) # end observeEvent
 
-
-  ## Population size ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  ##----------------------
+  ## Population size
+  ##----------------------
   observeEvent({
     input$pop_size_run_expert
   }, {
@@ -430,8 +452,9 @@ server <- function(input, output, session){
     } # end if
   }) # end observeEvent
 
-
-  ## Population growth ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  ##----------------------
+  ## Population growth
+  ##----------------------
   observeEvent({
     input$pop_growth_run_expert
   },{
@@ -449,8 +472,9 @@ server <- function(input, output, session){
     } # end if
   }) # end observeEvent
 
-
-  ## Carrying capacity ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  ##----------------------
+  ## Carrying capacity
+  ##----------------------
   observeEvent({
     input$carrying_cap_run_expert
   },{
