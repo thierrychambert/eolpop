@@ -1,7 +1,6 @@
 server <- function(input, output, session){
 
 
-  ##--------------------------------------------
   ##  Hide/Show : level 1
   ##--------------------------------------------
 
@@ -54,7 +53,7 @@ server <- function(input, output, session){
   })
 
 
-  ##--------------------------------------------
+
   ##  Hide/Show : level 2
   ##--------------------------------------------
   observe({
@@ -176,8 +175,8 @@ server <- function(input, output, session){
   }) # en observe show/hide
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
-  ##----------------------------------------------
-  ##  Function to run the elicitation analysis  --
+
+  ##  Function to run the elicitation analysis
   ##----------------------------------------------
   # Function to extract value from elicitation matrix and run the elication analysis
   func_eli <- function(mat_expert){
@@ -191,8 +190,8 @@ server <- function(input, output, session){
   }
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
-  ##--------------------------------------------
-  ##  Reactive value : simulation inputs      --
+
+  ##  Reactive value : simulation inputs
   ##--------------------------------------------
   param <- reactiveValues(N1 = NULL,
                           nsim = NULL,
@@ -233,8 +232,8 @@ server <- function(input, output, session){
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
-  ##----------------------------------------------------------
-  ## Observe parameter values to be used in simulations run --
+
+  ## Observe parameter values to be used in simulations run
   ##----------------------------------------------------------
   observe({
     param # required to ensure up-to-date values are run
@@ -252,11 +251,11 @@ server <- function(input, output, session){
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
-  ##--------------------------------------------
-  ##  Display parameter distribution          --
+
+  ##  Display parameter distribution
   ##--------------------------------------------
 
-  ## Function to plot a gamma distribution
+  # Function to plot a gamma distribution
   plot_gamma <- function(mu, se, show_se = TRUE, ...){
 
     ## Define shape and scale parameter of gamma distribution
@@ -277,14 +276,28 @@ server <- function(input, output, session){
     if(show_se) mtext(text = paste("Erreur-type = ", round(se, 2)), side = 3, line = 1, cex = 1.2, adj = 0)
   }
 
-  ## Fatalities ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
+
+
+
+
+  ## Fatalities
+  ##----------------------
   observeEvent({
+    #req(input$button_fatalities%%2 == 1)
+    #req(input$fatalities_input_type == "val")
     input$fatalities_input_type
     input$button_fatalities
   },{
-    output$title_distri_plot <- renderText({ "Mortalités annuelles"  })
-    output$distri_plot <- renderPlot({ plot_gamma(mu = input$fatalities_mean, se = input$fatalities_se) })
-  }, ignoreInit = TRUE)
+    if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "val"){
+      output$title_distri_plot <- renderText({ "Mortalités annuelles"  })
+      output$distri_plot <- renderPlot({ plot_gamma(mu = input$fatalities_mean, se = input$fatalities_se) })
+    } else {
+      output$title_distri_plot <- NULL
+      output$distri_plot <- NULL
+    }
+  }, ignoreInit = FALSE)
+
+
 
   ## Population size ###~~~~~~~~~~~~~~~~~~~~~~~~~~###
   observeEvent({
