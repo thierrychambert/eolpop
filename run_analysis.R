@@ -111,3 +111,6 @@ names(run0)
 N <- run0$N ; dim(N)
 plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
 abline(h = K)
+
+out = run0
+get_metrics(N = out$N)$scenario$impact[time_horzion, "avg",-1]
