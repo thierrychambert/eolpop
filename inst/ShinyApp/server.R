@@ -119,6 +119,7 @@ server <- function(input, output, session){
       # Show inputs for cumulated scenario
 
       if(input$analysis_choice == "cumulated"){
+        shinyjs::hide("fatalities_input_type")
         shinyjs::show("farm_number_cumulated")
         shinyjs::show("fatalities_mat_cumulated")
       }
@@ -290,28 +291,50 @@ server <- function(input, output, session){
   ## Fatalities
   ##----------------------
   observeEvent({
-    input$fatalities_input_type
+    input$analysis_choice
     input$button_fatalities
+    input$fatalities_input_type
+    input$fatalities_run_expert
+
+    input$farm_number_cumulated
+    input$fatalities_mat_cumulated
   },{
-    # Show from input values: if button is ON and input_type is set on "value"
-    if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "val"){
-      output$title_distri_plot <- renderText({ "Mortalités annuelles" })
-      output$distri_plot <- renderPlot({ plot_gamma(mu = input$fatalities_mean, se = input$fatalities_se) })
-    } else {
-      # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
-      if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "eli_exp"){
-        if(!is.null(param$fatalities_eli_result)){
-          output$title_distri_plot <- renderText({ "Mortalités annuelles" })
-          output$distri_plot <- renderPlot({ plot_expert(param$fatalities_eli_result$out) })
-        } else {
+    if(input$analysis_choice != "cumulated"){
+
+      # Show from input values: if button is ON and input_type is set on "value"
+      if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "val"){
+        output$title_distri_plot <- renderText({ "Mortalités annuelles" })
+        output$distri_plot <- renderPlot({ plot_gamma(mu = input$fatalities_mean, se = input$fatalities_se) })
+      } else {
+        # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
+        if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "eli_exp"){
+          if(!is.null(param$fatalities_eli_result)){
+            output$title_distri_plot <- renderText({ "Mortalités annuelles" })
+            output$distri_plot <- renderPlot({ plot_expert(param$fatalities_eli_result$out) })
+          } else {
+            output$title_distri_plot <- NULL
+            output$distri_plot <- NULL
+          }
+        # Hide otherwise (when button is OFF)
+        }else{
           output$title_distri_plot <- NULL
           output$distri_plot <- NULL
         }
-      # Hide otherwise (when button is OFF)
-      }else{
-        output$title_distri_plot <- NULL
-        output$distri_plot <- NULL
       }
+
+    # Hide otherwise (when analysis = cumulated impacts)
+    }else{
+      output$title_distri_plot <- renderText({ "Mortalités annuelles par parc (impacts cumulés)" })
+
+      # output$distri_plot <- NULL
+      output$distri_plot <- renderPlot({
+        par(mfrow = c(1,input$farm_number_cumulated), mar = c(5, 4, 7, 2) + 0.1, oma = c(0,0,0,0))
+        for(j in 1:input$farm_number_cumulated){
+          plot_gamma(mu = input$fatalities_mat_cumulated[j,1], se = input$fatalities_mat_cumulated[j,2])
+          title(paste("Parc", j), line = 5, outer = FALSE, cex.main = 1.8)
+        }
+      })
+
     }
   }, ignoreInit = FALSE)
 
@@ -512,9 +535,6 @@ server <- function(input, output, session){
   ##-------------------------------
   ## Cumulated impacts or not ?
   ##-------------------------------
-  #observeEvent({
-   # input$run
-  #}, {
   observe({
     if(input$analysis_choice == "scenario"){
       param$cumulated_impacts = FALSE
