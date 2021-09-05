@@ -440,7 +440,7 @@ server <- function(input, output, session){
 
       # Case 1.1 : Values from expert elicitation (if2)
       if(input$fatalities_input_type == "eli_exp"){
-        if(!(is.null(param$pop_size_eli_result))){
+        if(!(is.null(param$fatalities_eli_result))){
           param$fatalities_mean <- c(0, round(param$fatalities_eli_result$mean))
           param$onset_time <- NULL
           param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE))
