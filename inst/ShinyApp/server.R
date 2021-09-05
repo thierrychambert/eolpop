@@ -185,7 +185,9 @@ server <- function(input, output, session){
   ##############################################
   ##  Reactive value
   ##--------------------------------------------
-  out <- reactiveValues(run = NULL)
+  out <- reactiveValues(run = NULL, msg = NULL)
+
+  ready <- reactiveValues(fatalities = TRUE, pop_size = TRUE, pop_growth = TRUE, carrying_capacity = TRUE)
 
   param <- reactiveValues(N1 = NULL,
                           nsim = NULL,
@@ -444,13 +446,16 @@ server <- function(input, output, session){
           param$fatalities_mean <- c(0, round(param$fatalities_eli_result$mean))
           param$onset_time <- NULL
           param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE))
+          ready$fatalities <- TRUE
         } else {
-          print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts' ")
+          print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
+          ready$fatalities <- FALSE
         }
 
       } else {
 
         # Case 1.2 : Values directly provided (i.e., not from expert elicitation)
+        ready$fatalities <- TRUE
         param$fatalities_mean <- c(0, input$fatalities_mean)
         param$onset_time = NULL
         param$fatalities_se <- c(0, input$fatalities_se)
@@ -458,6 +463,7 @@ server <- function(input, output, session){
 
       # Case 2 : Cumulated effects (if-else 1)
     } else {
+      ready$fatalities <- TRUE
       param$fatalities_mean <- c(0, input$fatalities_mat_cumulated[,1])
       param$fatalities_se <- c(0, input$fatalities_mat_cumulated[,2])
       param$onset_year <- c(min(input$fatalities_mat_cumulated[,3]), input$fatalities_mat_cumulated[,3])
@@ -479,12 +485,15 @@ server <- function(input, output, session){
       if(!(is.null(param$pop_size_eli_result))){
         param$pop_size_mean <- round(param$pop_size_eli_result$mean)
         param$pop_size_se <- round(param$pop_size_eli_result$SE)
+        ready$pop_size <- TRUE
       } else {
         print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
+        ready$pop_size <- FALSE
       }
 
       # Case 2 : Values directly provided (i.e., not from expert elicitation)
     } else {
+      ready$pop_size <- TRUE
       param$pop_size_mean <- input$pop_size_mean
       param$pop_size_se <- input$pop_size_se
     }
@@ -504,38 +513,46 @@ server <- function(input, output, session){
       if(!(is.null(param$pop_growth_eli_result))){
         param$pop_growth_mean <- round(min(1 + param$rMAX_species, round(param$pop_growth_eli_result$mean, 2)), 2)
         param$pop_growth_se <- round(param$pop_growth_eli_result$SE, 2)
+        ready$pop_growth <- TRUE
       } else {
         print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
+        ready$pop_growth <- FALSE
       }
+
+    } else {
 
       # Case 2 : Trend information
-    } else if(input$pop_growth_input_type == "trend"){
+      if(input$pop_growth_input_type == "trend"){
+        ready$pop_growth <- TRUE
 
-      if(input$pop_trend == "growth") {
-        if(input$pop_trend_strength == "weak") {
-          param$pop_growth_mean <- 1.01
-        } else if(input$pop_trend_strength == "average"){
-          param$pop_growth_mean <- 1.03
+        if(input$pop_trend == "growth") {
+          if(input$pop_trend_strength == "weak") {
+            param$pop_growth_mean <- 1.01
+          } else if(input$pop_trend_strength == "average"){
+            param$pop_growth_mean <- 1.03
+          } else {
+            param$pop_growth_mean <- 1.06
+          }
+        } else if(input$pop_trend == "decline"){
+          if(input$pop_trend_strength == "weak") {
+            param$pop_growth_mean <- 0.99
+          } else if(input$pop_trend_strength == "average"){
+            param$pop_growth_mean <- 0.97
+          } else {
+            param$pop_growth_mean <- 0.94
+          }
         } else {
-          param$pop_growth_mean <- 1.06
+          param$pop_growth_mean <- 1
         }
-      } else if(input$pop_trend == "decline"){
-        if(input$pop_trend_strength == "weak") {
-          param$pop_growth_mean <- 0.99
-        } else if(input$pop_trend_strength == "average"){
-          param$pop_growth_mean <- 0.97
-        } else {
-          param$pop_growth_mean <- 0.94
-        }
-      } else {
-        param$pop_growth_mean <- 1
-      }
-      param$pop_growth_se <- 0.03
+        param$pop_growth_se <- 0.03
+
 
       # Case 3 : Values directly provided (i.e., not from expert elicitation)
-    } else {
-      param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 2)
-      param$pop_growth_se <- input$pop_growth_se
+      } else {
+        ready$pop_growth <- TRUE
+        param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 2)
+        param$pop_growth_se <- input$pop_growth_se
+      }
     }
   })
 
@@ -550,10 +567,13 @@ server <- function(input, output, session){
     if(input$carrying_cap_input_type == "eli_exp"){
       if(!(is.null(param$carrying_cap_eli_result))){
         param$carrying_capacity <- round(param$carrying_cap_eli_result$mean)
+        ready$carrying_capacity <- TRUE
       } else {
         print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
+        ready$carrying_capacity <- FALSE
       }
     } else {
+      ready$carrying_capacity <- TRUE
       param$carrying_capacity <- input$carrying_capacity
     }
   })
@@ -842,34 +862,41 @@ server <- function(input, output, session){
   observeEvent({
     input$run
   }, {
-    withProgress(message = 'Simulation progress', value = 0, {
 
-      out$run <- run_simul_shiny(nsim = param$nsim,
-                                  cumulated_impacts = param$cumulated_impacts,
+    if(ready$fatalities & ready$pop_size & ready$pop_growth & ready$carrying_capacity){
+      withProgress(message = 'Simulation progress', value = 0, {
 
-                                  fatalities_mean = param$fatalities_mean,
-                                  fatalities_se = param$fatalities_se,
-                                  onset_time = param$onset_time,
+        out$run <- run_simul_shiny(nsim = param$nsim,
+                                   cumulated_impacts = param$cumulated_impacts,
 
-                                  pop_size_mean = param$pop_size_mean,
-                                  pop_size_se = param$pop_size_se,
-                                  pop_size_type = param$pop_size_unit,
+                                   fatalities_mean = param$fatalities_mean,
+                                   fatalities_se = param$fatalities_se,
+                                   onset_time = param$onset_time,
 
-                                  pop_growth_mean = param$pop_growth_mean,
-                                  pop_growth_se = param$pop_growth_se,
+                                   pop_size_mean = param$pop_size_mean,
+                                   pop_size_se = param$pop_size_se,
+                                   pop_size_type = param$pop_size_unit,
 
-                                  survivals = param$s_calibrated,
-                                  fecundities = param$f_calibrated,
+                                   pop_growth_mean = param$pop_growth_mean,
+                                   pop_growth_se = param$pop_growth_se,
 
-                                  carrying_capacity = param$carrying_capacity,
-                                  theta = param$theta,
-                                  rMAX_species = param$rMAX_species,
+                                   survivals = param$s_calibrated,
+                                   fecundities = param$f_calibrated,
 
-                                  model_demo = NULL,
-                                  time_horzion = param$time_horzion,
-                                  coeff_var_environ = param$coeff_var_environ,
-                                  fatal_constant = param$fatal_constant)
-    }) # Close withProgress
+                                   carrying_capacity = param$carrying_capacity,
+                                   theta = param$theta,
+                                   rMAX_species = param$rMAX_species,
+
+                                   model_demo = NULL,
+                                   time_horzion = param$time_horzion,
+                                   coeff_var_environ = param$coeff_var_environ,
+                                   fatal_constant = param$fatal_constant)
+      }) # Close withProgress
+
+    }else{
+      out$run <- NULL
+      out$msg <- "error_not_ready"
+    }
   }) # Close observEvent
   #####
 
@@ -888,11 +915,29 @@ server <- function(input, output, session){
     paste0("Impact sur la taille de population : ", round(impact, 2)*100, "%",
            "[", round(lci, 2)*100, "% ; ", round(uci, 2)*100, "%]")
   }
-  print_out <- function() if(is.null(out$run$N)) {} else {
-    print_it(impact = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "avg",-1],
-             lci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "lci",-1],
-             uci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "uci",-1])
-  }
+
+  print_out <- function()
+    if(!is.null(out$run)) {
+      # Print the result
+      print_it(impact = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "avg",-1],
+               lci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "lci",-1],
+               uci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "uci",-1])
+    } else {
+      # When run is NULL
+
+      if(!is.null(out$msg)){
+
+        # Print the error msg, if there is one
+        if(out$msg == "error_not_ready"){
+          paste0("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
+        }else{
+          paste0("Some other error occurred")
+        }
+
+      }else{
+        # When no error msg : nothing happens
+      } # if "msg"
+    } # if "run
 
   # Display result (text)
   output$impact_text <- renderText({
