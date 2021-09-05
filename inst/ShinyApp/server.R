@@ -645,7 +645,56 @@ server <- function(input, output, session){
 
     if(show_mean) mtext(text = paste("Moyenne = ", round(mu, 2)), side = 3, line = 2.5, cex = 1.2, adj = 0)
     if(show_se) mtext(text = paste("Erreur-type = ", round(se, 2)), side = 3, line = 1, cex = 1.2, adj = 0)
-  }
+  } # end function plot_gamma
+
+  plot_gamma_cumulated_impacts <- function(mu, se, nparc, ...){
+    ## Define shape and scale parameter of gamma distribution
+    shape = (mu/se)^2
+    scale = se^2/mu
+
+
+    ## Define x and y lim
+    xx = yy = list()
+    for(j in 1:nparc){
+      xx[[j]] = seq(from = max(0,mu[j]-4*se[j]), to = mu[j]+4*se[j], length.out = 1e3)
+      yy[[j]] = dgamma(xx[[j]], shape=shape[j], scale=scale[j])
+    }
+
+    ylim = c(min(unlist(yy)), max(unlist(yy))*1.4)
+    xlim = c(min(unlist(xx)), max(unlist(xx)))
+
+
+    ## Plot
+    j=1
+    curve(dgamma(x, shape=shape[j], scale=scale[j]),
+          from = max(0,mu[j]-4*se[j]), to = mu[j]+4*se[j], n = 1e4,
+          xlim = xlim, ylim = ylim,
+          lwd = 3, col = j, yaxt = "n", xaxt = "n",
+          #xaxp = c(round(xlim[1]), round(xlim[2]), n = 10),
+          ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2)
+    axis(side = 1, at = seq(round(xlim[1]), round(xlim[2]),
+                            by = max(round((round(xlim[2])-round(xlim[1]))/10),1) ))
+    mtext(text = "Densité de probabilité", side = 2, line = 2, cex = 1.2)
+
+    y1 <- dgamma(x = mu[j], shape = shape[j], scale = scale[j])
+    segments(x0 = mu[j], y0 = 0, y1 = y1, lty = 2, lwd = 3, col = j)
+    points(x = mu[j], y = y1, pch = 19, cex = 1.5, col = j)
+
+    for(j in 2:nparc){
+      curve(dgamma(x, shape=shape[j], scale=scale[j]),
+            from = max(0,mu[j]-4*se[j]), to = mu[j]+4*se[j], n = 1e4,
+            lwd = 3, col = j, yaxt = "n",
+            ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2, add = TRUE)
+
+      y1 <- dgamma(x = mu[j], shape = shape[j], scale = scale[j])
+      segments(x0 = mu[j], y0 = 0, y1 = y1, lty = 2, lwd = 3, col = j)
+      points(x = mu[j], y = y1, pch = 19, cex = 1.5, col = j)
+    }
+
+    legend(x = xlim[1], y = ylim[2], legend = paste("Parc", 1:nparc),
+           lwd = 3, col = 1:nparc, text.col = 1:nparc, cex = 1.5,
+           bty = "n", horiz = TRUE)
+  } # end function plot_gamma_cumulated_impacts
 
   ########################
   ## Fatalities
@@ -682,20 +731,16 @@ server <- function(input, output, session){
         }
       }
 
-      # Hide otherwise (when analysis = cumulated impacts)
+    # When analysis = cumulated impacts
     }else{
       output$title_distri_plot <- renderText({ "Mortalités annuelles par parc (impacts cumulés)" })
-
-      # output$distri_plot <- NULL
       output$distri_plot <- renderPlot({
-        par(mfrow = c(1,input$farm_number_cumulated), mar = c(5, 4, 7, 2) + 0.1, oma = c(0,0,0,0))
-        for(j in 1:input$farm_number_cumulated){
-          plot_gamma(mu = input$fatalities_mat_cumulated[j,1], se = input$fatalities_mat_cumulated[j,2])
-          title(paste("Parc", j), line = 5, outer = FALSE, cex.main = 1.8)
-        }
+        plot_gamma_cumulated_impacts(mu = input$fatalities_mat_cumulated[,1],
+                                     se = input$fatalities_mat_cumulated[,2],
+                                     nparc = input$farm_number_cumulated)
       })
 
-    }
+    } # end "if"
   }, ignoreInit = FALSE)
 
 
