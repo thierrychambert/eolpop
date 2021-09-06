@@ -477,8 +477,8 @@ rm(list = ls(all.names = TRUE))
                  plotOutput("impact_plot", width = "100%", height = "550px"),
                  hr(),
 
-                 tags$h4(textOutput("title_impact_plot"), align = "center"),
-                 plotOutput("graph_traj", width = "100%", height = "550px")
+                 tags$h4(textOutput("title_traj_plot"), align = "center"),
+                 plotOutput("traj_plot", width = "100%", height = "550px")
         ), # End tabPanel
 
 

@@ -1053,7 +1053,13 @@ server <- function(input, output, session){
     if(is.null(out$run)) {} else {plot_traj(N = out$run$N, xlab = "year", ylab = "pop size")}
   }
 
-  output$graph_traj <- renderPlot({
+  output$title_traj_plot <- renderText({
+    if(input$run > 0){
+      "Graphique : Trajectoire démographique"
+    }
+  })
+
+  output$traj_plot <- renderPlot({
     plot_out_traj()
   })
   #####
