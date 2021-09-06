@@ -4,12 +4,12 @@
 \alias{get_metrics}
 \title{Calculate Impact Metrics}
 \usage{
-get_metrics(N, cumuated_impacts = FALSE)
+get_metrics(N, cumulated_impacts = FALSE)
 }
 \arguments{
 \item{N}{a 4-D array containing demographic projection outputs}
 
-\item{cumuated_impacts}{Logical. Must be set to TRUE if the output array N corresponds to
+\item{cumulated_impacts}{Logical. Must be set to TRUE if the output array N corresponds to
 a cumulated impacts demographic analysis (see ?run_simul).}
 }
 \value{
@@ -28,7 +28,7 @@ for each individual wind farm.
 data("demo_proj")
 
 ## Calculate the metric
-get_metrics(demo_proj, cumuated_impacts = FALSE)
+get_metrics(demo_proj, cumulated_impacts = FALSE)
 
 
 }
