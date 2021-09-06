@@ -78,7 +78,7 @@ pop_project <- function(fatalities,
     }
 
     # Sample a seed for RNG
-    seed <- ((((Sys.time() %>% as.numeric) %% 1e5) * 1e5) %% 1e5) %>% round
+    seed <- ((((Sys.time() %>% as.numeric) %% 1e10) * 1e9) %% 1e5) %>% round
       #runif(1, 0, 1e6)
 
     ## Projection : apply the LESLIE matrix calculation forward
