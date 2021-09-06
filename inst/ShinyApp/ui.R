@@ -56,12 +56,20 @@ rm(list = ls(all.names = TRUE))
 
   ## Other pre-fill data
   # fatalities for several wind farms (cumulated impacts)
-  init_cumul <- c(10, 5, 8,
-                  0.05, 0.05, 0.05,
-                  2010, 2015, 2018)
+  set.seed(seed = 200)
+  init_cumul <-
+    matrix(
+      round(c(
+        runif(n = 20, 1, 10),
+        runif(n = 20, 0.01, 0.20),
+        sort(sample(x = 2000:2050, size = 20, replace = TRUE))
+      ), 2),
+    nrow = 20, ncol = 3, byrow = FALSE)
 
-  init_cumul_add <- c(3, 0.05, 2020)
+  # Undo last 'set.seed'
+  set.seed(  ((((Sys.time() %>% as.numeric) %% 1e10) * 1e9) %% 1e5) %>% round  )
 }
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 

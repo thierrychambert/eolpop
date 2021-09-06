@@ -279,23 +279,18 @@ server <- function(input, output, session){
   ##############################################
   ## Update matrix cumulated impact
   ##-------------------------------------------
-  observeEvent({input$farm_number_cumulated}, {
-    rows_names <- function(n){
-      v <- c(paste0("Parc n°", c(1:n)))
-      return(v)
-    }
+  observeEvent({
+    input$farm_number_cumulated
+  }, {
 
-    nrow <- input$farm_number_cumulated
-    number_parks <- rows_names(nrow)
-
-    init_cumul_new <- rep(init_cumul_add, nrow)
-
+    nfarm <- input$farm_number_cumulated
+    init_cumul_new  <- init_cumul[1:nfarm,]
     updateMatrixInput(session, inputId = "fatalities_mat_cumulated",
-                      value =  matrix(init_cumul_new, nrow = nrow, ncol = 3, byrow = TRUE,
-                                      dimnames = list(number_parks,
+                      value =  matrix(init_cumul_new, nrow = nfarm, ncol = 3, byrow = FALSE,
+                                      dimnames = list(paste("Parc", c(1:nfarm)),
                                                       c("Moyenne",
                                                         "Erreur-type",
-                                                        "Année de mise en service du parc"))))
+                                                        "Année (début)"))))
   })
   #####
 
@@ -652,7 +647,6 @@ server <- function(input, output, session){
     shape = (mu/se)^2
     scale = se^2/mu
 
-
     ## Define x and y lim
     xx = yy = list()
     for(j in 1:nparc){
@@ -662,7 +656,6 @@ server <- function(input, output, session){
 
     ylim = c(min(unlist(yy)), max(unlist(yy))*1.4)
     xlim = c(min(unlist(xx)), max(unlist(xx)))
-
 
     ## Plot
     j=1
@@ -734,11 +727,15 @@ server <- function(input, output, session){
     # When analysis = cumulated impacts
     }else{
       output$title_distri_plot <- renderText({ "Mortalités annuelles par parc (impacts cumulés)" })
-      output$distri_plot <- renderPlot({
-        plot_gamma_cumulated_impacts(mu = input$fatalities_mat_cumulated[,1],
+      # Plot: note we use the "NULL + delay" sequence only to avoid error message in R console
+      output$distri_plot <- NULL
+      delay(5,
+        output$distri_plot <- renderPlot({
+          plot_gamma_cumulated_impacts(mu = input$fatalities_mat_cumulated[,1],
                                      se = input$fatalities_mat_cumulated[,2],
                                      nparc = input$farm_number_cumulated)
-      })
+        })
+      )
 
     } # end "if"
   }, ignoreInit = FALSE)
