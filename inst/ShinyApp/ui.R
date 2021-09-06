@@ -466,11 +466,15 @@ rm(list = ls(all.names = TRUE))
 
                  br(),
 
+                 actionButton(inputId = "run", label = "Lancer l'analyse"),
+                 hr(),
+
+                 span(textOutput("title_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
+                 br(),
                  strong(span(textOutput("impact_text"), style="color:blue; font-size:18px", align = "left")),
                  strong(span(tableOutput("impact_table"), style="color:blue; font-size:18px", align = "left")),
                  br(),
 
-                 actionButton(inputId = "run", label = "Lancer l'analyse"),
                  hr(),
 
                  tags$h4(textOutput("title_impact_plot"), align = "center"),

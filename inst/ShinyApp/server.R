@@ -625,8 +625,17 @@ server <- function(input, output, session){
   #################################
   ## Fatalities
   ##-------------------------------
-  output$fatalities_mean_info <- renderText({  paste0("Moyenne : ", tail(param$fatalities_mean, 1)) })
-  output$fatalities_se_info <- renderText({  paste0("Erreur-type : ", tail(param$fatalities_se, 1)) })
+  output$fatalities_mean_info <- renderText({
+    paste0(c("Moyenne : ",
+             paste0(c(tail(param$fatalities_mean, -1)), collapse = ", ")
+    ), collapse = "")
+  })
+
+  output$fatalities_se_info <- renderText({
+    paste0(c("Erreur-type : ",
+             paste0(c(tail(param$fatalities_se, -1)), collapse = ", ")
+    ), collapse = "")
+  })
 
 
   #################################
@@ -955,7 +964,7 @@ server <- function(input, output, session){
   ##-------------------------------------------
   ## Functions to print the output as text (non cumulated impacts)
   print_impact_text <- function(impact, lci, uci){
-    paste0("Impact sur la taille de population : ", round(impact, 2)*100, "%",
+    paste0("Impact : ", round(impact, 2)*100, "%",
            "[", round(lci, 2)*100, "% ; ", round(uci, 2)*100, "%]")
   } # end function print_impact_text
 
@@ -1000,6 +1009,13 @@ server <- function(input, output, session){
       } # if "msg"
     } # if "run
   } # end function print_out
+
+  # Display title
+  output$title_impact_result <- renderText({
+    if(input$run > 0){
+      "Résultat : Impact estimé au bout de 30 ans"
+    }
+  })
 
   # Display result (text for non cumulated impacts)
   output$impact_text <- renderText({
