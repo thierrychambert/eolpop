@@ -6,6 +6,7 @@ rm(list = ls(all.names = TRUE))
   ## Load libraries
   library(shiny)
   library(shinyjs)
+  library(shinyBS)
   library(shinyMatrix)
   library(tidyverse)
   library(eolpop)
@@ -91,14 +92,39 @@ rm(list = ls(all.names = TRUE))
 
       # Select type of analysis : cumulated impacted or not
       {column(width = 4,
-              radioButtons(inputId = "analysis_choice",
-                           h4(strong("Sélectionner un type d'analyse")),
-                           choices = c("Impacts non cumulés" = "scenario", "Impacts cumulés" = "cumulated")),
+              # radioButton : Choix du type d'analyse
+              {radioButtons(inputId = "analysis_choice",
+                           label = h4(strong("Type d'analyse"),
+                                      bsButton("Q_analysis_choice", label = "", icon = icon("question"), size = "extra-small"),
+                                      bsPopover(id = "Q_analysis_choice",
+                                                title = "Choix du type d\\'analyse",
+                                                content = HTML(
+                                                  "<b>Impacts non cumulés</b> : pour analyser l\\'impact d\\'<b>un seul parc éolien</b>. <br><br> <b>Impact  cumulés</b> : pour analyser l\\'impact de <b>plusieurs parcs éoliens</b> (attention : il faudra fournir des valeurs de mortalités propres à chaque parc)."
+                                                ),
+                                                placement = "right",
+                                                trigger = "click",
+                                                options = list(container='body')
+                                      )
+                           ),
+                           choices = c("Impacts non cumulés" = "scenario", "Impacts cumulés" = "cumulated")
+              )},
 
-              selectInput(inputId = "species_choice",
+              # Choix de l'espèce (selectInput)
+              {selectInput(inputId = "species_choice",
                           selected = 1, width = '80%',
-                          label = h4(strong("Sélectionner une espèce")),
-                          choices = species_list),
+                          label = h4(strong("Sélectionner une espèce"),
+                                     bsButton("Q_species_choice", label = "", icon = icon("question"), size = "extra-small"),
+                                     bsPopover(id = "Q_species_choice",
+                                               title = "Choix de l\\'espèce",
+                                               content = HTML(
+                                                 "Nécessaire pour fixer les valeurs de <b>paramètres démographiques</b> (survie, fécondité). <br> La liste fournie correspond à une liste d\\'espèces prioritaires. Au besoin, une option \\'espèce générique\\' est disponible à la fin de la liste."
+                                               ),
+                                               placement = "right",
+                                               trigger = "click",
+                                               options = list(container='body')
+                                     )
+                          ),
+                          choices = species_list)},
       )}, # close column
 
       # Show vital rate values
