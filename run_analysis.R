@@ -8,8 +8,8 @@ library(eolpop)
 ## Inputs
 nsim = 10
 
-fatalities_mean = c(0, 10, 5, 8)
-fatalities_se = c(0, 0.05, 0.05, 0.05)
+fatalities_mean = c(0, 10, 5)
+fatalities_se = c(0, 0.05, 0.05)
 
 pop_size_mean = 200
 pop_size_se = 25
@@ -116,5 +116,5 @@ out = run0
 get_metrics(N = out$N)$scenario$impact[time_horzion, "avg",-1]
 
 res = get_metrics(N = out$N, cumulated_impacts = cumulated_impacts)
-names(res)
-res$scenario
+round(t(res$indiv_farm$impact[time_horzion, -2, -1]),2)*100
+

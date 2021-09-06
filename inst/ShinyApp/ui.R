@@ -466,7 +466,8 @@ rm(list = ls(all.names = TRUE))
 
                  br(),
 
-                 strong(span(textOutput("impact_text"), style="color:blue; font-size:24px", align = "left")),
+                 strong(span(textOutput("impact_text"), style="color:blue; font-size:18px", align = "left")),
+                 strong(span(tableOutput("impact_table"), style="color:blue; font-size:18px", align = "left")),
                  br(),
 
                  actionButton(inputId = "run", label = "Lancer l'analyse"),
@@ -476,7 +477,7 @@ rm(list = ls(all.names = TRUE))
                  plotOutput("impact_plot", width = "100%", height = "550px"),
                  hr(),
 
-                 h4("Graphique : Trajectoire démographique", align = "center"),
+                 tags$h4(textOutput("title_impact_plot"), align = "center"),
                  plotOutput("graph_traj", width = "100%", height = "550px")
         ), # End tabPanel
 

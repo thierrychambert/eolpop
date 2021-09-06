@@ -411,213 +411,6 @@ server <- function(input, output, session){
 
   #####
   ##--------------------------------------------
-  ## Select parameter values for simulations
-  ##--------------------------------------------
-
-  #################################
-  ## Cumulated impacts or not ?
-  ##-------------------------------
-  observe({
-    if(input$analysis_choice == "scenario"){
-      param$cumulated_impacts = FALSE
-    } else {
-      param$cumulated_impacts = TRUE
-    } # end if
-  }) # end observeEvent
-
-
-  #################################
-  ## Fatalities
-  ##-------------------------------
-  observeEvent({
-    input$run
-  }, {
-    # Case 1 : Not cumulated effects (if1)
-    if(input$analysis_choice == "scenario"){
-
-      # Case 1.1 : Values from expert elicitation (if2)
-      if(input$fatalities_input_type == "eli_exp"){
-        if(!(is.null(param$fatalities_eli_result))){
-          param$fatalities_mean <- c(0, round(param$fatalities_eli_result$mean))
-          param$onset_time <- NULL
-          param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE))
-          ready$fatalities <- TRUE
-        } else {
-          print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
-          ready$fatalities <- FALSE
-        }
-
-      } else {
-
-        # Case 1.2 : Values directly provided (i.e., not from expert elicitation)
-        ready$fatalities <- TRUE
-        param$fatalities_mean <- c(0, input$fatalities_mean)
-        param$onset_time = NULL
-        param$fatalities_se <- c(0, input$fatalities_se)
-      } # end (if2)
-
-      # Case 2 : Cumulated effects (if-else 1)
-    } else {
-      ready$fatalities <- TRUE
-      param$fatalities_mean <- c(0, input$fatalities_mat_cumulated[,1])
-      param$fatalities_se <- c(0, input$fatalities_mat_cumulated[,2])
-      param$onset_year <- c(min(input$fatalities_mat_cumulated[,3]), input$fatalities_mat_cumulated[,3])
-      param$onset_time <- param$onset_year - min(param$onset_year) + 1
-    } # end (if1)
-
-  }) # end observeEvent
-  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
-
-  #################################
-  ## Population size
-  ##-------------------------------
-  observeEvent({
-    input$run
-  },{
-
-    # Case 1 : Values from expert elicitation
-    if(input$pop_size_input_type == "eli_exp"){
-      if(!(is.null(param$pop_size_eli_result))){
-        param$pop_size_mean <- round(param$pop_size_eli_result$mean)
-        param$pop_size_se <- round(param$pop_size_eli_result$SE)
-        ready$pop_size <- TRUE
-      } else {
-        print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
-        ready$pop_size <- FALSE
-      }
-
-      # Case 2 : Values directly provided (i.e., not from expert elicitation)
-    } else {
-      ready$pop_size <- TRUE
-      param$pop_size_mean <- input$pop_size_mean
-      param$pop_size_se <- input$pop_size_se
-    }
-    param$pop_size_unit <- input$pop_size_unit
-  })
-
-
-  #################################
-  ## Population growth
-  ##-------------------------------
-  observeEvent({
-    input$run
-  }, {
-
-    # Case 1 : Values from expert elicitation
-    if(input$pop_growth_input_type == "eli_exp"){
-      if(!(is.null(param$pop_growth_eli_result))){
-        param$pop_growth_mean <- round(min(1 + param$rMAX_species, round(param$pop_growth_eli_result$mean, 2)), 2)
-        param$pop_growth_se <- round(param$pop_growth_eli_result$SE, 2)
-        ready$pop_growth <- TRUE
-      } else {
-        print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
-        ready$pop_growth <- FALSE
-      }
-
-    } else {
-
-      # Case 2 : Trend information
-      if(input$pop_growth_input_type == "trend"){
-        ready$pop_growth <- TRUE
-
-        if(input$pop_trend == "growth") {
-          if(input$pop_trend_strength == "weak") {
-            param$pop_growth_mean <- 1.01
-          } else if(input$pop_trend_strength == "average"){
-            param$pop_growth_mean <- 1.03
-          } else {
-            param$pop_growth_mean <- 1.06
-          }
-        } else if(input$pop_trend == "decline"){
-          if(input$pop_trend_strength == "weak") {
-            param$pop_growth_mean <- 0.99
-          } else if(input$pop_trend_strength == "average"){
-            param$pop_growth_mean <- 0.97
-          } else {
-            param$pop_growth_mean <- 0.94
-          }
-        } else {
-          param$pop_growth_mean <- 1
-        }
-        param$pop_growth_se <- 0.03
-
-
-      # Case 3 : Values directly provided (i.e., not from expert elicitation)
-      } else {
-        ready$pop_growth <- TRUE
-        param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 2)
-        param$pop_growth_se <- input$pop_growth_se
-      }
-    }
-  })
-
-
-
-  #################################
-  ## Carrying capacity
-  ##------------------------------
-  observeEvent({
-    input$run
-  }, {
-    if(input$carrying_cap_input_type == "eli_exp"){
-      if(!(is.null(param$carrying_cap_eli_result))){
-        param$carrying_capacity <- round(param$carrying_cap_eli_result$mean)
-        ready$carrying_capacity <- TRUE
-      } else {
-        print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
-        ready$carrying_capacity <- FALSE
-      }
-    } else {
-      ready$carrying_capacity <- TRUE
-      param$carrying_capacity <- input$carrying_capacity
-    }
-  })
-  #############################################
-  ## Survivals, fecundities and rMAX_species
-  ##-------------------------------------------
-  observeEvent({input$run}, {
-    param$survivals <- input$mat_fill_vr[,1]
-    param$fecundities <- input$mat_fill_vr[,2]
-    param$rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
-  }) # end observeEvent
-  #####
-
-  #############################################
-  ## Calibration of survivals & fecundities
-  ##-------------------------------------------
-  observeEvent({
-    input$run
-  },{
-    param$vr_calibrated <- calibrate_params(
-      inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
-      f = param$fecundities, s = param$survivals, lam0 = param$pop_growth_mean
-    )
-    param$s_calibrated <- head(param$vr_calibrated, length(param$survivals))
-    param$f_calibrated <- tail(param$vr_calibrated, length(param$fecundities))
-  })
-  #####
-
-  ############################################################
-  ## Observe parameter values to be used in simulations run
-  ##----------------------------------------------------------
-  observe({
-    param # required to ensure up-to-date values are run
-
-    # simple inputs
-    param$nsim <- input$nsim
-    param$fatal_constant <- input$fatal_constant
-
-    # fixed in global environment (for now)
-    param$theta = theta
-    param$time_horzion = time_horzion
-    param$coeff_var_environ = coeff_var_environ
-
-  }) # end observe
-  #####
-
-
-  #####
-  ##--------------------------------------------
   ##  Display parameter distribution
   ##--------------------------------------------
 
@@ -898,6 +691,214 @@ server <- function(input, output, session){
 
 
   #####
+  ##--------------------------------------------
+  ## Select parameter values for simulations
+  ##--------------------------------------------
+  #################################
+  ## Cumulated impacts or not ?
+  ##-------------------------------
+  observeEvent({
+    input$run
+  }, {
+    if(input$analysis_choice == "scenario"){
+      param$cumulated_impacts = FALSE
+    } else {
+      param$cumulated_impacts = TRUE
+    } # end if
+  }) # end observeEvent
+
+  #################################
+  ## Fatalities
+  ##-------------------------------
+  observeEvent({
+    input$run
+  }, {
+    # Case 1 : Not cumulated effects (if1)
+    if(input$analysis_choice == "scenario"){
+
+      # Case 1.1 : Values from expert elicitation (if2)
+      if(input$fatalities_input_type == "eli_exp"){
+        if(!(is.null(param$fatalities_eli_result))){
+          param$fatalities_mean <- c(0, round(param$fatalities_eli_result$mean))
+          param$onset_time <- NULL
+          param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE))
+          ready$fatalities <- TRUE
+        } else {
+          print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
+          ready$fatalities <- FALSE
+        }
+
+      } else {
+
+        # Case 1.2 : Values directly provided (i.e., not from expert elicitation)
+        ready$fatalities <- TRUE
+        param$fatalities_mean <- c(0, input$fatalities_mean)
+        param$onset_time = NULL
+        param$fatalities_se <- c(0, input$fatalities_se)
+      } # end (if2)
+
+      # Case 2 : Cumulated effects (if-else 1)
+    } else {
+      ready$fatalities <- TRUE
+      param$fatalities_mean <- c(0, input$fatalities_mat_cumulated[,1])
+      param$fatalities_se <- c(0, input$fatalities_mat_cumulated[,2])
+      param$onset_year <- c(min(input$fatalities_mat_cumulated[,3]), input$fatalities_mat_cumulated[,3])
+      param$onset_time <- param$onset_year - min(param$onset_year) + 1
+    } # end (if1)
+
+  }) # end observeEvent
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
+
+  #################################
+  ## Population size
+  ##-------------------------------
+  observeEvent({
+    input$run
+  },{
+
+    # Case 1 : Values from expert elicitation
+    if(input$pop_size_input_type == "eli_exp"){
+      if(!(is.null(param$pop_size_eli_result))){
+        param$pop_size_mean <- round(param$pop_size_eli_result$mean)
+        param$pop_size_se <- round(param$pop_size_eli_result$SE)
+        ready$pop_size <- TRUE
+      } else {
+        print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
+        ready$pop_size <- FALSE
+      }
+
+      # Case 2 : Values directly provided (i.e., not from expert elicitation)
+    } else {
+      ready$pop_size <- TRUE
+      param$pop_size_mean <- input$pop_size_mean
+      param$pop_size_se <- input$pop_size_se
+    }
+    param$pop_size_unit <- input$pop_size_unit
+  })
+
+
+  #################################
+  ## Population growth
+  ##-------------------------------
+  observeEvent({
+    input$run
+  }, {
+
+    # Case 1 : Values from expert elicitation
+    if(input$pop_growth_input_type == "eli_exp"){
+      if(!(is.null(param$pop_growth_eli_result))){
+        param$pop_growth_mean <- round(min(1 + param$rMAX_species, round(param$pop_growth_eli_result$mean, 2)), 2)
+        param$pop_growth_se <- round(param$pop_growth_eli_result$SE, 2)
+        ready$pop_growth <- TRUE
+      } else {
+        print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
+        ready$pop_growth <- FALSE
+      }
+
+    } else {
+
+      # Case 2 : Trend information
+      if(input$pop_growth_input_type == "trend"){
+        ready$pop_growth <- TRUE
+
+        if(input$pop_trend == "growth") {
+          if(input$pop_trend_strength == "weak") {
+            param$pop_growth_mean <- 1.01
+          } else if(input$pop_trend_strength == "average"){
+            param$pop_growth_mean <- 1.03
+          } else {
+            param$pop_growth_mean <- 1.06
+          }
+        } else if(input$pop_trend == "decline"){
+          if(input$pop_trend_strength == "weak") {
+            param$pop_growth_mean <- 0.99
+          } else if(input$pop_trend_strength == "average"){
+            param$pop_growth_mean <- 0.97
+          } else {
+            param$pop_growth_mean <- 0.94
+          }
+        } else {
+          param$pop_growth_mean <- 1
+        }
+        param$pop_growth_se <- 0.03
+
+
+        # Case 3 : Values directly provided (i.e., not from expert elicitation)
+      } else {
+        ready$pop_growth <- TRUE
+        param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 2)
+        param$pop_growth_se <- input$pop_growth_se
+      }
+    }
+  })
+
+
+
+  #################################
+  ## Carrying capacity
+  ##------------------------------
+  observeEvent({
+    input$run
+  }, {
+    if(input$carrying_cap_input_type == "eli_exp"){
+      if(!(is.null(param$carrying_cap_eli_result))){
+        param$carrying_capacity <- round(param$carrying_cap_eli_result$mean)
+        ready$carrying_capacity <- TRUE
+      } else {
+        print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
+        ready$carrying_capacity <- FALSE
+      }
+    } else {
+      ready$carrying_capacity <- TRUE
+      param$carrying_capacity <- input$carrying_capacity
+    }
+  })
+  #############################################
+  ## Survivals, fecundities and rMAX_species
+  ##-------------------------------------------
+  observeEvent({
+    input$run
+  }, {
+    param$survivals <- input$mat_fill_vr[,1]
+    param$fecundities <- input$mat_fill_vr[,2]
+    param$rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
+  }) # end observeEvent
+  #####
+
+  #############################################
+  ## Calibration of survivals & fecundities
+  ##-------------------------------------------
+  observeEvent({
+    input$run
+  },{
+    param$vr_calibrated <- calibrate_params(
+      inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
+      f = param$fecundities, s = param$survivals, lam0 = param$pop_growth_mean
+    )
+    param$s_calibrated <- head(param$vr_calibrated, length(param$survivals))
+    param$f_calibrated <- tail(param$vr_calibrated, length(param$fecundities))
+  })
+  #####
+
+  ############################################################
+  ## Observe parameter values to be used in simulations run
+  ##----------------------------------------------------------
+  observe({
+    param # required to ensure up-to-date values are run
+
+    # simple inputs
+    param$nsim <- input$nsim
+    param$fatal_constant <- input$fatal_constant
+
+    # fixed in global environment (for now)
+    param$theta = theta
+    param$time_horzion = time_horzion
+    param$coeff_var_environ = coeff_var_environ
+
+  }) # end observe
+  #####
+
+  #####
   ##-----------------------------------------------------------------------------------
   ##                                RUN SIMULATIONS
   ##-----------------------------------------------------------------------------------
@@ -952,18 +953,36 @@ server <- function(input, output, session){
   ##-------------------------------------------
   ## Impact text
   ##-------------------------------------------
-  ## Two Functions to print the output
-  print_it <- function(impact, lci, uci){
+  ## Functions to print the output as text (non cumulated impacts)
+  print_impact_text <- function(impact, lci, uci){
     paste0("Impact sur la taille de population : ", round(impact, 2)*100, "%",
            "[", round(lci, 2)*100, "% ; ", round(uci, 2)*100, "%]")
-  }
+  } # end function print_impact_text
 
-  print_out <- function()
+  ## Functions to print the output as text (non cumulated impacts)
+  print_impact_table <- function(res){
+    nfarm <- (dim(res$indiv_farm$impact)[3]-1)
+    fil <- paste0(round(t(res$indiv_farm$impact[time_horzion, -2, -1]),2)*100, "%")
+    matrix(fil,
+           nrow = nfarm,
+           dimnames = list(paste("Parc",1:nfarm), c("Impact", "IC (min)", "IC (max)"))
+    )
+  } # end function print_impact_table
+
+  print_out <- function(){
     if(!is.null(out$run)) {
       # Print the result
-      print_it(impact = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "avg",-1],
-               lci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "lci",-1],
-               uci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "uci",-1])
+
+      if(param$cumulated_impacts){
+        # cumulated impact ==> Table
+        print_impact_table(res = get_metrics(N = out$run$N, cumulated_impacts = TRUE))
+      }else{
+        # non cumulated impact ==> Text
+        print_impact_text(impact = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "avg",-1],
+                 lci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "lci",-1],
+                 uci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "uci",-1])
+      }
+
     } else {
       # When run is NULL
 
@@ -980,15 +999,33 @@ server <- function(input, output, session){
         # When no error msg : nothing happens
       } # if "msg"
     } # if "run
+  } # end function print_out
 
-  # Display result (text)
+  # Display result (text for non cumulated impacts)
   output$impact_text <- renderText({
-    if(!param$cumulated_impacts){
-      print_out()
-    } else{
+    if(input$run == 0){
       NULL
+    }else{
+      if(!param$cumulated_impacts){
+        print_out()
+      } else{
+        NULL
+      }
     }
   })
+
+  # Display result (table for cumulated impacts)
+  output$impact_table <- renderTable({
+    if(input$run == 0){
+      NULL
+    }else{
+      if(param$cumulated_impacts){
+        print_out()
+      } else{
+        NULL
+      }
+    }
+  }, rownames = TRUE)
 
   ##-------------------------------------------
   ## Plot Impacts
