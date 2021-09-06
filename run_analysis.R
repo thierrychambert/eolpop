@@ -114,3 +114,7 @@ abline(h = K)
 
 out = run0
 get_metrics(N = out$N)$scenario$impact[time_horzion, "avg",-1]
+
+res = get_metrics(N = out$N, cumulated_impacts = cumulated_impacts)
+names(res)
+res$scenario

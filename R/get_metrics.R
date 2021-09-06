@@ -14,7 +14,7 @@
 #'
 #'
 #' @param N a 4-D array containing demographic projection outputs
-#' @param cumuated_impacts Logical. Must be set to TRUE if the output array N corresponds to
+#' @param cumulated_impacts Logical. Must be set to TRUE if the output array N corresponds to
 #' a cumulated impacts demographic analysis (see ?run_simul).
 #'
 #' @return a list of metric outputs : mean, SD, 95% C.I. of the
@@ -25,15 +25,15 @@
 #' data("demo_proj")
 #'
 #' ## Calculate the metric
-#' get_metrics(demo_proj, cumuated_impacts = FALSE)
+#' get_metrics(demo_proj, cumulated_impacts = FALSE)
 #'
 #'
-get_metrics <- function(N, cumuated_impacts = FALSE){
+get_metrics <- function(N, cumulated_impacts = FALSE){
 
   TH <- dim(N)[2]
   warning <- NULL
 
-  ### Impact of each SCENARIO
+  ### Impact of each SCENARIO #####
   ## Relative difference of population size
   DR_N <- array(NA, dim = dim(N)[2:4],
                 dimnames = list(paste0("year", 1:dim(N)[2]),
@@ -108,7 +108,7 @@ get_metrics <- function(N, cumuated_impacts = FALSE){
     Pext = Pext_sc,
     DR_Pext = DR_Pext_sc)
 
-
+  #####
 
   #===================================================================
   #               CASE: CUMULATED IMPACT RUN                        ==
@@ -125,7 +125,7 @@ get_metrics <- function(N, cumuated_impacts = FALSE){
 
   Pext_indiv <- DR_Pext_indiv <- NA
 
-  if(cumuated_impacts){
+  if(cumulated_impacts){
     ## Relative difference of population size
     DR_N <- array(NA, dim = dim(N)[2:4],
                   dimnames = list(paste0("year", 1:dim(N)[2]),
