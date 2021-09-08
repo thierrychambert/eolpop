@@ -56,7 +56,7 @@ rm(list = ls(all.names = TRUE))
                       0.3, 0.90, 0.95, 0.98, 0.70)
 
   ## Other pre-fill data
-  # fatalities for several wind farms (cumulated impacts)
+  # fatality table for cumulated impacts (several wind farms)
   set.seed(seed = 200)
   init_cumul <-
     matrix(
@@ -92,14 +92,14 @@ rm(list = ls(all.names = TRUE))
 
       # Select type of analysis : cumulated impacted or not
       {column(width = 4,
-              # radioButton : Choix du type d'analyse
+              # Choose analysis type (radioButton)
               {radioButtons(inputId = "analysis_choice",
                            label = h4(strong("Type d'analyse"),
                                       bsButton("Q_analysis_choice", label = "", icon = icon("question"), size = "extra-small"),
                                       bsPopover(id = "Q_analysis_choice",
                                                 title = "Choix du type d\\'analyse",
                                                 content = HTML(
-                                                  "<b>Impacts non cumulés</b> : pour analyser l\\'impact d\\'<b>un seul parc éolien</b>. <br><br> <b>Impact  cumulés</b> : pour analyser l\\'impact de <b>plusieurs parcs éoliens</b> (attention : il faudra fournir des valeurs de mortalités propres à chaque parc)."
+                                                  "<b>Impacts non cumulés</b> : pour analyser l\\'impact d\\'<b>un seul parc éolien</b>. <br><br> <b>Impact cumulés</b> : pour analyser l\\'impact de <b>plusieurs parcs éoliens</b> (attention : il faudra fournir des valeurs de mortalités propres à chaque parc)."
                                                 ),
                                                 placement = "right",
                                                 trigger = "click",
@@ -109,7 +109,7 @@ rm(list = ls(all.names = TRUE))
                            choices = c("Impacts non cumulés" = "scenario", "Impacts cumulés" = "cumulated")
               )},
 
-              # Choix de l'espèce (selectInput)
+              # Choose species (selectInput)
               {selectInput(inputId = "species_choice",
                           selected = 1, width = '80%',
                           label = h4(strong("Sélectionner une espèce"),
@@ -127,16 +127,27 @@ rm(list = ls(all.names = TRUE))
                           choices = species_list)},
       )}, # close column
 
-      # Show vital rate values
+      # Show vital rate values (tableOutput)
       {column(width = 4,
               fluidRow(
-                h4(strong("Paramètres démographiques")),
+                h4(strong("Paramètres démographiques"),
+                   bsButton("Q_vital_rates_info", label = "", icon = icon("question"), size = "extra-small"),
+                   bsPopover(id = "Q_vital_rates_info",
+                             title = "Paramètres démographiques",
+                             content = HTML(
+                               "Valeurs de <b>survie et fécondités par classe d\\'âge</b>, pour l\\'espèce sélectionnée. <br><br><b>Juv 0</b> correspond à un individu né dans l\\'année, n\\'ayant <u>pas encore</u> 1 an révolu.<br><b>Juv 1</b> correspond à un individu ayant 1 an révolu, donc dans sa 2<sup>e</sup> année de vie.<br>Etc."
+                               ),
+                               placement = "right",
+                             trigger = "click",
+                             options = list(container='body')
+                   )
+                ),
                 tableOutput(outputId = "vital_rates_info"),
               ),
       )}, # close column
 
 
-      ## Modify vital rates (if needed)
+      ## Modify vital rates, if needed (actionButton and matrixInput)
       {column(width = 4,
               tags$style(HTML('#button_vital_rates{background-color:#C2C8D3}')),
               actionButton(inputId = "button_vital_rates",
@@ -165,7 +176,19 @@ rm(list = ls(all.names = TRUE))
   # Head Panel 2 : Model parameters
   {wellPanel(
 
-    p("Saisie des paramètres", style="font-size:28px"),
+    ## Enter parameter values
+    p("Saisie des paramètres", style="font-size:28px",
+      bsButton("Q_param_enter", label = "", icon = icon("question"), size = "extra-small"),
+      bsPopover(id = "Q_param_enter",
+                title = "Saisie des paramètres pour l\\'analyse",
+                content = HTML(
+                "Cliquer sur les boutons ci-dessous pour saisir les valeurs des quatre paramètres requis pour l\\'analyse : <br>(1) Mortalités annuelles, <br>(2) Taille de la population, <br>(3) Tendance de la population, <br>(4) Capacité de charge."
+                ),
+                placement = "right",
+                trigger = "click",
+                options = list(container='body')
+      )
+    ),
 
     {fluidRow(
 
@@ -177,6 +200,15 @@ rm(list = ls(all.names = TRUE))
               tags$style(HTML('#button_fatalities{background-color:#C2C8D3}')),
               actionButton(inputId = "button_fatalities", width = '100%',
                            label = tags$span("Mortalités annuelles", style = "font-weight: bold; font-size: 18px;")
+              ),
+              bsPopover(id = "button_fatalities",
+                        title = "Mortalités annuelles",
+                        content = HTML(
+                        "Nombre de mortalités totales <b><u>annuelles</u> (cad. sur 12 mois) </b> attendues, pour l\\'espèce sélectionnée, sur chaque parc éolien concerné (somme des mortalités attendues sur toutes les éoliennes d\\'un parc)."
+                        ),
+                        placement = "top",
+                        trigger = "hover",
+                        options = list(container='body')
               ),
 
               ### Part for non-cumulated impacts
