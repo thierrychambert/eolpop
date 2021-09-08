@@ -82,7 +82,7 @@ rm(list = ls(all.names = TRUE))
 {ui <- fluidPage(
 
   useShinyjs(),
-  titlePanel("eolpop : Impact demographique des éoliennes"),
+  titlePanel("eolpop : Impact demographique des collisions aviaires avec les éoliennes"),
 
 
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
@@ -176,8 +176,8 @@ rm(list = ls(all.names = TRUE))
   # Head Panel 2 : Model parameters
   {wellPanel(
 
-    ## Enter parameter values
-    p("Saisie des paramètres", style="font-size:28px",
+    ## Enter parameter values (TITLE)
+    {p("Saisie des paramètres", style="font-size:28px",
       bsButton("Q_param_enter", label = "", icon = icon("question"), size = "extra-small"),
       bsPopover(id = "Q_param_enter",
                 title = "Saisie des paramètres pour l\\'analyse",
@@ -188,7 +188,7 @@ rm(list = ls(all.names = TRUE))
                 trigger = "click",
                 options = list(container='body')
       )
-    ),
+    )},
 
     {fluidRow(
 
@@ -455,7 +455,7 @@ rm(list = ls(all.names = TRUE))
   {sidebarLayout(
     {sidebarPanel(
 
-      p("Valeurs utilisées", style="font-size:28px"),
+      p("Valeurs sélectionnées", style="font-size:28px"),
 
       # Mortalites annuelles
       {wellPanel(style = "background:#DCDCDC",
