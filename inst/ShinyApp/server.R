@@ -731,7 +731,6 @@ server <- function(input, output, session){
           param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE, 2))
           ready$fatalities <- TRUE
         } else {
-          print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
           ready$fatalities <- FALSE
         }
 
@@ -767,7 +766,6 @@ server <- function(input, output, session){
         param$pop_size_se <- round(param$pop_size_eli_result$SE)
         ready$pop_size <- TRUE
       } else {
-        print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
         ready$pop_size <- FALSE
       }
 
@@ -792,7 +790,6 @@ server <- function(input, output, session){
         param$pop_growth_se <- round(param$pop_growth_eli_result$SE, 2)
         ready$pop_growth <- TRUE
       } else {
-        print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
         ready$pop_growth <- FALSE
       }
 
@@ -844,7 +841,6 @@ server <- function(input, output, session){
         param$carrying_capacity <- round(param$carrying_cap_eli_result$mean)
         ready$carrying_capacity <- TRUE
       } else {
-        print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
         ready$carrying_capacity <- FALSE
       }
     } else {
