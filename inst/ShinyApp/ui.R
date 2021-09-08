@@ -277,6 +277,15 @@ rm(list = ls(all.names = TRUE))
               actionButton(inputId = "button_pop_size", width = '100%',
                            label = tags$span("Taille de la population", style = "font-weight: bold; font-size: 18px;")
               ),
+              bsPopover(id = "button_pop_size",
+                        title = "Taille de la population",
+                        content = HTML(
+                        "Effectif de la population cible pour l\\'analyse d\\'impact. <br> Il peut s\\'agir soit du <b>nombre de couples</b>, soit de l\\'<b>effectif total</b> de la population (cad. toutes classes d\\'âge incluses)."
+                        ),
+                        placement = "top",
+                        trigger = "hover",
+                        options = list(container='body')
+              ),
 
               {conditionalPanel("output.hide_pop_size",
                               br(),
@@ -284,7 +293,7 @@ rm(list = ls(all.names = TRUE))
                               {wellPanel(style = "background:#FFF8DC",
                                  radioButtons(inputId = "pop_size_unit", inline = TRUE,
                                               label = "Unité",
-                                              choices = c("Nombre de couple" = "Npair", "Effectif total" = "Ntotal"),
+                                              choices = c("Nombre de couples" = "Npair", "Effectif total" = "Ntotal"),
                                               selected = "Ntotal"),
                               )}, # close wellPanel 1
 
@@ -330,6 +339,15 @@ rm(list = ls(all.names = TRUE))
               tags$style(HTML('#button_pop_growth{background-color:#C2C8D3}')),
               actionButton(inputId = "button_pop_growth", width = '100%',
                            label = tags$span("Tendance de la population", style = "font-weight: bold; font-size: 18px;")
+              ),
+              bsPopover(id = "button_pop_growth",
+                        title = "Tendance de la population",
+                        content = HTML(
+                        "<b>Taux de croissance annuel (&lambda;) </b> de la population (avec &lambda; = 1 pour une population stable). <br>A défaut, on pourra juste cocher la <b>tendance globale</b> (déclin, stabilité ou croissance) et l\\'intensité de cette tendance (faible, moyenne, forte)."
+                        ),
+                        placement = "top",
+                        trigger = "hover",
+                        options = list(container='body')
               ),
 
               {conditionalPanel("output.hide_pop_growth",
@@ -405,6 +423,17 @@ rm(list = ls(all.names = TRUE))
                            label = tags$span("Capacité de charge", style = "font-weight: bold; font-size: 18px;")
               ),
 
+              bsPopover(id = "button_carrying_cap",
+                        title = "Capacité de charge",
+                        content = HTML(
+                          "La capacité de charge correspond à la <b>taille maximale que peut atteindre la population</b> dans son environnement et les limites spatiales considérées. <br><br><u>Note:</u> Ce chiffre sera exprimé dans la <b>même unité</b> que la taille de population (cad. nombre de couples ou effectif total). <br>Il n\\'a pas besoin d\\'être très précis&nbsp;; il doit simplement fournir un ordre de grandeur de la taille limite au-delà de laquelle la population ne peut plus croître (environnement local «saturé»)."
+                          ),
+                        placement = "top",
+                        trigger = "hover",
+                        options = list(container='body')
+              ),
+
+
               {conditionalPanel("output.hide_carrying_cap",
                                 br(),
 
@@ -455,7 +484,15 @@ rm(list = ls(all.names = TRUE))
   {sidebarLayout(
     {sidebarPanel(
 
-      p("Valeurs sélectionnées", style="font-size:28px"),
+      p("Valeurs sélectionnées", style="font-size:28px",
+        bsButton("Q_selected_values", label = "", icon = icon("question"), size = "extra-small"),
+        bsTooltip(id = "Q_selected_values",
+                  title = "Rappel des valeurs de paramètres actuellement sélectionnées.",
+                  placement = "right",
+                  trigger = "click",
+                  options = list(container='body')
+        )
+      ),
 
       # Mortalites annuelles
       {wellPanel(style = "background:#DCDCDC",
