@@ -183,7 +183,7 @@ server <- function(input, output, session){
   #####
 
   ##############################################
-  ##  Reactive value
+  ##  Reactive values
   ##--------------------------------------------
   out <- reactiveValues(run = NULL, msg = NULL)
 
@@ -626,10 +626,10 @@ server <- function(input, output, session){
   ## Fatalities
   ##-------------------------------
   output$fatalities_mean_info <- renderText({
-    paste0(c("Moyenne : ",
-             paste0(c(tail(param$fatalities_mean, -1)), collapse = ", ")
-    ), collapse = "")
-  })
+      paste0(c("Moyenne : ",
+               paste0(c(tail(param$fatalities_mean, -1)), collapse = ", ")
+      ), collapse = "")
+    })
 
   output$fatalities_se_info <- renderText({
     paste0(c("Erreur-type : ",
@@ -719,18 +719,16 @@ server <- function(input, output, session){
   #################################
   ## Fatalities
   ##-------------------------------
-  observeEvent({
-    input$run
-  }, {
+  observe({
     # Case 1 : Not cumulated effects (if1)
     if(input$analysis_choice == "scenario"){
 
       # Case 1.1 : Values from expert elicitation (if2)
       if(input$fatalities_input_type == "eli_exp"){
         if(!(is.null(param$fatalities_eli_result))){
-          param$fatalities_mean <- c(0, round(param$fatalities_eli_result$mean))
+          param$fatalities_mean <- c(0, round(param$fatalities_eli_result$mean, 2))
           param$onset_time <- NULL
-          param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE))
+          param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE, 2))
           ready$fatalities <- TRUE
         } else {
           print("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
@@ -755,16 +753,13 @@ server <- function(input, output, session){
       param$onset_time <- param$onset_year - min(param$onset_year) + 1
     } # end (if1)
 
-  }) # end observeEvent
+  }) # end observe
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
   #################################
   ## Population size
   ##-------------------------------
-  observeEvent({
-    input$run
-  },{
-
+  observe({
     # Case 1 : Values from expert elicitation
     if(input$pop_size_input_type == "eli_exp"){
       if(!(is.null(param$pop_size_eli_result))){
@@ -789,10 +784,7 @@ server <- function(input, output, session){
   #################################
   ## Population growth
   ##-------------------------------
-  observeEvent({
-    input$run
-  }, {
-
+  observe({
     # Case 1 : Values from expert elicitation
     if(input$pop_growth_input_type == "eli_exp"){
       if(!(is.null(param$pop_growth_eli_result))){
@@ -846,9 +838,7 @@ server <- function(input, output, session){
   #################################
   ## Carrying capacity
   ##------------------------------
-  observeEvent({
-    input$run
-  }, {
+  observe({
     if(input$carrying_cap_input_type == "eli_exp"){
       if(!(is.null(param$carrying_cap_eli_result))){
         param$carrying_capacity <- round(param$carrying_cap_eli_result$mean)
