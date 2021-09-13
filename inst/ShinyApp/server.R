@@ -191,7 +191,7 @@ server <- function(input, output, session){
 
   param <- reactiveValues(N1 = NULL,
                           nsim = NULL,
-                          cumulated_impacts = NULL,
+                          cumulated_impacts = FALSE,
 
                           fatalities_mean = NULL,
                           fatalities_se = NULL,
