@@ -739,7 +739,8 @@ server <- function(input, output, session){
         # Case 1.2 : Values directly provided (i.e., not from expert elicitation)
         ready$fatalities <- TRUE
         param$fatalities_mean <- c(0, input$fatalities_mean)
-        param$onset_time = NULL
+        param$onset_year <- NULL
+        param$onset_time <- NULL
         param$fatalities_se <- c(0, input$fatalities_se)
       } # end (if2)
 
