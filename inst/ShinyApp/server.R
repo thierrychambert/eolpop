@@ -1034,7 +1034,10 @@ server <- function(input, output, session){
   ##-------------------------------------------
   ## Function to plot the impact
   plot_out_impact <- function(){
-    if(is.null(out$run)) {} else {plot_impact(N = out$run$N, xlab = "year", ylab = "pop size")}
+    if(is.null(out$run)) {} else {
+      plot_impact(N = out$run$N, onset_year = param$onset_year, percent = TRUE,
+                  xlab = "\nAnnée", ylab = "Impact relatif (%)\n")
+      }
   }
 
   output$title_impact_plot <- renderText({

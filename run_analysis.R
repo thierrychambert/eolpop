@@ -21,7 +21,7 @@ survivals <- c(0.5, 0.7, 0.8, 0.95)
 fecundities <- c(0, 0, 0.05, 0.55)
 
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
-time_horzion = 50
+time_horzion = 30
 coeff_var_environ = 0.10
 fatal_constant = "h"
 pop_size_type = "Ntotal"
@@ -111,6 +111,8 @@ names(run0)
 N <- run0$N ; dim(N)
 plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
 abline(h = K)
+
+
 
 out = run0
 get_metrics(N = out$N)$scenario$impact[time_horzion, "avg",-1]

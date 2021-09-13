@@ -36,4 +36,5 @@ import(stats, except = c(filter, lag))
 
 import(utils)
 importFrom(dplyr,filter)
+importFrom(scales,pretty_breaks)
 importFrom(shiny,incProgress)

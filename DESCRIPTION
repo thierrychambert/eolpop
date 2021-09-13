@@ -22,6 +22,7 @@ Imports:
     magrittr,
     popbio,
     RColorBrewer,
+    scales,
     SHELF,
     shiny,
     stats,
