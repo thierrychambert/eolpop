@@ -251,6 +251,18 @@ rm(list = ls(all.names = TRUE))
                                                         value = 3, min = 2, max = Inf, step = 1),
 
                                            matrixInput(inputId = "fatalities_mat_cumulated",
+                                                       label = span("Mortalités dans chaque parc",
+                                                                      bsButton("Q_fatalities_mat_cumulated", label = "", icon = icon("question"), size = "extra-small"),
+                                                                      bsPopover(id = "Q_fatalities_mat_cumulated",
+                                                                                title = "Mortalités cumulées",
+                                                                                content = HTML(
+                                                                                  "1 ligne = 1 parc <br><br>Les parcs doivent être fournis dans l\\'<b>ordre chronologique</b> de leur mise en service (\\'Année début\\'). <br><br>Pour chaque parc, veuillez indiquer la <u>moyenne</u> et l\\'<u>erreur-type</u> du nombre de mortalités estimées, ainsi que son <u>année de mise en service</u>."
+                                                                                  ),
+                                                                                placement = "right",
+                                                                                trigger = "click",
+                                                                                options = list(container='body')
+                                                                      )
+                                                       ),
                                                        value = matrix(init_cumul, 3, 3,
                                                                       dimnames = list(c(paste0("Parc num.", c(1:3))),
                                                                                       c("Moyenne",
