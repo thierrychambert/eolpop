@@ -119,47 +119,62 @@ elicitation <- function(vals, Cp, weights = 1, lower = 0, upper = Inf){
 plot_elicitation <- function(out, ...){
 
   fit_raw = out$fit_raw
-
-  ## Extract predictions
-  # Linear pool predicts (not smoothed)
-  LP <- SHELF::linearPoolDensity(fit = fit_raw, d = "gamma", lpw = 1)
-  xlim0 <- c(min(LP$x), max(LP$x))
-
-  # Smoothed predicts
-  Y_smooth <- dgamma(x = LP$x, shape = out$shape_smooth, rate = out$rate_smooth)
-
-  # Individual expert predicts
   n_experts <- nrow(fit_raw$Gamma)
-  shape_i <- rate_i <- rep(NA, n_experts)
-  length.out <- 200
-  Y_i <- X_i <- matrix(NA, nrow = n_experts, ncol = length.out)
 
-  for(i in 1:nrow(fit_raw$Gamma)){
-    xlims <- qgamma(p = c(0.0001,0.9999), shape = fit_raw$Gamma[i, "shape"],
-                    rate = fit_raw$Gamma[i, "rate"])
-    X_i[i,] <- seq(xlims[1], xlims[2], length.out = length.out)
-    Y_i[i,] <- dgamma(x = X_i[i,], shape = fit_raw$Gamma[i, "shape"],
-                      rate = fit_raw$Gamma[i, "rate"])
-  }
+  if(n_experts < 1){
+
+  }else{
+    if(n_experts == 1){
+      xlims <- qgamma(p = c(0.0001,0.9999), shape = fit_raw$Gamma[, "shape"],
+                      rate = fit_raw$Gamma[,"rate"])
+      X_i <- seq(xlims[1], xlims[2], length.out = 200)
+      Y_i <- dgamma(x = X_i, shape = fit_raw$Gamma[, "shape"], rate = fit_raw$Gamma[, "rate"])
+      # Plot
+      plot(x = X_i, y = Y_i, type = "l", col = "darkblue", lwd = 3)
+
+    }else{
+
+      ## Extract predictions
+      # Linear pool predicts (not smoothed)
+      LP <- SHELF::linearPoolDensity(fit = fit_raw, d = "gamma", lpw = 1)
+      xlim0 <- c(min(LP$x), max(LP$x))
+
+      # Smoothed predicts
+      Y_smooth <- dgamma(x = LP$x, shape = out$shape_smooth, rate = out$rate_smooth)
+
+      # Individual expert predicts
+      length.out <- 200
+      Y_i <- X_i <- matrix(NA, nrow = n_experts, ncol = length.out)
+
+      for(i in 1:nrow(fit_raw$Gamma)){
+        xlims <- qgamma(p = c(0.0001,0.9999), shape = fit_raw$Gamma[i, "shape"],
+                        rate = fit_raw$Gamma[i, "rate"])
+        X_i[i,] <- seq(xlims[1], xlims[2], length.out = length.out)
+        Y_i[i,] <- dgamma(x = X_i[i,], shape = fit_raw$Gamma[i, "shape"],
+                          rate = fit_raw$Gamma[i, "rate"])
+      }
 
 
-  # Plot
-  xlim <- qgamma(p = c(0.001,0.999), shape = out$shape_smooth, rate = out$rate_smooth)
-  ylim = c(min(c(Y_i, Y_smooth, LP$y)), max(c(Y_i, Y_smooth, LP$y)))
+      # Plot
+      xlim <- qgamma(p = c(0.001,0.999), shape = out$shape_smooth, rate = out$rate_smooth)
+      ylim = c(min(c(Y_i, Y_smooth, LP$y)), max(c(Y_i, Y_smooth, LP$y)))
 
-  plot(x = LP$x, y = Y_smooth, type = "l", col = "darkblue", lwd = 3, ylim = ylim, xlim = xlim, ...)
-  for(i in 1:n_experts) points(x = X_i[i,], y = Y_i[i,], type = "l", col = i, lwd = 1, lty = 2)
+      plot(x = LP$x, y = Y_smooth, type = "l", col = "darkblue", lwd = 3, ylim = ylim, xlim = xlim, ...)
+      for(i in 1:n_experts) points(x = X_i[i,], y = Y_i[i,], type = "l", col = i, lwd = 1, lty = 2)
 
-  # lengend
-  legend(x = xlim[2], y = max(Y_smooth, Y_i), xjust = 1,
-         legend = c(paste0("Expert #", 1:n_experts), "Estimation globale"),
-         lty = c(rep(3, n_experts), 1), lwd = c(rep(1, n_experts), 3),
-         col = c(1:n_experts, "darkblue"),
-         text.col = c(1:n_experts, "darkblue"), text.font = c(rep(1, n_experts), 2),
-         bty = "n", y.intersp = 1.5
-  )
+      # lengend
+      legend(x = xlim[2], y = max(Y_smooth, Y_i), xjust = 1,
+             legend = c(paste0("Expert #", 1:n_experts), "Estimation globale"),
+             lty = c(rep(3, n_experts), 1), lwd = c(rep(1, n_experts), 3),
+             col = c(1:n_experts, "darkblue"),
+             text.col = c(1:n_experts, "darkblue"), text.font = c(rep(1, n_experts), 2),
+             bty = "n", y.intersp = 1.5
+      )
 
-  # points(x = LP$x, y = LP$f, type = "l", col = "green", lwd = 3)
+      # points(x = LP$x, y = LP$f, type = "l", col = "green", lwd = 3)
+
+    }  # if 2
+  } # if 1
 
   } # End of function
 ################################################################################
