@@ -24,6 +24,7 @@ rm(list = ls(all.names = TRUE))
   coeff_var_environ = 0.10
   time_horzion = 30
   theta = 1 # DD parameter theta
+  CP = 0.99 # Coverage probability for lower - upper values
 }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
@@ -225,12 +226,21 @@ rm(list = ls(all.names = TRUE))
                                            # Values
                                            numericInput(inputId = "fatalities_mean",
                                                         label = "Moyenne des mortalités annuelles",
-                                                        value = 5,
+                                                        value = 1,
                                                         min = 0, max = Inf, step = 0.5),
-                                           numericInput(inputId = "fatalities_se",
-                                                        label = "Erreur-type des mortalités annuelles",
-                                                        value = 0.05,
-                                                        min = 0, max = Inf, step = 0.1),
+
+                                           numericInput(inputId = "fatalities_lower",
+                                                        label = "Borne inférieure (mortalités annuelles)",
+                                                        value = 0.5,
+                                                        min = 0, max = Inf, step = 0.5),
+
+                                           numericInput(inputId = "fatalities_upper",
+                                                        label = "Borne supérieure (mortalités annuelles)",
+                                                        value = 2.5,
+                                                        min = 0, max = Inf, step = 0.5),
+
+                                           actionButton(inputId = "fatalities_run_values", label = "Utiliser ces valeurs"),
+
 
                                            # Matrix for expert elicitation
                                            matrixInput(inputId = "fatalities_mat_expert",

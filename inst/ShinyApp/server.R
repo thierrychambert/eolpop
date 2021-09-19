@@ -194,9 +194,11 @@ server <- function(input, output, session){
                           cumulated_impacts = FALSE,
 
                           fatalities_mean = NULL,
+                          fatalities_mean_use = NULL,
                           fatalities_se = NULL,
                           onset_time = NULL,
                           onset_year = NULL,
+                          out_fatal = NULL,
 
                           pop_size_mean = NULL,
                           pop_size_se = NULL,
@@ -414,6 +416,20 @@ server <- function(input, output, session){
   ##  Display parameter distribution
   ##--------------------------------------------
 
+  # Function to plot the parameter distribution (from range values)
+  plot_range <- function(out, mu, show_se = TRUE, ...){
+    plot_elicitation(out, ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2, yaxt = "n")
+    mtext(text = "Densité de probabilité", side = 2, line = 2, cex = 1.2)
+
+    y2 <- dgamma(x = mu, shape = out$shape_smooth, rate = out$rate_smooth)
+    xx <- qgamma(p = c(0.01,0.99), shape = out$shape_smooth, rate = out$rate_smooth)
+    clip(xx[1], xx[2], -100, y2)
+    abline(v = mu, lwd = 3, col = "darkblue")
+
+    mtext(text = paste("Moyenne = ", round(mu,2)), side = 3, line = 2.5, cex = 1.2, adj = 0)
+    if(show_se) mtext(text = paste("Erreur-type = ", round(sqrt(out$var_smooth), 2)), side = 3, line = 1, cex = 1.2, adj = 0)
+  }
+
   # Function to plot a gamma distribution
   plot_gamma <- function(mu, se, show_mean = TRUE, show_se = TRUE, ...){
 
@@ -490,6 +506,7 @@ server <- function(input, output, session){
     input$button_fatalities
     input$fatalities_input_type
     input$fatalities_run_expert
+    input$fatalities_run_values
 
     input$farm_number_cumulated
     input$fatalities_mat_cumulated
@@ -499,7 +516,8 @@ server <- function(input, output, session){
       # Show from input values: if button is ON and input_type is set on "value"
       if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "val"){
         output$title_distri_plot <- renderText({ "Mortalités annuelles" })
-        output$distri_plot <- renderPlot({ plot_gamma(mu = input$fatalities_mean, se = input$fatalities_se) })
+        req(param$out_fatal)
+        output$distri_plot <- renderPlot({ plot_range(param$out_fatal, mu = param$fatalities_mean_use) })
       } else {
         # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
         if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "eli_exp"){
@@ -699,6 +717,30 @@ server <- function(input, output, session){
 
 
 
+
+
+
+
+  observe({
+    param$fatalities_mean_use = (input$fatalities_lower + input$fatalities_upper)/2
+    req(input$fatalities_mean)
+    param$fatalities_mean_use <- input$fatalities_mean
+  })
+
+  observeEvent({
+    input$fatalities_run_values
+  }, {
+    vals <- matrix(c(input$fatalities_lower, param$fatalities_mean_use, input$fatalities_upper))
+    param$out_fatal <- elicitation(vals, Cp = CP)
+
+  })
+
+
+
+
+
+
+
   #####
   ##--------------------------------------------
   ## Select parameter values for simulations
@@ -736,12 +778,29 @@ server <- function(input, output, session){
 
       } else {
 
+
+
+
+
+
         # Case 1.2 : Values directly provided (i.e., not from expert elicitation)
-        ready$fatalities <- TRUE
-        param$fatalities_mean <- c(0, input$fatalities_mean)
-        param$onset_year <- NULL
-        param$onset_time <- NULL
-        param$fatalities_se <- c(0, input$fatalities_se)
+        if(!(is.null(param$out_fatal))){
+          param$fatalities_mean <- c(0, round(param$fatalities_mean_use, 2))
+          param$onset_time <- NULL
+          param$fatalities_se <- c(0, round(sqrt(param$out_fatal$var_smooth), 2))
+          ready$fatalities <- TRUE
+        } else {
+          ready$fatalities <- FALSE
+        }
+
+
+
+
+        #ready$fatalities <- TRUE
+        #param$fatalities_se <- c(0, round(sqrt(param$out_fatal$var_smooth), 2))
+        #param$onset_year <- NULL
+        #param$onset_time <- NULL
+
       } # end (if2)
 
       # Case 2 : Cumulated effects (if-else 1)
