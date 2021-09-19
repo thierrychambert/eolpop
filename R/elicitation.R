@@ -130,7 +130,7 @@ plot_elicitation <- function(out, ...){
       X_i <- seq(xlims[1], xlims[2], length.out = 200)
       Y_i <- dgamma(x = X_i, shape = fit_raw$Gamma[, "shape"], rate = fit_raw$Gamma[, "rate"])
       # Plot
-      plot(x = X_i, y = Y_i, type = "l", col = "darkblue", lwd = 3)
+      plot(x = X_i, y = Y_i, type = "l", col = "darkblue", lwd = 3, ...)
 
     }else{
 
