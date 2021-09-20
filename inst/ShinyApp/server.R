@@ -500,17 +500,26 @@ server <- function(input, output, session){
     input$button_fatalities
     input$fatalities_input_type
     input$fatalities_run_expert
-    #input$fatalities_run_values
-
     input$farm_number_cumulated
     input$fatalities_mat_cumulated
   },{
+
     if(input$analysis_choice != "cumulated"){
 
-      # Show from input values: if button is ON and input_type is set on "value"
-      if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "val"){
+      # Show from input values: if button is ON and input_type is set on "value" or "itvl" (thus not "eli_exp")
+      if(input$button_fatalities%%2 == 1 & !input$fatalities_input_type == "eli_exp"){
         output$title_distri_plot <- renderText({ "Mortalités annuelles" })
-        output$distri_plot <- renderPlot({ plot_gamma(mu = tail(param$fatalities_mean, -1), se = tail(param$fatalities_se, -1)) })
+
+        output$distri_plot <- renderPlot({
+          if(input$fatalities_input_type == "itvl"){
+            req(input$fatalities_lower, input$fatalities_upper)
+            plot_gamma(mu = tail(param$fatalities_mean, -1), se = tail(param$fatalities_se, -1))
+          }else{
+            req(input$fatalities_mean, input$fatalities_se)
+            plot_gamma(mu = tail(param$fatalities_mean, -1), se = tail(param$fatalities_se, -1))
+          }
+        })
+
       } else {
         # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
         if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "eli_exp"){
