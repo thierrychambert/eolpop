@@ -112,7 +112,7 @@ rm(list = ls(all.names = TRUE))
 
               # Choose species (selectInput)
               {selectInput(inputId = "species_choice",
-                          selected = 1, width = '80%',
+                          selected = "Faucon crécerellette", width = '80%',
                           label = h4(strong("Sélectionner une espèce"),
                                      bsButton("Q_species_choice", label = "", icon = icon("question"), size = "extra-small"),
                                      bsPopover(id = "Q_species_choice",
@@ -221,10 +221,12 @@ rm(list = ls(all.names = TRUE))
 
                                            radioButtons(inputId = "fatalities_input_type",
                                                         label = "Type de saisie",
-                                                        choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
+                                                        choices = c("Intervalle" = "itvl",
+                                                                    "Valeurs" = "val",
+                                                                    "Elicitation d'expert" = "eli_exp")),
 
-                                           # Values
-                                          numericInput(inputId = "fatalities_lower",
+                                           # Intervalle
+                                           numericInput(inputId = "fatalities_lower",
                                                         label = "Borne inférieure (mortalités annuelles)",
                                                         value = 0.5,
                                                         min = 0, max = Inf, step = 0.5),
@@ -234,8 +236,16 @@ rm(list = ls(all.names = TRUE))
                                                         value = 2.5,
                                                         min = 0, max = Inf, step = 0.5),
 
-                                           #actionButton(inputId = "fatalities_run_values", label = "Utiliser ces valeurs"),
+                                           # Values
+                                           numericInput(inputId = "fatalities_mean",
+                                                        label = "Moyenne (mortalités annuelles)",
+                                                        value = 2.2,
+                                                        min = 0, max = Inf, step = 0.5),
 
+                                           numericInput(inputId = "fatalities_se",
+                                                        label = "Erreur-type (mortalités annuelles)",
+                                                        value = 0.5,
+                                                        min = 0, max = Inf, step = 0.1),
 
                                            # Matrix for expert elicitation
                                            matrixInput(inputId = "fatalities_mat_expert",
@@ -311,7 +321,7 @@ rm(list = ls(all.names = TRUE))
                                  radioButtons(inputId = "pop_size_unit", inline = TRUE,
                                               label = "Unité",
                                               choices = c("Nombre de couples" = "Npair", "Effectif total" = "Ntotal"),
-                                              selected = "Ntotal"),
+                                              selected = "Npair"),
                               )}, # close wellPanel 1
 
                               {wellPanel(style = "background:#F0F8FF",
@@ -381,12 +391,12 @@ rm(list = ls(all.names = TRUE))
                                            ## Input values: mean and se
                                            numericInput(inputId = "pop_growth_mean",
                                                         label = "Moyenne de la croissance de la population",
-                                                        value = 1.1,
+                                                        value = 1,
                                                         min = 0, max = Inf, step = 0.01),
 
                                            numericInput(inputId = "pop_growth_se",
                                                         label = "Erreur-type de la croissance de la population",
-                                                        value = 0.01,
+                                                        value = 0,
                                                         min = 0, max = Inf, step = 0.01),
 
                                            ## Input expert elicitation: table

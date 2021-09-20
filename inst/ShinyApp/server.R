@@ -62,8 +62,8 @@ server <- function(input, output, session){
     #------------
     # Hide all
     #------------
-    #shinyjs::hide("fatal_constant")
-    #shinyjs::hide("fatalities_input_type")
+    shinyjs::hide("fatalities_mean")
+    shinyjs::hide("fatalities_se")
     shinyjs::hide("fatalities_lower")
     shinyjs::hide("fatalities_upper")
     shinyjs::hide("fatalities_mat_expert")
@@ -71,14 +71,11 @@ server <- function(input, output, session){
     shinyjs::hide("farm_number_cumulated")
     shinyjs::hide("fatalities_mat_cumulated")
 
-    #shinyjs::hide("pop_size_unit")
-    #shinyjs::hide("pop_size_input_type")
     shinyjs::hide("pop_size_mean")
     shinyjs::hide("pop_size_se")
     shinyjs::hide("pop_size_mat_expert")
     shinyjs::hide("pop_size_run_expert")
 
-    #shinyjs::hide("pop_growth_input_type")
     shinyjs::hide("pop_growth_mean")
     shinyjs::hide("pop_growth_se")
     shinyjs::hide("pop_growth_mat_expert")
@@ -86,8 +83,6 @@ server <- function(input, output, session){
     shinyjs::hide("pop_trend")
     shinyjs::hide("pop_trend_strength")
 
-
-    #shinyjs::hide("carrying_cap_input_type")
     shinyjs::hide("carrying_capacity")
     shinyjs::hide("carrying_cap_mat_expert")
     shinyjs::hide("carrying_cap_run_expert")
@@ -106,9 +101,13 @@ server <- function(input, output, session){
       if(input$analysis_choice == "scenario"){
         shinyjs::show("fatalities_input_type")
 
-        if(input$fatalities_input_type == "val"){
+        if(input$fatalities_input_type == "itvl"){
           shinyjs::show("fatalities_lower")
           shinyjs::show("fatalities_upper")
+        }
+        if(input$fatalities_input_type == "val"){
+          shinyjs::show("fatalities_mean")
+          shinyjs::show("fatalities_se")
         }
         if(input$fatalities_input_type == "eli_exp"){
           shinyjs::show("fatalities_mat_expert")
@@ -416,38 +415,33 @@ server <- function(input, output, session){
   ##  Display parameter distribution
   ##--------------------------------------------
 
-  # Function to plot the parameter distribution (from range values)
-  plot_range <- function(out, mu, show_se = TRUE, ...){
-    plot_elicitation(out, ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2, yaxt = "n")
-    mtext(text = "Densité de probabilité", side = 2, line = 2, cex = 1.2)
-
-    y2 <- dgamma(x = mu, shape = out$shape_smooth, rate = out$rate_smooth)
-    xx <- qgamma(p = c(0.01,0.99), shape = out$shape_smooth, rate = out$rate_smooth)
-    clip(xx[1], xx[2], -100, y2)
-    abline(v = mu, lwd = 3, col = "darkblue")
-
-    mtext(text = paste("Moyenne = ", round(mu,2)), side = 3, line = 2.5, cex = 1.2, adj = 0)
-    if(show_se) mtext(text = paste("Erreur-type = ", round(sqrt(out$var_smooth), 2)), side = 3, line = 1, cex = 1.2, adj = 0)
-  }
-
   # Function to plot a gamma distribution
-  plot_gamma <- function(mu, se, show_mean = TRUE, show_se = TRUE, ...){
+  plot_gamma <- function(mu, se, show_mode = TRUE, show_mean = TRUE, show_se = TRUE, ...){
 
     ## Define shape and scale parameter of gamma distribution
     shape = (mu/se)^2
     scale = se^2/mu
 
     ## Plot the curve
+    par(mar = c(5, 4, 6, 2))
     curve(dgamma(x, shape=shape, scale=scale), from = max(0,mu-3*se), to = mu+4*se, lwd = 3, col = "darkblue", yaxt = "n",
           ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2)
     mtext(text = "Densité de probabilité", side = 2, line = 2, cex = 1.2)
 
-    y2 <- dgamma(x = mu, shape = shape, scale = scale)
+    # show mode
+    MU <- (shape-1)*scale
+    y_MU <- dgamma(x = MU, shape = shape, scale = scale)
     xx <- qgamma(p = c(0.01,0.99), shape = shape, scale = scale)
-    clip(xx[1], xx[2], -100, y2)
-    abline(v = mu, lwd = 3, col = "darkblue")
+    clip(xx[1], xx[2], -100, y_MU)
+    abline(v = MU, lwd = 3, col = "darkblue")
 
-    if(show_mean) mtext(text = paste("Moyenne = ", round(mu, 2)), side = 3, line = 2.5, cex = 1.2, adj = 0)
+    # show mean
+    y_mu <- dgamma(x = mu, shape = shape, scale = scale)
+    clip(xx[1], xx[2], -100, y_mu)
+    abline(v = mu, lwd = 2, col = "darkblue", lty = 2)
+
+    if(show_mode) mtext(text = paste("Mode = ", round(MU, 1)), side = 3, line = 4, cex = 1.2, adj = 0)
+    if(show_mean) mtext(text = paste("Moyenne = ", round(mu, 1)), side = 3, line = 2.5, cex = 1.2, adj = 0)
     if(show_se) mtext(text = paste("Erreur-type = ", round(se, 2)), side = 3, line = 1, cex = 1.2, adj = 0)
   } # end function plot_gamma
 
@@ -715,19 +709,6 @@ server <- function(input, output, session){
   #####
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   #####
   ##--------------------------------------------
   ## Select parameter values for simulations
@@ -769,22 +750,20 @@ server <- function(input, output, session){
 
       } else {
 
+        if(input$fatalities_input_type == "val"){
+          # Case 1.2 : Values directly provided as mean & SE
+          param$fatalities_mean <- c(0, input$fatalities_mean)
+          param$onset_time <- NULL
+          param$fatalities_se <- c(0, input$fatalities_se)
+          ready$fatalities <- TRUE
 
-
-
-
-
-        # Case 1.2 : Values directly provided (i.e., not from expert elicitation)
-        #req(lower)
+        }else{
+          # Case 1.3 : Values directly provided as lower/upper interval
           param$fatalities_mean <- c(0, round(get_mu(lower = input$fatalities_lower, upper = input$fatalities_upper), 2))
           param$onset_time <- NULL
           param$fatalities_se <- c(0, round(get_sd(lower = input$fatalities_lower, upper = input$fatalities_upper, coverage = CP), 3))
           ready$fatalities <- TRUE
-
-        #ready$fatalities <- TRUE
-        #param$fatalities_se <- c(0, round(sqrt(param$out_fatal$var_smooth), 2))
-        #param$onset_year <- NULL
-        #param$onset_time <- NULL
+        } # end (if3)
 
       } # end (if2)
 
@@ -863,7 +842,7 @@ server <- function(input, output, session){
         } else {
           param$pop_growth_mean <- 1
         }
-        param$pop_growth_se <- 0.03
+        param$pop_growth_se <- 0
 
 
         # Case 3 : Values directly provided (i.e., not from expert elicitation)
