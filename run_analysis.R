@@ -8,25 +8,25 @@ library(eolpop)
 ## Inputs
 nsim = 10
 
-fatalities_mean = c(0, 10, 5)
-fatalities_se = c(0, 0.05, 0.05)
+fatalities_mean = c(0, 2.2)
+fatalities_se = c(0, 0.5)
 
 pop_size_mean = 200
 pop_size_se = 25
 
-pop_growth_mean = 1.1
+pop_growth_mean = 1
 pop_growth_se = 0
 
-survivals <- c(0.5, 0.7, 0.8, 0.95)
-fecundities <- c(0, 0, 0.05, 0.55)
+survivals <- c(0.5, rep(0.71, 5), 0.59)
+fecundities <- c(0, 0.21, rep(1.08, 5))
 
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
 time_horzion = 30
 coeff_var_environ = 0.10
 fatal_constant = "h"
-pop_size_type = "Ntotal"
+pop_size_type = "Npair"
 
-cumulated_impacts = TRUE
+cumulated_impacts = FALSE
 
 onset_year = c(2010, 2013, 2016)
 onset_time = onset_year - min(onset_year) + 1
@@ -50,6 +50,7 @@ rMAX_species
 pop_growth_mean <- min(1 + rMAX_species, pop_growth_mean)
 pop_growth_mean
 
+lambda( build_Leslie(s = survivals, f = fecundities) )
 
 ##--------------------------------------------
 ##  Calibration                             --
@@ -62,21 +63,10 @@ f_calibrated <- tail(vr_calibrated, length(fecundities))
 
 lambda( build_Leslie(s = s_calibrated, f = f_calibrated) )
 
-
-
-#pop_size_mean = 200
-#pop_growth_mean = 1.1
-#fatal_constant = "M"
-#cumulated_impacts = FALSE
-
-pop_growth_mean = 1.1
-pop_size_type = "Ntotal"
-carrying_capacity = 500
-
-
 ##==============================================================================
 ##                         Analyses (simulations)                             ==
 ##==============================================================================
+system.time(
 run0 <- run_simul(nsim = nsim,
                             cumulated_impacts = cumulated_impacts,
 
@@ -102,7 +92,7 @@ run0 <- run_simul(nsim = nsim,
                             time_horzion = time_horzion,
                             coeff_var_environ = coeff_var_environ,
                             fatal_constant = fatal_constant)
-
+)
 
 #####################################################
 
@@ -110,6 +100,7 @@ run0 <- run_simul(nsim = nsim,
 names(run0)
 N <- run0$N ; dim(N)
 plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
+
 abline(h = K)
 
 
