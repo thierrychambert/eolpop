@@ -2,26 +2,33 @@
 % Please edit documentation in R/get_metrics.R
 \name{get_metrics}
 \alias{get_metrics}
-\title{Calculate Impact Metric
-Relative Difference of Population Size DR_N}
+\title{Calculate Impact Metrics}
 \usage{
-get_metrics(N)
+get_metrics(N, cumulated_impacts = FALSE)
 }
 \arguments{
 \item{N}{a 4-D array containing demographic projection outputs}
+
+\item{cumulated_impacts}{Logical. Must be set to TRUE if the output array N corresponds to
+a cumulated impacts demographic analysis (see ?run_simul).}
 }
 \value{
 a list of metric outputs : mean, SD, 95\% C.I. of the
 }
 \description{
-Calculate Impact Metric
-Relative Difference of Population Size DR_N
+get_metrics takes the output array of the simulations run and calculate two impact metrics :
+(1) The relative difference (between scenarios) in population size at the time horizon, and
+(2) The difference in terms of extinction probability.
+
+When used on a cumulated_impacts analysis, this function also calculates these two metrics
+for each individual wind farm.
 }
 \examples{
 ## Import Data
 data("demo_proj")
 
 ## Calculate the metric
-get_metrics(demo_proj)
+get_metrics(demo_proj, cumulated_impacts = FALSE)
+
 
 }

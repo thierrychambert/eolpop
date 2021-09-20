@@ -1,51 +1,116 @@
 server <- function(input, output, session){
 
-  # Hide all inputs excepted actionButtons
+  ##############################################
+  ##  Hide/Show : level 1
+  ##--------------------------------------------
 
+  ## Fatalities
+  output$hide_fatalities <- eventReactive({
+    input$button_fatalities
+  },{
+    if(input$button_fatalities%%2 == 1) TRUE else FALSE
+  }, ignoreInit = TRUE)
+
+  outputOptions(output, "hide_fatalities", suspendWhenHidden = FALSE)
+
+
+  ## Population Size
+  output$hide_pop_size <- eventReactive({
+    input$button_pop_size
+  },{
+    if(input$button_pop_size%%2 == 1) TRUE else FALSE
+  }, ignoreInit = TRUE)
+
+  outputOptions(output, "hide_pop_size", suspendWhenHidden = FALSE)
+
+
+  ## Population Growth
+  output$hide_pop_growth <- eventReactive({
+    input$button_pop_growth
+  },{
+    if(input$button_pop_growth%%2 == 1) TRUE else FALSE
+  }, ignoreInit = TRUE)
+
+  outputOptions(output, "hide_pop_growth", suspendWhenHidden = FALSE)
+
+
+  ## Carrying capacity
+  output$hide_carrying_cap <- eventReactive({
+    input$button_carrying_cap
+  },{
+    if(input$button_carrying_cap%%2 == 1) TRUE else FALSE
+  }, ignoreInit = TRUE)
+
+  outputOptions(output, "hide_carrying_cap", suspendWhenHidden = FALSE)
+
+  # Display Carrying capacity Unit Info
+  output$carrying_cap_unit_info <- renderText({
+    if(input$pop_size_unit == "Npair"){
+      paste0("Nombre de couple")
+    } else {
+      paste0("Effectif total")
+    }
+  })
+
+
+
+  ##############################################
+  ##  Hide/Show : level 2
+  ##--------------------------------------------
   observe({
-    shinyjs::hide("fatal_constant")
-    shinyjs::hide("fatalities_input_type")
+
+    #------------
+    # Hide all
+    #------------
+    #shinyjs::hide("fatal_constant")
+    #shinyjs::hide("fatalities_input_type")
     shinyjs::hide("fatalities_mean")
     shinyjs::hide("fatalities_se")
     shinyjs::hide("fatalities_mat_expert")
     shinyjs::hide("fatalities_run_expert")
     shinyjs::hide("farm_number_cumulated")
     shinyjs::hide("fatalities_mat_cumulated")
-    shinyjs::hide("pop_size_type")
-    shinyjs::hide("pop_size_input_type")
+
+    #shinyjs::hide("pop_size_unit")
+    #shinyjs::hide("pop_size_input_type")
     shinyjs::hide("pop_size_mean")
     shinyjs::hide("pop_size_se")
     shinyjs::hide("pop_size_mat_expert")
     shinyjs::hide("pop_size_run_expert")
-    shinyjs::hide("carrying_cap_input_type")
-    shinyjs::hide("carrying_capacity")
-    shinyjs::hide("carrying_cap_mat_expert")
-    shinyjs::hide("carrying_cap_run_expert")
-    shinyjs::hide("lambda_input_type")
+
+    #shinyjs::hide("pop_growth_input_type")
     shinyjs::hide("pop_growth_mean")
     shinyjs::hide("pop_growth_se")
     shinyjs::hide("pop_growth_mat_expert")
     shinyjs::hide("pop_growth_run_expert")
     shinyjs::hide("pop_trend")
     shinyjs::hide("pop_trend_strength")
-    shinyjs::hide("fill_type_vr")
-    shinyjs::hide("mat_display_vr")
+
+
+    #shinyjs::hide("carrying_cap_input_type")
+    shinyjs::hide("carrying_capacity")
+    shinyjs::hide("carrying_cap_mat_expert")
+    shinyjs::hide("carrying_cap_run_expert")
+
     shinyjs::hide("mat_fill_vr")
 
-    # Show fatalities part
-
+    #------------
+    # Show some
+    #------------
+    # Show inputs for fatalities part
     if(input$button_fatalities%%2 == 1){
-      shinyjs::show("fatal_constant")
+      #shinyjs::show("fatal_constant")
 
       # Show inputs for none cumulated impacts scenario
 
       if(input$analysis_choice == "scenario"){
         shinyjs::show("fatalities_input_type")
-        if(input$fatalities_input_type == "Valeurs"){
+
+        if(input$fatalities_input_type == "val"){
           shinyjs::show("fatalities_mean")
           shinyjs::show("fatalities_se")
         }
-        if(input$fatalities_input_type == "Elicitation d'expert"){
+        if(input$fatalities_input_type == "eli_exp"){
           shinyjs::show("fatalities_mat_expert")
           shinyjs::show("fatalities_run_expert")
         }
@@ -54,6 +119,7 @@ server <- function(input, output, session){
       # Show inputs for cumulated scenario
 
       if(input$analysis_choice == "cumulated"){
+        shinyjs::hide("fatalities_input_type")
         shinyjs::show("farm_number_cumulated")
         shinyjs::show("fatalities_mat_cumulated")
       }
@@ -61,526 +127,134 @@ server <- function(input, output, session){
     }
 
     # Show inputs for population size part
-
     if(input$button_pop_size%%2 == 1){
-      shinyjs::show("pop_size_type")
+      #shinyjs::show("pop_size_unit")
       shinyjs::show("pop_size_input_type")
-      if(input$pop_size_input_type == "Valeurs"){
+      if(input$pop_size_input_type == "val"){
         shinyjs::show("pop_size_mean")
         shinyjs::show("pop_size_se")
       }
-      if(input$pop_size_input_type == "Elicitation d'expert"){
+      if(input$pop_size_input_type == "eli_exp"){
         shinyjs::show("pop_size_mat_expert")
         shinyjs::show("pop_size_run_expert")
       }
     }
 
-    # Show inputs for carrying capacity part
+    # Show inputs for population trend/growth part
+    if(input$button_pop_growth%%2 == 1){
+      shinyjs::show("pop_growth_input_type")
+      if(input$pop_growth_input_type == "val"){
+        shinyjs::show("pop_growth_mean")
+        shinyjs::show("pop_growth_se")
+      }
+      if(input$pop_growth_input_type == "eli_exp"){
+        shinyjs::show("pop_growth_mat_expert")
+        shinyjs::show("pop_growth_run_expert")
+      }
+      if(input$pop_growth_input_type == "trend"){
+        shinyjs::show("pop_trend")
+        if(input$pop_trend != "stable"){
+          shinyjs::show("pop_trend_strength")
+        }
+      }
+    }
 
+    # Show inputs for carrying capacity part
     if(input$button_carrying_cap%%2 == 1){
       shinyjs::show("carrying_cap_input_type")
-      if(input$carrying_cap_input_type == "Valeurs"){
+      if(input$carrying_cap_input_type == "val"){
         shinyjs::show("carrying_capacity")
       }
-      if(input$carrying_cap_input_type == "Elicitation d'expert"){
+      if(input$carrying_cap_input_type == "eli_exp"){
         shinyjs::show("carrying_cap_mat_expert")
         shinyjs::show("carrying_cap_run_expert")
       }
     }
 
-    # Show inputs for population trend part
-
-    if(input$button_pop_trend%%2 == 1){
-      shinyjs::show("lambda_input_type")
-      if(input$lambda_input_type == "Taux de croissance"){
-        shinyjs::show("pop_growth_mean")
-        shinyjs::show("pop_growth_se")
-      }
-      if(input$lambda_input_type == "Elicitation d'expert"){
-        shinyjs::show("pop_growth_mat_expert")
-        shinyjs::show("pop_growth_run_expert")
-      }
-      if(input$lambda_input_type == "Tendance locale ou régionale"){
-        shinyjs::show("pop_trend")
-        shinyjs::show("pop_trend_strength")
-      }
-    }
-
     # Show inputs vital rates part
-
     if(input$button_vital_rates%%2 == 1){
-      shinyjs::show("fill_type_vr")
-      if(input$fill_type_vr == "Automatique"){
-        shinyjs::show("mat_display_vr")
-      }
-      if(input$fill_type_vr == "Manuelle"){
-        shinyjs::show("mat_fill_vr")
-      }
+      shinyjs::show("mat_fill_vr")
     }
-  })
 
-  # Elicitation experts part
+  }) # en observe show/hide
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
-  func_eli <- function(mat_expert){
-    t_mat_expert <- t(mat_expert)
-    vals = t_mat_expert[3:5,]
-    Cp = t_mat_expert[6,]
-    weights = t_mat_expert[2,]
 
-    out <- elicitation(vals, Cp, weights)
-    return(list(out = out, mean = out$mean_smooth, SE = sqrt(out$var_smooth)))
-  }
+  #####
 
-  func_eli_plot <- function(out){
-    plot_elicitation(out)
-  }
+  ##############################################
+  ##  Reactive values
+  ##--------------------------------------------
+  out <- reactiveValues(run = NULL, msg = NULL)
 
-  ## Output
+  ready <- reactiveValues(fatalities = TRUE, pop_size = TRUE, pop_growth = TRUE, carrying_capacity = TRUE)
 
   param <- reactiveValues(N1 = NULL,
+                          nsim = NULL,
+                          cumulated_impacts = FALSE,
+
                           fatalities_mean = NULL,
+                          fatalities_se = NULL,
+                          onset_time = NULL,
+                          onset_year = NULL,
+
+                          pop_size_mean = NULL,
+                          pop_size_se = NULL,
+                          pop_size_unit = NULL,
+
+                          pop_growth_mean = NULL,
+                          pop_growth_se = NULL,
+
                           fecundities = NULL,
                           survivals = NULL,
                           s_calibrated = NULL,
                           f_calibrated = NULL,
                           vr_calibrated = NULL,
-                          cumulated_impacts = NULL,
-                          onset_time = NULL,
-                          onset_year = NULL,
+
                           carrying_capacity = NULL,
-                          rMAX_species = rMAX_species,
-                          theta = theta,
+                          theta = NULL,
+                          rMAX_species = NULL,
+
+                          model_demo = NULL,
+                          time_horzion = NULL,
+                          coeff_var_environ = NULL,
+                          fatal_constant = NULL,
+
                           fatalities_eli_result = NULL,
                           pop_size_eli_result = NULL,
-                          pop_size_mean = NULL,
-                          pop_size_se = NULL,
-                          pop_size_type = NULL,
                           pop_growth_eli_result = NULL,
-                          pop_growth_mean = NULL,
-                          pop_growth_se = NULL,
-                          carrying_cap_eli_result = NULL)
+                          carrying_cap_eli_result = NULL
+  )
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
-  # Elicitation
 
-  ## Fatalities
 
-  observeEvent({input$fatalities_run_expert}, {
-    if(all(is.na(input$fatalities_mat_expert))) {} else {
-      param$fatalities_eli_result <- func_eli(input$fatalities_mat_expert)
+  #####
 
-      ### Plot fatalities
-      output$fatalities_expert_plot <- renderPlot({func_eli_plot(param$fatalities_eli_result$out)})}
-  })
-
-  ## Population size
-
-  observeEvent({input$pop_size_run_expert}, {
-    if(all(is.na(input$pop_size_mat_expert))) {} else {
-      param$pop_size_eli_result <- func_eli(input$pop_size_mat_expert)
-
-      ### Plot pop size
-      output$pop_size_expert_plot <- renderPlot({func_eli_plot(param$pop_size_eli_result$out)})}
-  })
-
-  ## Population growth
-
-  observeEvent({input$pop_growth_run_expert},{
-    if(all(is.na(input$pop_growth_mat_expert))) {} else {
-      param$pop_growth_eli_result <- func_eli(input$pop_growth_mat_expert)
-
-      ### plot pop growth
-      output$pop_growth_expert_plot <- renderPlot({func_eli_plot(param$pop_growth_eli_result$out)})
-    }
-  })
-
-  ## Carrying capacity
-
-  observeEvent({input$carrying_cap_run_expert},{
-    if(all(is.na(input$carrying_cap_mat_expert))) {} else {
-      param$carrying_cap_eli_result <- func_eli(input$carrying_cap_mat_expert)
-
-      ### Plot carrying capacity
-      output$carrying_cap_expert_plot <- renderPlot({func_eli_plot(param$carrying_cap_eli_result$out)})
-    }
-  })
-
-  # Reactive values (cumulated impacts, fatalities mean, fatalities se, onset_time, survivals mean, fecundities mean)
-
-  observeEvent({input$run}, {
-    if(input$analysis_choice == "scenario"){
-      param$cumulated_impacts = FALSE
-    } else {
-      param$cumulated_impacts = TRUE
-    }
-  })
-
-  # Fatalities
-  ## onset time, mean and se
-
-  observeEvent({input$run}, {
-    if(input$analysis_choice == "scenario"){
-      if(input$fatalities_input_type == "Elicitation d'expert"){
-        if(!(is.null(param$fatalities_eli_result))) {
-          param$fatalities_mean <- c(0, round(param$fatalities_eli_result$mean))
-          param$onset_time = NULL
-          param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE))
-        } else {
-          print("#Intégrer un message d'erreur")
-        }
-      } else {
-        param$fatalities_mean <- c(0, input$fatalities_mean)
-        param$onset_time = NULL
-        param$fatalities_se <- c(0, input$fatalities_se)
-      }
-    } else {
-      param$fatalities_mean <- c(0, input$fatalities_mat_cumulated[,1])
-      param$onset_year <- c(min(input$fatalities_mat_cumulated[,3]), input$fatalities_mat_cumulated[,3])
-      param$onset_time <- param$onset_year - min(param$onset_year) + 1
-      param$fatalities_se <- c(0, input$fatalities_mat_cumulated[,2])
-    }
-  })
-
-  # Population size
-  ## Mean, se and type
-
-  observeEvent({input$run},{
-    if(input$pop_size_input_type == "Elicitation d'expert"){
-      if(!(is.null(param$pop_size_eli_result))){
-        param$pop_size_mean <- round(param$pop_size_eli_result$mean)
-        param$pop_size_se <- round(param$pop_size_eli_result$SE)
-      } else {
-        print("#intégrer un message d'erreur")
-      }
-    } else {
-      param$pop_size_mean <- input$pop_size_mean
-      param$pop_size_se <- input$pop_size_se
-    }
-    param$pop_size_type <- input$pop_size_type
-  })
-
-  # Observe pop growth value
-  ##  Avoid unrealistic scenarios
-
-  observeEvent({input$run}, {
-    if(input$lambda_input_type == "Elicitation d'expert"){
-      if(!(is.null(param$pop_growth_eli_result))){
-        param$pop_growth_mean <- round(min(1 + param$rMAX_species, round(param$pop_growth_eli_result$mean, 2)), 2)
-        param$pop_growth_se <- round(param$pop_growth_eli_result$SE, 2)
-      } else {
-        print("#intégrer un message d'erreur")
-      }
-    } else if(input$lambda_input_type == "Tendance locale ou régionale"){
-      if(input$pop_trend == "Croissance") {
-        if(input$pop_trend_strength == "Faible") {
-          param$pop_growth_mean <- 1.01
-        } else if(input$pop_trend_strength == "Moyen"){
-          param$pop_growth_mean <- 1.03
-        } else {
-          param$pop_growth_mean <- 1.06
-        }
-      } else if(input$pop_trend == "Déclin"){
-        if(input$pop_trend_strength == "Faible") {
-          param$pop_growth_mean <- 0.99
-        } else if(input$pop_trend_strength == "Moyen"){
-          param$pop_growth_mean <- 0.97
-        } else {
-          param$pop_growth_mean <- 0.94
-        }
-      } else {
-        param$pop_growth_mean <- 1
-      }
-      param$pop_growth_se <- 0.03
-    }
-    else {
-      param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 2)
-      param$pop_growth_se <- input$pop_growth_se
-    }
-  })
-
-  # Survivals and fecundities
-
-  observeEvent({input$run}, {
-    if(input$fill_type_vr == "Manuelle"){
-      param$survivals <- input$mat_fill_vr[,1]
-      param$fecundities <- input$mat_fill_vr[,2]
-    } else {
-      param$survivals <- survivals
-      param$fecundities <- fecundities
-    }
-  })
-
-  # Survival and fecundity calibration
-
-  observeEvent({
-    input$run
-    # input$species_choice
-    # input$pop_growth_mean
-  },{
-
-    ##  Avoid unrealistic scenarios
-    #param$pop_growth_mean <- min(1 + param$rMAX_species, input$pop_growth_mean)
-
-    param$vr_calibrated <- calibrate_params(
-      inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
-      f = param$fecundities, s = param$survivals, lam0 = param$pop_growth_mean
-    )
-    param$s_calibrated <- head(param$vr_calibrated, length(param$survivals))
-    param$f_calibrated <- tail(param$vr_calibrated, length(param$fecundities))
-  })
-
-
-  # Observe carrying capacity
-  observeEvent({input$run}, {
-    if(input$carrying_cap_input_type == "Elicitation d'expert"){
-      if(!(is.null(param$carrying_cap_eli_result))){
-        param$carrying_capacity <- round(param$carrying_cap_eli_result$mean)
-      } else {
-        print("#intégrer un message d'erreur")
-      }
-    } else {
-      param$carrying_capacity <- input$carrying_capacity
-    }
-  })
-
-  observeEvent({input$run}, {
-    print(param$pop_growth_mean)
-    print(param$pop_growth_se)
-  })
-
-  # End of reactive
-
-  # Simulations
-
-  observeEvent({
-    input$run
-  }, {
-
-    withProgress(message = 'Simulation progress', value = 0, {
-
-      param$N1 <- run_simul_shiny(nsim = input$nsim,
-                                  cumuated_impacts = param$cumulated_impacts,
-
-                                  fatalities_mean = param$fatalities_mean,
-                                  fatalities_se = param$fatalities_se,
-                                  onset_time = param$onset_time,
-
-                                  pop_size_mean = param$pop_size_mean,
-                                  pop_size_se = param$pop_size_se,
-                                  pop_size_type = param$pop_size_type,
-
-                                  pop_growth_mean = param$pop_growth_mean,
-                                  pop_growth_se = param$pop_growth_se,
-
-                                  survivals = param$s_calibrated,
-                                  fecundities = param$f_calibrated,
-
-                                  carrying_capacity = param$carrying_capacity,
-                                  theta = param$theta,
-                                  rMAX_species = param$rMAX_species,
-
-                                  model_demo = NULL,
-                                  time_horzion = time_horzion,
-                                  coeff_var_environ = coeff_var_environ,
-                                  fatal_constant = input$fatal_constant)
-    }) # Close withProgress
-  }) # Close observEvent
-
-
-  # Plot Impacts
-
-  plot_out_impact <- function(){
-    if(is.null(param$N1)) {} else {plot_impact(N = param$N1$N, xlab = "year", ylab = "pop size")}
-  }
-
-  output$graph_impact <- renderPlot({
-    plot_out_impact()
-  })
-
-  # Plot trajectories
-
-  plot_out_traj <- function(){
-    if(is.null(param$N1)) {} else {plot_traj(N = param$N1$N, xlab = "year", ylab = "pop size")}
-  }
-
-  output$graph_traj <- renderPlot({
-    plot_out_traj()
-  })
-  # End simulations
-
-  # General informations output
-
-  ## Fatalities
-
-  output$fatalities_mean_info <- renderText({
-    if(input$fatalities_input_type == "Elicitation d'expert"){
-      if(!(is.null(param$fatalities_eli_result))){
-        info <- round(param$fatalities_eli_result$mean)
-      } else {info <- NA}
-    }
-    else {
-      info <- input$fatalities_mean
-    }
-    paste0("Moyenne des mortalités : ", info)
-  })
-
-  output$fatalities_se_info <- renderText({
-    if(input$fatalities_input_type == "Elicitation d'expert"){
-      if(!(is.null(param$fatalities_eli_result))){
-        info <- round(param$fatalities_eli_result$SE)
-      } else {info <- NA}
-    }
-    else {
-      info <- input$fatalities_se
-    }
-    paste0("Ecart-type des mortalités : ", info)
-  })
-
-  ## Poplutation size
-
-  output$pop_size_type_info <- renderText({
-    if(input$pop_size_type == "Npair"){
-      paste0("Type de taille de pop : ", "Nombre de couple")
-    } else {
-      paste0("Type de taille de pop : ", "Effectif total")
-    }
-  })
-
-  output$pop_size_mean_info <- renderText({
-    if(input$pop_size_input_type == "Elicitation d'expert"){
-      if(!(is.null(param$pop_size_eli_result))){
-        info <- round(param$pop_size_eli_result$mean)
-      } else {info <- NA}
-    }
-    else {
-      info <- input$pop_size_mean
-    }
-    paste0("Moyenne de la taille de la population : ", info)
-  })
-
-  output$pop_size_se_info <- renderText({
-    if(input$pop_size_input_type == "Elicitation d'expert"){
-      if(!(is.null(param$pop_size_eli_result))){
-        info <- round(param$pop_size_eli_result$SE)
-      } else {info <- NA}
-    }
-    else {
-      info <- input$pop_size_se
-    }
-    paste0("Ecart-type de la taille de la population : ", info)
-  })
-
-  ## Carrying capacity
-
-  output$carrying_capacity_info <- renderText({
-    if(input$carrying_cap_input_type == "Elicitation d'expert"){
-      if(!(is.null(param$carrying_cap_eli_result))){
-        info <- round(param$carrying_cap_eli_result$mean)
-      } else {info <- NA}
-    }
-    else {
-      info <- input$carrying_capacity
-    }
-    paste0("Capacité de charge du milieu : ", info)
-  })
-
-  ## Population growth
-
-  output$pop_trend_type_info <- renderText({paste0("Type de Tendance de pop : ", input$lambda_input_type)})
-
-  output$pop_growth_mean_info <- renderText({
-    if(input$lambda_input_type == "Elicitation d'expert"){
-      if(!(is.null(param$pop_growth_eli_result))){
-        info <- round(param$pop_growth_eli_result$mean, 2)
-      } else {info <- NA}
-    } else if(input$lambda_input_type == "Tendance locale ou régionale"){
-        if(input$pop_trend == "Croissance") {
-          if(input$pop_trend_strength == "Faible") {
-            info <- 1.01
-          } else if(input$pop_trend_strength == "Moyen"){
-            info <- 1.03
-          } else {
-            info <- 1.06
-          }
-        } else if(input$pop_trend == "Déclin"){
-          if(input$pop_trend_strength == "Faible") {
-            info <- 0.99
-          } else if(input$pop_trend_strength == "Moyen"){
-            info <- 0.97
-          } else {
-            info <- 0.94
-          }
-        } else {
-          info <- 1.00
-        }
-    } else {
-        info <- input$pop_growth_mean
-    }
-    paste0("Moyenne de la croissance de la population : ", info)
-  })
-
-  output$pop_growth_se_info <- renderText({
-    if(input$lambda_input_type == "Elicitation d'expert"){
-      if(!(is.null(param$pop_growth_eli_result))){
-        info <- round(param$pop_growth_eli_result$SE, 2)
-      } else {info <- NA}
-    } else if (input$lambda_input_type == "Tendance locale ou régionale") {
-      info <- 0.03
-    }
-    else {
-      info <- input$pop_growth_se
-    }
-    paste0("Ecart-type de  la croissance de la population : ", info)
-  })
-
-  ## Vital rates
-
-  output$vital_rates_info <- renderTable({
-    if(input$fill_type_vr == "Automatique"){
-      input$mat_display_vr
-    } else {
-      input$mat_fill_vr
-    }
-  })
-  # End genral informations output
-
-  ## Update matrix cumulated impact
-
-  observeEvent({input$farm_number_cumulated}, {
-    rows_names <- function(n){
-      v <- c(paste0("Parc n°", c(1:n)))
-      return(v)
-    }
-
-    nrow <- input$farm_number_cumulated
-    number_parks <- rows_names(nrow)
-    # data_fatalities_cumulated <- c(c(input$fatalities_mat_cumulated[,1]),
-    #                               c(input$fatalities_mat_cumulated[,2]),
-    #                               c(input$fatalities_mat_cumulated[,3]))
-
-    updateMatrixInput(session, inputId = "fatalities_mat_cumulated",
-                      value =  matrix("", nrow = nrow, 3,
-                                      dimnames = list(number_parks,
-                                                      c("Moyennes des mortalités annuelles",
-                                                        "Ecart-type des mortalités annuelles",
-                                                        "Année de mise en service du parc"))))
-  })
-
-  # Survivals and Fecundities
-
-  create.matrice <- function(species){
-    tab_test <- data_sf %>%
+  ################################################
+  ## Update the vital rate matrix (mat_fill_vr)
+  ##   when changing species in the list
+  ##----------------------------------------------
+  # Function to create the matrix
+  create.matrice <- function(data_sf, species){
+    out_mat <- data_sf %>%
       filter(species == data_sf$Nom_espece) %>%
       select(classes_age, survie, fecondite)
-    return(tab_test)
+    return(out_mat)
   }
 
-  observeEvent({input$species_list}, {
-    if(input$species_list == "Espèce") {} else {
-      tab_species <- create.matrice(input$species_list)
+  # Update the vital rate matrix (mat_fill_vr) when changing species in the list
+  observeEvent({
+    input$species_choice
+  }, {
+
+    if(input$species_choice == "Espèce générique") {} else {
+
+      tab_species <- create.matrice(data_sf = data_sf, species = input$species_choice)
 
       if(all(is.na(tab_species))) {
         updateMatrixInput(session, inputId = "mat_fill_vr",
-                          value = matrix(data = "",
+                          value = matrix(data = NA,
                                          nrow = 4,
                                          ncol = 2,
                                          dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "Fécondité"))))
@@ -596,12 +270,807 @@ server <- function(input, output, session){
                                          nrow = number_age_class,
                                          ncol = 2,
                                          dimnames = list(ages, c("Survie", "Fécondité"))))
+      } # end if 2
+    } # end if 1
+
+  }) # end observeEvent species_list
+  #####
+
+  ##############################################
+  ## Update matrix cumulated impact
+  ##-------------------------------------------
+  observeEvent({
+    input$farm_number_cumulated
+  }, {
+
+    nfarm <- input$farm_number_cumulated
+    init_cumul_new  <- init_cumul[1:nfarm,]
+    updateMatrixInput(session, inputId = "fatalities_mat_cumulated",
+                      value =  matrix(init_cumul_new, nrow = nfarm, ncol = 3, byrow = FALSE,
+                                      dimnames = list(paste("Parc", c(1:nfarm)),
+                                                      c("Moyenne",
+                                                        "Erreur-type",
+                                                        "Année (début)"))))
+  })
+  #####
+
+
+  #####
+  ##--------------------------------------------
+  ##  Run expert elicitation
+  ##--------------------------------------------
+  # Function to run the elication analysis
+  func_eli <- function(mat_expert){
+    t_mat_expert <- t(mat_expert)
+    vals <- t_mat_expert[2:4,]
+    Cp <- t_mat_expert[5,]
+    weights <- t_mat_expert[1,]
+
+    out <- elicitation(vals, Cp, weights)
+    return(list(out = out, mean = out$mean_smooth, SE = sqrt(out$var_smooth)))
+  }
+
+  # Function to plot the elication analysis output
+  plot_expert <- function(out, show_se = TRUE, ...){
+    plot_elicitation(out, ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2, yaxt = "n")
+    mtext(text = "Densité de probabilité", side = 2, line = 2, cex = 1.2)
+
+    y2 <- dgamma(x = out$mean_smooth, shape = out$shape_smooth, rate = out$rate_smooth)
+    xx <- qgamma(p = c(0.01,0.99), shape = out$shape_smooth, rate = out$rate_smooth)
+    clip(xx[1], xx[2], -100, y2)
+    abline(v = out$mean_smooth, lwd = 3, col = "darkblue")
+
+    mtext(text = paste("Moyenne = ", round(out$mean_smooth,2)), side = 3, line = 2.5, cex = 1.2, adj = 0)
+    if(show_se) mtext(text = paste("Erreur-type = ", round(sqrt(out$var_smooth), 2)), side = 3, line = 1, cex = 1.2, adj = 0)
+  }
+
+  ########################
+  ## Fatalities
+  ##----------------------
+  observeEvent({
+    input$fatalities_run_expert
+  }, {
+    if( all(!is.na(input$fatalities_mat_expert)) ) {
+
+      ## run elicitation analysis
+      param$fatalities_eli_result <- func_eli(input$fatalities_mat_expert)
+
+      ## plot distribution
+      output$title_distri_plot <- renderText({ "Mortalités annuelles" })
+      output$distri_plot <- renderPlot({ plot_expert(param$fatalities_eli_result$out) })
+
+    } else {
+      print("missing value")
+    } # end if
+  }) # end observeEvent
+
+  ########################
+  ## Population size
+  ##----------------------
+  observeEvent({
+    input$pop_size_run_expert
+  }, {
+    if(all(!is.na(input$pop_size_mat_expert))) {
+
+      ## run elicitation analysis
+      param$pop_size_eli_result <- func_eli(input$pop_size_mat_expert)
+
+      ## plot distribution
+      output$title_distri_plot <- renderText({ "Taille de population" })
+      output$distri_plot <- renderPlot({ plot_expert(param$pop_size_eli_result$out) })
+
+    } else {
+      print("missing value")
+    } # end if
+  }) # end observeEvent
+
+  ########################
+  ## Population growth
+  ##----------------------
+  observeEvent({
+    input$pop_growth_run_expert
+  },{
+    if(all(!is.na(input$pop_growth_mat_expert))) {
+
+      ## run elicitation analysis
+      param$pop_growth_eli_result <- func_eli(input$pop_growth_mat_expert)
+
+      ## plot distribution
+      output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
+      output$distri_plot <- renderPlot({ plot_expert(param$pop_growth_eli_result$out) })
+
+    } else {
+      print("missing value")
+    } # end if
+  }) # end observeEvent
+
+  ########################
+  ## Carrying capacity
+  ##----------------------
+  observeEvent({
+    input$carrying_cap_run_expert
+  },{
+    if(all(!is.na(input$carrying_cap_mat_expert))) {
+
+      ## run elicitation analysis
+      param$carrying_cap_eli_result <- func_eli(input$carrying_cap_mat_expert)
+
+      ## run elicitation analysis
+      output$title_distri_plot <- renderText({ "Capacité de charge" })
+      output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out, show_se = FALSE) })
+
+    } else {
+      print("missing value")
+    } # end if
+  }) # end observeEvent
+
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
+
+  #####
+
+
+  #####
+  ##--------------------------------------------
+  ##  Display parameter distribution
+  ##--------------------------------------------
+
+  # Function to plot a gamma distribution
+  plot_gamma <- function(mu, se, show_mean = TRUE, show_se = TRUE, ...){
+
+    ## Define shape and scale parameter of gamma distribution
+    shape = (mu/se)^2
+    scale = se^2/mu
+
+    ## Plot the curve
+    curve(dgamma(x, shape=shape, scale=scale), from = max(0,mu-3*se), to = mu+4*se, lwd = 3, col = "darkblue", yaxt = "n",
+          ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2)
+    mtext(text = "Densité de probabilité", side = 2, line = 2, cex = 1.2)
+
+    y2 <- dgamma(x = mu, shape = shape, scale = scale)
+    xx <- qgamma(p = c(0.01,0.99), shape = shape, scale = scale)
+    clip(xx[1], xx[2], -100, y2)
+    abline(v = mu, lwd = 3, col = "darkblue")
+
+    if(show_mean) mtext(text = paste("Moyenne = ", round(mu, 2)), side = 3, line = 2.5, cex = 1.2, adj = 0)
+    if(show_se) mtext(text = paste("Erreur-type = ", round(se, 2)), side = 3, line = 1, cex = 1.2, adj = 0)
+  } # end function plot_gamma
+
+  plot_gamma_cumulated_impacts <- function(mu, se, nparc, ...){
+    ## Define shape and scale parameter of gamma distribution
+    shape = (mu/se)^2
+    scale = se^2/mu
+
+    ## Define x and y lim
+    xx = yy = list()
+    for(j in 1:nparc){
+      xx[[j]] = seq(from = max(0,mu[j]-4*se[j]), to = mu[j]+4*se[j], length.out = 1e3)
+      yy[[j]] = dgamma(xx[[j]], shape=shape[j], scale=scale[j])
+    }
+
+    ylim = c(min(unlist(yy)), max(unlist(yy))*1.4)
+    xlim = c(min(unlist(xx)), max(unlist(xx)))
+
+    ## Plot
+    j=1
+    curve(dgamma(x, shape=shape[j], scale=scale[j]),
+          from = max(0,mu[j]-4*se[j]), to = mu[j]+4*se[j], n = 1e4,
+          xlim = xlim, ylim = ylim,
+          lwd = 3, col = j, yaxt = "n", xaxt = "n",
+          #xaxp = c(round(xlim[1]), round(xlim[2]), n = 10),
+          ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2)
+    axis(side = 1, at = seq(round(xlim[1]), round(xlim[2]),
+                            by = max(round((round(xlim[2])-round(xlim[1]))/10),1) ))
+    mtext(text = "Densité de probabilité", side = 2, line = 2, cex = 1.2)
+
+    y1 <- dgamma(x = mu[j], shape = shape[j], scale = scale[j])
+    segments(x0 = mu[j], y0 = 0, y1 = y1, lty = 2, lwd = 3, col = j)
+    points(x = mu[j], y = y1, pch = 19, cex = 1.5, col = j)
+
+    for(j in 2:nparc){
+      curve(dgamma(x, shape=shape[j], scale=scale[j]),
+            from = max(0,mu[j]-4*se[j]), to = mu[j]+4*se[j], n = 1e4,
+            lwd = 3, col = j, yaxt = "n",
+            ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2, add = TRUE)
+
+      y1 <- dgamma(x = mu[j], shape = shape[j], scale = scale[j])
+      segments(x0 = mu[j], y0 = 0, y1 = y1, lty = 2, lwd = 3, col = j)
+      points(x = mu[j], y = y1, pch = 19, cex = 1.5, col = j)
+    }
+
+    legend(x = xlim[1], y = ylim[2], legend = paste("Parc", 1:nparc),
+           lwd = 3, col = 1:nparc, text.col = 1:nparc, cex = 1.5,
+           bty = "n", horiz = TRUE)
+  } # end function plot_gamma_cumulated_impacts
+
+  ########################
+  ## Fatalities
+  ##----------------------
+  observeEvent({
+    input$analysis_choice
+    input$button_fatalities
+    input$fatalities_input_type
+    input$fatalities_run_expert
+
+    input$farm_number_cumulated
+    input$fatalities_mat_cumulated
+  },{
+    if(input$analysis_choice != "cumulated"){
+
+      # Show from input values: if button is ON and input_type is set on "value"
+      if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "val"){
+        output$title_distri_plot <- renderText({ "Mortalités annuelles" })
+        output$distri_plot <- renderPlot({ plot_gamma(mu = input$fatalities_mean, se = input$fatalities_se) })
+      } else {
+        # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
+        if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "eli_exp"){
+          if(!is.null(param$fatalities_eli_result)){
+            output$title_distri_plot <- renderText({ "Mortalités annuelles" })
+            output$distri_plot <- renderPlot({ plot_expert(param$fatalities_eli_result$out) })
+          } else {
+            output$title_distri_plot <- NULL
+            output$distri_plot <- NULL
+          }
+          # Hide otherwise (when button is OFF)
+        }else{
+          output$title_distri_plot <- NULL
+          output$distri_plot <- NULL
+        }
+      }
+
+    # When analysis = cumulated impacts
+    }else{
+      output$title_distri_plot <- renderText({ "Mortalités annuelles par parc (impacts cumulés)" })
+      # Plot: note we use the "NULL + delay" sequence only to avoid error message in R console
+      output$distri_plot <- NULL
+      delay(5,
+        output$distri_plot <- renderPlot({
+          plot_gamma_cumulated_impacts(mu = input$fatalities_mat_cumulated[,1],
+                                     se = input$fatalities_mat_cumulated[,2],
+                                     nparc = input$farm_number_cumulated)
+        })
+      )
+
+    } # end "if"
+  }, ignoreInit = FALSE)
+
+
+  ########################
+  ## Population size
+  ##----------------------
+  observeEvent({
+    input$pop_size_input_type
+    input$button_pop_size
+  },{
+    # Show from input values: if button is ON and input_type is set on "value"
+    if(input$button_pop_size%%2 == 1 & input$pop_size_input_type == "val"){
+      output$title_distri_plot <- renderText({ "Taille initiale de la population" })
+      output$distri_plot <- renderPlot({ plot_gamma(mu = input$pop_size_mean, se = input$pop_size_se) })
+    } else {
+      # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
+      if(input$button_pop_size%%2 == 1 & input$pop_size_input_type == "eli_exp"){
+        if(!is.null(param$pop_size_eli_result)){
+          output$title_distri_plot <- renderText({ "Taille initiale de la population" })
+          output$distri_plot <- renderPlot({ plot_expert(param$pop_size_eli_result$out) })
+        } else {
+          output$title_distri_plot <- NULL
+          output$distri_plot <- NULL
+        }
+        # Hide otherwise (when button is OFF)
+      }else{
+        output$title_distri_plot <- NULL
+        output$distri_plot <- NULL
+      }
+    }
+  }, ignoreInit = FALSE)
+
+
+  ########################
+  ## Population growth
+  ##----------------------
+  observeEvent({
+    input$pop_growth_input_type
+    input$button_pop_growth
+  },{
+    # Show from input values: if button is ON and input_type is set on "value"
+    if(input$button_pop_growth%%2 == 1 & input$pop_growth_input_type == "val"){
+      output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
+      output$distri_plot <- renderPlot({ plot_gamma(mu = input$pop_growth_mean, se = input$pop_growth_se) })
+    } else {
+      # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
+      if(input$button_pop_growth%%2 == 1 & input$pop_growth_input_type == "eli_exp"){
+        if(!is.null(param$pop_growth_eli_result)){
+          output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
+          output$distri_plot <- renderPlot({ plot_expert(param$pop_growth_eli_result$out) })
+        } else {
+          output$title_distri_plot <- NULL
+          output$distri_plot <- NULL
+        }
+        # Hide otherwise (when button is OFF)
+      }else{
+        output$title_distri_plot <- NULL
+        output$distri_plot <- NULL
+      }
+    }
+  }, ignoreInit = FALSE)
+
+  ########################
+  ## Carrying capacity
+  ##----------------------
+  observeEvent({
+    input$carrying_cap_input_type
+    input$button_carrying_cap
+  },{
+    # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
+    if(input$button_carrying_cap%%2 == 1 & input$carrying_cap_input_type == "eli_exp"){
+      if(!is.null(param$carrying_cap_eli_result)){
+        output$title_distri_plot <- renderText({ "Capacité de charge" })
+        output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out) })
+      } else {
+        output$title_distri_plot <- NULL
+        output$distri_plot <- NULL
+      }
+      # Hide otherwise (when button is OFF)
+    }else{
+      output$title_distri_plot <- NULL
+      output$distri_plot <- NULL
+    }
+  }, ignoreInit = FALSE)
+  #####
+
+
+  #####
+  ##-------------------------------------------------
+  ##  Display parameter values (on the side panel)
+  ##-------------------------------------------------
+  #################################
+  ## Fatalities
+  ##-------------------------------
+  output$fatalities_mean_info <- renderText({
+      paste0(c("Moyenne : ",
+               paste0(c(tail(param$fatalities_mean, -1)), collapse = ", ")
+      ), collapse = "")
+    })
+
+  output$fatalities_se_info <- renderText({
+    paste0(c("Erreur-type : ",
+             paste0(c(tail(param$fatalities_se, -1)), collapse = ", ")
+    ), collapse = "")
+  })
+
+
+  #################################
+  ## Poplutation size
+  ##-------------------------------
+  ## UNIT
+  output$pop_size_unit_info <- renderText({
+    if(!is.null(param$pop_size_unit)){
+      if(param$pop_size_unit == "Npair"){
+        paste0("Nombre de couple")
+      } else {
+        paste0("Effectif total")
       }
     }
   })
-}
-# End server
 
-shinyApp(ui, server)
+  ## VALUES
+  output$pop_size_mean_info <- renderText({  paste0("Moyenne : ", param$pop_size_mean) })
+  output$pop_size_se_info <- renderText({  paste0("Erreur-type : ", param$pop_size_se) })
 
+
+  #################################
+  ## Population growth
+  ##-------------------------------
+  output$pop_growth_mean_info <- renderText({  paste0("Moyenne : ", param$pop_growth_mean) })
+  output$pop_growth_se_info <- renderText({  paste0("Erreur-type : ", param$pop_growth_se) })
+
+
+  #################################
+  ## Carrying capacity
+  ##-------------------------------
+  # UNIT (like pop size)
+  output$carrying_capacity_info <- renderText({
+
+    # Source info "unit"
+    if(is.null(param$pop_size_unit)){
+      unit1 <- input$pop_size_unit
+    }else{
+      unit1 <- param$pop_size_unit
+    }
+
+    # UNIT information
+    if(unit1 == "Npair"){
+      info1 <- paste0("Nombre de couple")
+    } else {
+      info1 <- paste0("Effectif total")
+    }
+
+    # paste for printing
+    paste0(info1, " : ", param$carrying_capacity)
+  })
+
+
+  #################################
+  ## Vital rates
+  ##-------------------------------
+  output$vital_rates_info <- renderTable({
+    input$mat_fill_vr
+  }, rownames = TRUE)
+  #####
+
+
+
+  #####
+  ##--------------------------------------------
+  ## Select parameter values for simulations
+  ##--------------------------------------------
+  #################################
+  ## Cumulated impacts or not ?
+  ##-------------------------------
+  observeEvent({
+    input$run
+  }, {
+    if(input$analysis_choice == "scenario"){
+      param$cumulated_impacts = FALSE
+    } else {
+      param$cumulated_impacts = TRUE
+    } # end if
+  }) # end observeEvent
+
+  #################################
+  ## Fatalities
+  ##-------------------------------
+  observe({
+    # Case 1 : Not cumulated effects (if1)
+    if(input$analysis_choice == "scenario"){
+
+      # Case 1.1 : Values from expert elicitation (if2)
+      if(input$fatalities_input_type == "eli_exp"){
+        if(!(is.null(param$fatalities_eli_result))){
+          param$fatalities_mean <- c(0, round(param$fatalities_eli_result$mean, 2))
+          param$onset_time <- NULL
+          param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE, 2))
+          ready$fatalities <- TRUE
+        } else {
+          ready$fatalities <- FALSE
+        }
+
+      } else {
+
+        # Case 1.2 : Values directly provided (i.e., not from expert elicitation)
+        ready$fatalities <- TRUE
+        param$fatalities_mean <- c(0, input$fatalities_mean)
+        param$onset_year <- NULL
+        param$onset_time <- NULL
+        param$fatalities_se <- c(0, input$fatalities_se)
+      } # end (if2)
+
+      # Case 2 : Cumulated effects (if-else 1)
+    } else {
+      ready$fatalities <- TRUE
+      param$fatalities_mean <- c(0, input$fatalities_mat_cumulated[,1])
+      param$fatalities_se <- c(0, input$fatalities_mat_cumulated[,2])
+      param$onset_year <- c(min(input$fatalities_mat_cumulated[,3]), input$fatalities_mat_cumulated[,3])
+      param$onset_time <- param$onset_year - min(param$onset_year) + 1
+    } # end (if1)
+
+  }) # end observe
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
+
+  #################################
+  ## Population size
+  ##-------------------------------
+  observe({
+    # Case 1 : Values from expert elicitation
+    if(input$pop_size_input_type == "eli_exp"){
+      if(!(is.null(param$pop_size_eli_result))){
+        param$pop_size_mean <- round(param$pop_size_eli_result$mean)
+        param$pop_size_se <- round(param$pop_size_eli_result$SE)
+        ready$pop_size <- TRUE
+      } else {
+        ready$pop_size <- FALSE
+      }
+
+      # Case 2 : Values directly provided (i.e., not from expert elicitation)
+    } else {
+      ready$pop_size <- TRUE
+      param$pop_size_mean <- input$pop_size_mean
+      param$pop_size_se <- input$pop_size_se
+    }
+    param$pop_size_unit <- input$pop_size_unit
+  })
+
+
+  #################################
+  ## Population growth
+  ##-------------------------------
+  observe({
+    # Case 1 : Values from expert elicitation
+    if(input$pop_growth_input_type == "eli_exp"){
+      if(!(is.null(param$pop_growth_eli_result))){
+        param$pop_growth_mean <- round(min(1 + param$rMAX_species, round(param$pop_growth_eli_result$mean, 2)), 2)
+        param$pop_growth_se <- round(param$pop_growth_eli_result$SE, 2)
+        ready$pop_growth <- TRUE
+      } else {
+        ready$pop_growth <- FALSE
+      }
+
+    } else {
+
+      # Case 2 : Trend information
+      if(input$pop_growth_input_type == "trend"){
+        ready$pop_growth <- TRUE
+
+        if(input$pop_trend == "growth") {
+          if(input$pop_trend_strength == "weak") {
+            param$pop_growth_mean <- 1.01
+          } else if(input$pop_trend_strength == "average"){
+            param$pop_growth_mean <- 1.03
+          } else {
+            param$pop_growth_mean <- 1.06
+          }
+        } else if(input$pop_trend == "decline"){
+          if(input$pop_trend_strength == "weak") {
+            param$pop_growth_mean <- 0.99
+          } else if(input$pop_trend_strength == "average"){
+            param$pop_growth_mean <- 0.97
+          } else {
+            param$pop_growth_mean <- 0.94
+          }
+        } else {
+          param$pop_growth_mean <- 1
+        }
+        param$pop_growth_se <- 0.03
+
+
+        # Case 3 : Values directly provided (i.e., not from expert elicitation)
+      } else {
+        ready$pop_growth <- TRUE
+        param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 2)
+        param$pop_growth_se <- input$pop_growth_se
+      }
+    }
+  })
+
+
+
+  #################################
+  ## Carrying capacity
+  ##------------------------------
+  observe({
+    if(input$carrying_cap_input_type == "eli_exp"){
+      if(!(is.null(param$carrying_cap_eli_result))){
+        param$carrying_capacity <- round(param$carrying_cap_eli_result$mean)
+        ready$carrying_capacity <- TRUE
+      } else {
+        ready$carrying_capacity <- FALSE
+      }
+    } else {
+      ready$carrying_capacity <- TRUE
+      param$carrying_capacity <- input$carrying_capacity
+    }
+  })
+  #############################################
+  ## Survivals, fecundities and rMAX_species
+  ##-------------------------------------------
+  observeEvent({
+    input$run
+  }, {
+    param$survivals <- input$mat_fill_vr[,1]
+    param$fecundities <- input$mat_fill_vr[,2]
+    param$rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
+  }) # end observeEvent
+  #####
+
+  #############################################
+  ## Calibration of survivals & fecundities
+  ##-------------------------------------------
+  observeEvent({
+    input$run
+  },{
+    param$vr_calibrated <- calibrate_params(
+      inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
+      f = param$fecundities, s = param$survivals, lam0 = param$pop_growth_mean
+    )
+    param$s_calibrated <- head(param$vr_calibrated, length(param$survivals))
+    param$f_calibrated <- tail(param$vr_calibrated, length(param$fecundities))
+  })
+  #####
+
+  ############################################################
+  ## Observe parameter values to be used in simulations run
+  ##----------------------------------------------------------
+  observe({
+    param # required to ensure up-to-date values are run
+
+    # simple inputs
+    param$nsim <- input$nsim
+    param$fatal_constant <- input$fatal_constant
+
+    # fixed in global environment (for now)
+    param$theta = theta
+    param$time_horzion = time_horzion
+    param$coeff_var_environ = coeff_var_environ
+
+  }) # end observe
+  #####
+
+  #####
+  ##-----------------------------------------------------------------------------------
+  ##                                RUN SIMULATIONS
+  ##-----------------------------------------------------------------------------------
+  observeEvent({
+    input$run
+  }, {
+
+    if(ready$fatalities & ready$pop_size & ready$pop_growth & ready$carrying_capacity){
+      withProgress(message = 'Simulation progress', value = 0, {
+
+        out$run <- run_simul_shiny(nsim = param$nsim,
+                                   cumulated_impacts = param$cumulated_impacts,
+
+                                   fatalities_mean = param$fatalities_mean,
+                                   fatalities_se = param$fatalities_se,
+                                   onset_time = param$onset_time,
+
+                                   pop_size_mean = param$pop_size_mean,
+                                   pop_size_se = param$pop_size_se,
+                                   pop_size_type = param$pop_size_unit,
+
+                                   pop_growth_mean = param$pop_growth_mean,
+                                   pop_growth_se = param$pop_growth_se,
+
+                                   survivals = param$s_calibrated,
+                                   fecundities = param$f_calibrated,
+
+                                   carrying_capacity = param$carrying_capacity,
+                                   theta = param$theta,
+                                   rMAX_species = param$rMAX_species,
+
+                                   model_demo = NULL,
+                                   time_horzion = param$time_horzion,
+                                   coeff_var_environ = param$coeff_var_environ,
+                                   fatal_constant = param$fatal_constant)
+      }) # Close withProgress
+
+    }else{
+      out$run <- NULL
+      out$msg <- "error_not_ready"
+    }
+  }) # Close observEvent
+  #####
+
+
+
+  #####
+  ##-----------------------------------------------------------------------------------
+  ##                                OUTPUTS
+  ##-----------------------------------------------------------------------------------
+
+  ##-------------------------------------------
+  ## Impact text
+  ##-------------------------------------------
+  ## Functions to print the output as text (non cumulated impacts)
+  print_impact_text <- function(impact, lci, uci){
+    paste0("Impact : ", round(impact, 2)*100, "%",
+           "[", round(lci, 2)*100, "% ; ", round(uci, 2)*100, "%]")
+  } # end function print_impact_text
+
+  ## Functions to print the output as text (non cumulated impacts)
+  print_impact_table <- function(res){
+    nfarm <- (dim(res$indiv_farm$impact)[3]-1)
+    fil <- paste0(round(t(res$indiv_farm$impact[time_horzion, -2, -1]),2)*100, "%")
+    matrix(fil,
+           nrow = nfarm,
+           dimnames = list(paste("Parc",1:nfarm), c("Impact", "IC (min)", "IC (max)"))
+    )
+  } # end function print_impact_table
+
+  print_out <- function(){
+    if(!is.null(out$run)) {
+      # Print the result
+
+      if(param$cumulated_impacts){
+        # cumulated impact ==> Table
+        print_impact_table(res = get_metrics(N = out$run$N, cumulated_impacts = TRUE))
+      }else{
+        # non cumulated impact ==> Text
+        print_impact_text(impact = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "avg",-1],
+                 lci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "lci",-1],
+                 uci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "uci",-1])
+      }
+
+    } else {
+      # When run is NULL
+
+      if(!is.null(out$msg)){
+
+        # Print the error msg, if there is one
+        if(out$msg == "error_not_ready"){
+          paste0("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
+        }else{
+          paste0("Some other error occurred")
+        }
+
+      }else{
+        # When no error msg : nothing happens
+      } # if "msg"
+    } # if "run
+  } # end function print_out
+
+  # Display title
+  output$title_impact_result <- renderText({
+    if(input$run > 0){
+      "Résultat : Impact estimé au bout de 30 ans"
+    }
+  })
+
+  # Display result (text for non cumulated impacts)
+  output$impact_text <- renderText({
+    if(input$run == 0){
+      NULL
+    }else{
+      if(!param$cumulated_impacts){
+        print_out()
+      } else{
+        NULL
+      }
+    }
+  })
+
+  # Display result (table for cumulated impacts)
+  output$impact_table <- renderTable({
+    if(input$run == 0){
+      NULL
+    }else{
+      if(param$cumulated_impacts){
+        print_out()
+      } else{
+        NULL
+      }
+    }
+  }, rownames = TRUE)
+
+  ##-------------------------------------------
+  ## Plot Impacts
+  ##-------------------------------------------
+  ## Function to plot the impact
+  plot_out_impact <- function(){
+    if(is.null(out$run)) {} else {
+      plot_impact(N = out$run$N, onset_year = param$onset_year, percent = TRUE,
+                  xlab = "\nAnnée", ylab = "Impact relatif (%)\n")
+      }
+  }
+
+  output$title_impact_plot <- renderText({
+    if(input$run > 0){
+      "Résultat : Impact relatif au cours du temps"
+    }
+  })
+
+  output$impact_plot <- renderPlot({
+    plot_out_impact()
+  })
+
+  ##-------------------------------------------
+  ## Plot Demographic Trajectories
+  ##-------------------------------------------
+  # Function to plot trajectories
+  plot_out_traj <- function(){
+    if(is.null(out$run)) {} else {plot_traj(N = out$run$N, xlab = "year", ylab = "pop size")}
+  }
+
+  output$title_traj_plot <- renderText({
+    if(input$run > 0){
+      "Graphique : Trajectoire démographique"
+    }
+  })
+
+  output$traj_plot <- renderPlot({
+    plot_out_traj()
+  })
+  #####
+
+
+  ###################################################################################
+} # End server
 

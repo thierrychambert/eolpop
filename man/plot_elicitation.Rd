@@ -4,10 +4,12 @@
 \alias{plot_elicitation}
 \title{Function to plot the expert elicitation curves}
 \usage{
-plot_elicitation(out)
+plot_elicitation(out, ...)
 }
 \arguments{
 \item{out}{the output list from the elicitation function}
+
+\item{...}{additional graphical parameters passed onto the classic "plot" function}
 }
 \value{
 a plot of the estimated distirbution (elitation curves) of elicited parameters

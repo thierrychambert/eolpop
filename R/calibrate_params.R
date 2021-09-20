@@ -15,7 +15,8 @@
 #'
 #' @import popbio
 #' @import magrittr
-#' @import stats
+#' @rawNamespace import(stats, except = c(filter, lag))
+#'
 #' @examples
 #' s <- c(0.5, 0.7, 0.8, 0.95)
 #' f <- c(0, 0, 0.05, 0.55)
@@ -39,9 +40,9 @@ calibrate_params <- function(inits = NULL, s, f, lam0){
   # Set parameter boundaries for the optimization
   if(lam0 - lam00 < 0){
     lower = c(rep(0, length(fu)), apply(cbind((s*0.5), 0.05), 1, max))
-    upper = c(fu, s)
+    upper = c(fu, s)*1.01
   }else{
-    lower = c(fu, s)
+    lower = c(fu, s)*0.99
     upper = c(rep(10, length(fu)), apply(cbind((s*1.25), 0.98), 1, min))
   }
 
@@ -51,6 +52,7 @@ calibrate_params <- function(inits = NULL, s, f, lam0){
   # Optimize the utility function
   opt <- stats::optim(par = inits, fn = uti_fun, fo=fo, nac=nac, lam0=lam0,
                       lower = lower, upper = upper, method="L-BFGS-B")
+
 
   # Return output : New fecundity vector
   params <- c(tail(opt$par, nac), fo, head(opt$par, -nac))
@@ -90,7 +92,7 @@ init_calib  <- function(s, f, lam0){
   nac = length(s)
 
   inits_vr <- c(s,f) + d
-  inits_vr <- c(tail(inits_vr, nac), head(inits_vr, nac))
+  inits_vr <- c(tail(inits_vr, nac), head(inits_vr, nac) %>% sapply(min, 0.999))
   inits <- inits_vr[inits_vr != 0]
   return(inits)
 } # End function
