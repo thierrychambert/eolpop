@@ -224,12 +224,7 @@ rm(list = ls(all.names = TRUE))
                                                         choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
 
                                            # Values
-                                           numericInput(inputId = "fatalities_mean",
-                                                        label = "Moyenne des mortalités annuelles",
-                                                        value = 1,
-                                                        min = 0, max = Inf, step = 0.5),
-
-                                           numericInput(inputId = "fatalities_lower",
+                                          numericInput(inputId = "fatalities_lower",
                                                         label = "Borne inférieure (mortalités annuelles)",
                                                         value = 0.5,
                                                         min = 0, max = Inf, step = 0.5),
@@ -239,7 +234,7 @@ rm(list = ls(all.names = TRUE))
                                                         value = 2.5,
                                                         min = 0, max = Inf, step = 0.5),
 
-                                           actionButton(inputId = "fatalities_run_values", label = "Utiliser ces valeurs"),
+                                           #actionButton(inputId = "fatalities_run_values", label = "Utiliser ces valeurs"),
 
 
                                            # Matrix for expert elicitation

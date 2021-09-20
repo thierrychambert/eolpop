@@ -64,8 +64,8 @@ server <- function(input, output, session){
     #------------
     #shinyjs::hide("fatal_constant")
     #shinyjs::hide("fatalities_input_type")
-    shinyjs::hide("fatalities_mean")
-    shinyjs::hide("fatalities_se")
+    shinyjs::hide("fatalities_lower")
+    shinyjs::hide("fatalities_upper")
     shinyjs::hide("fatalities_mat_expert")
     shinyjs::hide("fatalities_run_expert")
     shinyjs::hide("farm_number_cumulated")
@@ -107,8 +107,8 @@ server <- function(input, output, session){
         shinyjs::show("fatalities_input_type")
 
         if(input$fatalities_input_type == "val"){
-          shinyjs::show("fatalities_mean")
-          shinyjs::show("fatalities_se")
+          shinyjs::show("fatalities_lower")
+          shinyjs::show("fatalities_upper")
         }
         if(input$fatalities_input_type == "eli_exp"){
           shinyjs::show("fatalities_mat_expert")
@@ -506,7 +506,7 @@ server <- function(input, output, session){
     input$button_fatalities
     input$fatalities_input_type
     input$fatalities_run_expert
-    input$fatalities_run_values
+    #input$fatalities_run_values
 
     input$farm_number_cumulated
     input$fatalities_mat_cumulated
@@ -516,8 +516,7 @@ server <- function(input, output, session){
       # Show from input values: if button is ON and input_type is set on "value"
       if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "val"){
         output$title_distri_plot <- renderText({ "Mortalités annuelles" })
-        req(param$out_fatal)
-        output$distri_plot <- renderPlot({ plot_range(param$out_fatal, mu = param$fatalities_mean_use) })
+        output$distri_plot <- renderPlot({ plot_gamma(mu = tail(param$fatalities_mean, -1), se = tail(param$fatalities_se, -1)) })
       } else {
         # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
         if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "eli_exp"){
@@ -721,19 +720,7 @@ server <- function(input, output, session){
 
 
 
-  observe({
-    param$fatalities_mean_use = (input$fatalities_lower + input$fatalities_upper)/2
-    req(input$fatalities_mean)
-    param$fatalities_mean_use <- input$fatalities_mean
-  })
 
-  observeEvent({
-    input$fatalities_run_values
-  }, {
-    vals <- matrix(c(input$fatalities_lower, param$fatalities_mean_use, input$fatalities_upper))
-    param$out_fatal <- elicitation(vals, Cp = CP)
-
-  })
 
 
 
@@ -745,6 +732,10 @@ server <- function(input, output, session){
   ##--------------------------------------------
   ## Select parameter values for simulations
   ##--------------------------------------------
+  # Functions to calculate mean and SD from lower & upper values
+  get_mu <- function(lower, upper) (lower + upper)/2
+  get_sd <- function(lower, upper, coverage) ((abs(upper - lower)/2))/qnorm(1-((1-coverage)/2))
+
   #################################
   ## Cumulated impacts or not ?
   ##-------------------------------
@@ -770,7 +761,7 @@ server <- function(input, output, session){
         if(!(is.null(param$fatalities_eli_result))){
           param$fatalities_mean <- c(0, round(param$fatalities_eli_result$mean, 2))
           param$onset_time <- NULL
-          param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE, 2))
+          param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE, 3))
           ready$fatalities <- TRUE
         } else {
           ready$fatalities <- FALSE
@@ -784,17 +775,11 @@ server <- function(input, output, session){
 
 
         # Case 1.2 : Values directly provided (i.e., not from expert elicitation)
-        if(!(is.null(param$out_fatal))){
-          param$fatalities_mean <- c(0, round(param$fatalities_mean_use, 2))
+        #req(lower)
+          param$fatalities_mean <- c(0, round(get_mu(lower = input$fatalities_lower, upper = input$fatalities_upper), 2))
           param$onset_time <- NULL
-          param$fatalities_se <- c(0, round(sqrt(param$out_fatal$var_smooth), 2))
+          param$fatalities_se <- c(0, round(get_sd(lower = input$fatalities_lower, upper = input$fatalities_upper, coverage = CP), 3))
           ready$fatalities <- TRUE
-        } else {
-          ready$fatalities <- FALSE
-        }
-
-
-
 
         #ready$fatalities <- TRUE
         #param$fatalities_se <- c(0, round(sqrt(param$out_fatal$var_smooth), 2))
