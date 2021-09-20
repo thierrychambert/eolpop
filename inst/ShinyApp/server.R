@@ -78,6 +78,8 @@ server <- function(input, output, session){
     shinyjs::hide("pop_size_mat_expert")
     shinyjs::hide("pop_size_run_expert")
 
+    shinyjs::hide("pop_growth_lower")
+    shinyjs::hide("pop_growth_upper")
     shinyjs::hide("pop_growth_mean")
     shinyjs::hide("pop_growth_se")
     shinyjs::hide("pop_growth_mat_expert")
@@ -147,6 +149,11 @@ server <- function(input, output, session){
     # Show inputs for population trend/growth part
     if(input$button_pop_growth%%2 == 1){
       shinyjs::show("pop_growth_input_type")
+
+      if(input$pop_growth_input_type == "itvl"){
+        shinyjs::show("pop_growth_lower")
+        shinyjs::show("pop_growth_upper")
+      }
       if(input$pop_growth_input_type == "val"){
         shinyjs::show("pop_growth_mean")
         shinyjs::show("pop_growth_se")
@@ -575,9 +582,6 @@ server <- function(input, output, session){
         plot_gamma(mu = param$pop_size_mean, se = param$pop_size_se)
       })
 
-
-
-
     } else {
       # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
       if(input$button_pop_size%%2 == 1 & input$pop_size_input_type == "eli_exp"){
@@ -604,10 +608,16 @@ server <- function(input, output, session){
     input$pop_growth_input_type
     input$button_pop_growth
   },{
-    # Show from input values: if button is ON and input_type is set on "value"
-    if(input$button_pop_growth%%2 == 1 & input$pop_growth_input_type == "val"){
+
+    # Show from input values: if button is ON and input_type is set on "value" or "interval"
+    if(input$button_pop_growth%%2 == 1 & input$pop_growth_input_type != "eli_exp" & input$pop_growth_input_type != "trend"){
       output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
-      output$distri_plot <- renderPlot({ plot_gamma(mu = input$pop_growth_mean, se = input$pop_growth_se) })
+
+      output$distri_plot <- renderPlot({
+        req(param$pop_growth_mean, param$pop_growth_se > 0)
+        plot_gamma(mu = param$pop_growth_mean, se = param$pop_growth_se)
+      })
+
     } else {
       # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
       if(input$button_pop_growth%%2 == 1 & input$pop_growth_input_type == "eli_exp"){
@@ -879,9 +889,22 @@ server <- function(input, output, session){
 
         # Case 3 : Values directly provided (i.e., not from expert elicitation)
       } else {
-        ready$pop_growth <- TRUE
-        param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 2)
-        param$pop_growth_se <- input$pop_growth_se
+
+        if(input$pop_growth_input_type == "val"){
+          # Case 2 : Values directly provided as mean & SE
+          ready$pop_growth <- TRUE
+          param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 3)
+          param$pop_growth_se <- input$pop_growth_se
+
+        }else{
+          # Case 3 : Values directly provided as lower/upper interval
+          ready$pop_growth <- TRUE
+          param$pop_growth_mean <- round(min(1 + param$rMAX_species,
+                                             round(get_mu(lower = input$pop_growth_lower, upper = input$pop_growth_upper), 2)
+                                             ), 3)
+          param$pop_growth_se <- round(get_sd(lower = input$pop_growth_lower, upper = input$pop_growth_upper, coverage = CP), 3)
+        } # end (if3)
+
       }
     }
   })

@@ -399,18 +399,29 @@ rm(list = ls(all.names = TRUE))
 
                                            radioButtons(inputId = "pop_growth_input_type",
                                                         label = "Type de saisie",
-                                                        choices = c("Taux de croissance" = "val",
+                                                        choices = c("Intervalle" = "itvl",
+                                                                    "Taux d'accroissement" = "val",
                                                                     "Elicitation d'expert" = "eli_exp",
                                                                     "Tendance locale ou régionale" = "trend")),
+                                           # Interval
+                                           numericInput(inputId = "pop_growth_lower",
+                                                        label = "Borne inférieure (taux d'accroissement)",
+                                                        value = 1.05,
+                                                        min = 0, max = Inf, step = 0.01),
+
+                                           numericInput(inputId = "pop_growth_upper",
+                                                        label = "Borne supérieure (taux d'accroissement)",
+                                                        value = 1.10,
+                                                        min = 0, max = Inf, step = 0.01),
 
                                            ## Input values: mean and se
                                            numericInput(inputId = "pop_growth_mean",
-                                                        label = "Moyenne de la croissance de la population",
+                                                        label = "Moyenne (taux d'accroissement)",
                                                         value = 0.99,
                                                         min = 0, max = Inf, step = 0.01),
 
                                            numericInput(inputId = "pop_growth_se",
-                                                        label = "Erreur-type de la croissance de la population",
+                                                        label = "Erreur-type (taux d'accroissement)",
                                                         value = 0,
                                                         min = 0, max = Inf, step = 0.01),
 
