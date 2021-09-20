@@ -6,15 +6,15 @@ library(popbio)
 library(eolpop)
 
 ## Inputs
-nsim = 10
+nsim = 100
 
-fatalities_mean = c(0, 2.2)
+fatalities_mean = c(0, 5)
 fatalities_se = c(0, 0.5)
 
 pop_size_mean = 200
-pop_size_se = 25
+pop_size_se = 0
 
-pop_growth_mean = 1
+pop_growth_mean = 1.2
 pop_growth_se = 0
 
 survivals <- c(0.5, rep(0.71, 5), 0.59)
@@ -22,9 +22,9 @@ fecundities <- c(0, 0.21, rep(1.08, 5))
 
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
 time_horzion = 30
-coeff_var_environ = 0.10
+coeff_var_environ = 0
 fatal_constant = "h"
-pop_size_type = "Npair"
+pop_size_type = "Ntotal"
 
 cumulated_impacts = FALSE
 
@@ -109,5 +109,3 @@ out = run0
 get_metrics(N = out$N)$scenario$impact[time_horzion, "avg",-1]
 
 res = get_metrics(N = out$N, cumulated_impacts = cumulated_impacts)
-round(t(res$indiv_farm$impact[time_horzion, -2, -1]),2)*100
-

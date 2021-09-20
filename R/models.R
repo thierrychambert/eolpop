@@ -151,9 +151,9 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params){
 
 
   ## Check if approximation is close enough to desired lambda
-  if( abs((lambda(build_Leslie(s = s_Nt, f = f_Nt)) - lam_Nt) / lam_Nt) > 0.005 ){
+ if( abs((lambda(build_Leslie(s = s_Nt, f = f_Nt)) - lam_Nt) / lam_Nt) > 0.05 ){
 
-    # If difference is too large : Use optimisation function for better calibration
+    #If difference is too large : Use optimisation function for better calibration
     inits <- c(tail(vr_Nt, length(f)), head(vr_Nt, length(s)) %>% sapply(min, 0.999))
     inits <- inits[inits != 0]
     vr_calib <- calibrate_params(inits = inits, f = f_Nt, s = s_Nt, lam0 = lam_Nt)
@@ -226,7 +226,7 @@ M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params){
 
 
   ## Check if approximation is close enough to desired lambda
-  if( abs((lambda(build_Leslie(s = s_Nt, f = f_Nt)) - lam_Nt) / lam_Nt) > 0.005 ){
+  if( abs((lambda(build_Leslie(s = s_Nt, f = f_Nt)) - lam_Nt) / lam_Nt) > 0.05 ){
 
     # If difference is too large : Use optimisation function for better calibration
     inits <- c(tail(vr_Nt, length(f)), head(vr_Nt, length(s)) %>% sapply(min, 0.999))
