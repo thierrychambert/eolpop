@@ -2,26 +2,24 @@
 % Please edit documentation in R/sample_gamma.R
 \name{sample_gamma_v1}
 \alias{sample_gamma_v1}
-\title{Draw values from a Custom Gamma Distribution using mean and standard deviation as inputs}
+\title{Draw values from a Custom Gamma Distribution using lower and upper limits}
 \usage{
-sample_gamma_v1(n, mu, sd, r = 3)
+sample_gamma_v1(n, lower, upper, coverage = 0.95)
 }
 \arguments{
 \item{n}{number of value to draw.}
 
-\item{mu}{mean}
+\item{lower}{lower limit}
 
-\item{sd}{standard deviation}
-
-\item{r}{scaling factor. Used to ensure a Normal shape for small mean values.}
+\item{upper}{upper limit}
 }
 \value{
 a vector of drawn values.
 }
 \description{
-Draw values from a Custom Gamma Distribution using mean and standard deviation as inputs
+Draw values from a Custom Gamma Distribution using lower and upper limits
 }
 \examples{
-sample_gamma_v1(n= 5, mu = 4, sd = 1.5)
+sample_gamma_v1(n = 50, lower = 10, upper = 30)
 
 }
