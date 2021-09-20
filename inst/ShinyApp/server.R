@@ -71,6 +71,8 @@ server <- function(input, output, session){
     shinyjs::hide("farm_number_cumulated")
     shinyjs::hide("fatalities_mat_cumulated")
 
+    shinyjs::hide("pop_size_lower")
+    shinyjs::hide("pop_size_upper")
     shinyjs::hide("pop_size_mean")
     shinyjs::hide("pop_size_se")
     shinyjs::hide("pop_size_mat_expert")
@@ -127,8 +129,11 @@ server <- function(input, output, session){
 
     # Show inputs for population size part
     if(input$button_pop_size%%2 == 1){
-      #shinyjs::show("pop_size_unit")
       shinyjs::show("pop_size_input_type")
+      if(input$pop_size_input_type == "itvl"){
+        shinyjs::show("pop_size_lower")
+        shinyjs::show("pop_size_upper")
+      }
       if(input$pop_size_input_type == "val"){
         shinyjs::show("pop_size_mean")
         shinyjs::show("pop_size_se")
@@ -507,7 +512,7 @@ server <- function(input, output, session){
     if(input$analysis_choice != "cumulated"){
 
       # Show from input values: if button is ON and input_type is set on "value" or "itvl" (thus not "eli_exp")
-      if(input$button_fatalities%%2 == 1 & !input$fatalities_input_type == "eli_exp"){
+      if(input$button_fatalities%%2 == 1 & input$fatalities_input_type != "eli_exp"){
         output$title_distri_plot <- renderText({ "Mortalités annuelles" })
 
         output$distri_plot <- renderPlot({
@@ -558,13 +563,21 @@ server <- function(input, output, session){
   ## Population size
   ##----------------------
   observeEvent({
-    input$pop_size_input_type
     input$button_pop_size
+    input$pop_size_input_type
   },{
     # Show from input values: if button is ON and input_type is set on "value"
-    if(input$button_pop_size%%2 == 1 & input$pop_size_input_type == "val"){
+    if(input$button_pop_size%%2 == 1 & input$pop_size_input_type != "eli_exp"){
       output$title_distri_plot <- renderText({ "Taille initiale de la population" })
-      output$distri_plot <- renderPlot({ plot_gamma(mu = input$pop_size_mean, se = input$pop_size_se) })
+
+      output$distri_plot <- renderPlot({
+        req(param$pop_size_mean, param$pop_size_se)
+        plot_gamma(mu = param$pop_size_mean, se = param$pop_size_se)
+      })
+
+
+
+
     } else {
       # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
       if(input$button_pop_size%%2 == 1 & input$pop_size_input_type == "eli_exp"){
@@ -802,11 +815,21 @@ server <- function(input, output, session){
         ready$pop_size <- FALSE
       }
 
-      # Case 2 : Values directly provided (i.e., not from expert elicitation)
     } else {
-      ready$pop_size <- TRUE
-      param$pop_size_mean <- input$pop_size_mean
-      param$pop_size_se <- input$pop_size_se
+
+      if(input$pop_size_input_type == "val"){
+        # Case 2 : Values directly provided as mean & SE
+        ready$pop_size <- TRUE
+        param$pop_size_mean <- input$pop_size_mean
+        param$pop_size_se <- input$pop_size_se
+
+      }else{
+        # Case 3 : Values directly provided as lower/upper interval
+        ready$pop_size <- TRUE
+        param$pop_size_mean <- round(get_mu(lower = input$pop_size_lower, upper = input$pop_size_upper), 2)
+        param$pop_size_se <- round(get_sd(lower = input$pop_size_lower, upper = input$pop_size_upper, coverage = CP), 3)
+      } # end (if3)
+
     }
     param$pop_size_unit <- input$pop_size_unit
   })

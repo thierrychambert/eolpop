@@ -21,7 +21,7 @@ rm(list = ls(all.names = TRUE))
 
   # Fixed parameters (for now)
   nsim = 10
-  coeff_var_environ = 0.10
+  coeff_var_environ = 0.03
   time_horzion = 30
   theta = 1 # DD parameter theta
   CP = 0.99 # Coverage probability for lower - upper values
@@ -225,7 +225,7 @@ rm(list = ls(all.names = TRUE))
                                                                     "Valeurs" = "val",
                                                                     "Elicitation d'expert" = "eli_exp")),
 
-                                           # Intervalle
+                                           # Interval
                                            numericInput(inputId = "fatalities_lower",
                                                         label = "Borne inférieure (mortalités annuelles)",
                                                         value = 0.5,
@@ -328,8 +328,22 @@ rm(list = ls(all.names = TRUE))
 
                                          radioButtons(inputId = "pop_size_input_type",
                                                       label = "Type de saisie",
-                                                      choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
+                                                      choices = c("Intervalle" = "itvl",
+                                                                  "Valeurs" = "val",
+                                                                  "Elicitation d'expert" = "eli_exp")),
 
+                                         # Interval
+                                         numericInput(inputId = "pop_size_lower",
+                                                      label = "Borne inférieure (taille population)",
+                                                      value = 130,
+                                                      min = 0, max = Inf, step = 10),
+
+                                         numericInput(inputId = "pop_size_upper",
+                                                      label = "Borne supérieure (taille population)",
+                                                      value = 140,
+                                                      min = 0, max = Inf, step = 10),
+
+                                         # Values
                                          numericInput(inputId = "pop_size_mean",
                                                       label = "Moyenne de la taille de la population",
                                                       value = 200,
@@ -340,6 +354,7 @@ rm(list = ls(all.names = TRUE))
                                                       value = 25,
                                                       min = 0, max = Inf, step = 1),
 
+                                         # Matrix for expert elicitation
                                          matrixInput(inputId = "pop_size_mat_expert",
                                                      value = matrix(data = eli_pop_size, nrow = 4, ncol = 5,
                                                                     dimnames = list(c("#1", "#2", "#3", "#4"),
