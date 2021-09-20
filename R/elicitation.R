@@ -57,7 +57,7 @@ elicitation <- function(vals, Cp, weights = 1, lower = 0, upper = Inf){
   rate_raw <- fit_raw$Gamma$rate
 
   ## Smoothing
-  v_new <- seq(min(vals), max(vals), length.out = 100)#[-1]
+  v_new <- seq(min(vals), max(vals), length.out = 10)#[-1]
   p_new <- SHELF::plinearpool(fit = fit_raw, x = v_new, d = "gamma", w = 1)
   fit_smooth <- SHELF::fitdist(vals = v_new, probs = p_new, lower = lower, upper = upper, weights = 1)
 
