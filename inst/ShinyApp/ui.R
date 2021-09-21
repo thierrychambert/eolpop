@@ -228,12 +228,12 @@ rm(list = ls(all.names = TRUE))
                                            # Interval
                                            numericInput(inputId = "fatalities_lower",
                                                         label = "Borne inférieure (mortalités annuelles)",
-                                                        value = 0.5,
+                                                        value = 4.9,
                                                         min = 0, max = Inf, step = 0.5),
 
                                            numericInput(inputId = "fatalities_upper",
                                                         label = "Borne supérieure (mortalités annuelles)",
-                                                        value = 2.5,
+                                                        value = 38.7,
                                                         min = 0, max = Inf, step = 0.5),
 
                                            # Values
@@ -335,12 +335,12 @@ rm(list = ls(all.names = TRUE))
                                          # Interval
                                          numericInput(inputId = "pop_size_lower",
                                                       label = "Borne inférieure (taille population)",
-                                                      value = 130,
+                                                      value = 220,
                                                       min = 0, max = Inf, step = 10),
 
                                          numericInput(inputId = "pop_size_upper",
                                                       label = "Borne supérieure (taille population)",
-                                                      value = 140,
+                                                      value = 230,
                                                       min = 0, max = Inf, step = 10),
 
                                          # Values
@@ -366,6 +366,10 @@ rm(list = ls(all.names = TRUE))
 
                                          actionButton(inputId = "pop_size_run_expert", label = "Utiliser valeurs experts"),
                               )}, # close wellPanel 2
+
+
+                              # Display matrix for stable age distribution
+                              tableOutput("pop_size_by_age"),
 
               )}, # close conditional panel
 
@@ -503,7 +507,7 @@ rm(list = ls(all.names = TRUE))
 
                                            numericInput(inputId = "carrying_capacity",
                                                         label = "Capacité de charge",
-                                                        value = 500,
+                                                        value = 1000,
                                                         min = 0, max = Inf, step = 100),
 
                                            matrixInput(inputId = "carrying_cap_mat_expert",

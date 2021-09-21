@@ -8,14 +8,14 @@ library(eolpop)
 ## Inputs
 nsim = 100
 
-fatalities_mean = c(0, 5)
-fatalities_se = c(0, 0.5)
+fatalities_mean = c(0, 20)
+fatalities_se = c(0, 6.5)
 
-pop_size_mean = 200
+pop_size_mean = 220
 pop_size_se = 0
 
-pop_growth_mean = 1.2
-pop_growth_se = 0
+pop_growth_mean = 1.05
+pop_growth_se = 0.01
 
 survivals <- c(0.5, rep(0.71, 5), 0.59)
 fecundities <- c(0, 0.21, rep(1.08, 5))
@@ -24,7 +24,7 @@ model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDe
 time_horzion = 30
 coeff_var_environ = 0
 fatal_constant = "h"
-pop_size_type = "Ntotal"
+pop_size_type = "Npair"
 
 cumulated_impacts = FALSE
 
@@ -33,8 +33,9 @@ onset_time = onset_year - min(onset_year) + 1
 onset_time = c(min(onset_time), onset_time)
 
 # Pop size total
-sum(pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = survivals, f = fecundities))
-
+N000 <- pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = survivals, f = fecundities)
+sum(N000)
+rm(N000)
 
 # Define K
 carrying_capacity = 500

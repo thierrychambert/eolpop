@@ -249,9 +249,9 @@ server <- function(input, output, session){
   ##   when changing species in the list
   ##----------------------------------------------
   # Function to create the matrix
-  create.matrice <- function(data_sf, species){
+  make_mat_vr <- function(data_sf, species){
     out_mat <- data_sf %>%
-      filter(species == data_sf$Nom_espece) %>%
+      filter(Nom_espece == species) %>%
       select(classes_age, survie, fecondite)
     return(out_mat)
   }
@@ -263,7 +263,7 @@ server <- function(input, output, session){
 
     if(input$species_choice == "Espèce générique") {} else {
 
-      tab_species <- create.matrice(data_sf = data_sf, species = input$species_choice)
+      tab_species <- make_mat_vr(data_sf = data_sf, species = input$species_choice)
 
       if(all(is.na(tab_species))) {
         updateMatrixInput(session, inputId = "mat_fill_vr",
@@ -695,9 +695,76 @@ server <- function(input, output, session){
     }
   })
 
+
+
+
+
+
+
+
+
+
+
+
+
+
   ## VALUES
   output$pop_size_mean_info <- renderText({  paste0("Moyenne : ", param$pop_size_mean) })
   output$pop_size_se_info <- renderText({  paste0("Erreur-type : ", param$pop_size_se) })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ## Show Popsize by age (table)
+  # Function to create the table
+  make_mat_popsizes <- function(data_sf, species, pop_size, pop_size_unit, survivals, fecundities){
+    nam <- data_sf %>%
+      filter(Nom_espece == species) %>%
+      select(classes_age) %>%
+      unlist
+
+    matrix(round(pop_vector(pop_size = pop_size, pop_size_type = pop_size_unit, s = survivals, f = fecundities)),
+           nrow = 1,
+           dimnames = list("Effectifs", nam)
+    )
+  }
+
+  # Display the table
+  output$pop_size_by_age <- renderTable({
+    req(param$survivals, param$fecundities)
+    make_mat_popsizes(data_sf = data_sf, species = input$species_choice, pop_size = param$pop_size_mean,
+                      pop_size_unit = input$pop_size_unit, s = param$survivals, f = param$fecundities)
+  },
+  width = "100%",
+  rownames = FALSE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   #################################
@@ -705,7 +772,6 @@ server <- function(input, output, session){
   ##-------------------------------
   output$pop_growth_mean_info <- renderText({  paste0("Moyenne : ", param$pop_growth_mean) })
   output$pop_growth_se_info <- renderText({  paste0("Erreur-type : ", param$pop_growth_se) })
-
 
   #################################
   ## Carrying capacity
@@ -930,12 +996,9 @@ server <- function(input, output, session){
   #############################################
   ## Survivals, fecundities and rMAX_species
   ##-------------------------------------------
-  observeEvent({
-    input$run
-  }, {
+  observe({
     param$survivals <- input$mat_fill_vr[,1]
     param$fecundities <- input$mat_fill_vr[,2]
-    param$rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
   }) # end observeEvent
   #####
 
@@ -945,6 +1008,10 @@ server <- function(input, output, session){
   observeEvent({
     input$run
   },{
+
+    # we also define rMAX here
+    param$rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
+
     param$vr_calibrated <- calibrate_params(
       inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
       f = param$fecundities, s = param$survivals, lam0 = param$pop_growth_mean
