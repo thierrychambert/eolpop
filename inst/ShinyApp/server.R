@@ -760,20 +760,15 @@ server <- function(input, output, session){
 
   }) # end observeEvent species_list
 
-  # Display output table
+  # Display vital rates output table
   output$vital_rates_info <- renderTable({
     input$mat_fill_vr
   }, rownames = TRUE)
 
-
-
-
-
-
+  # Display intrinsic lambda (based solely on Leslie matrix)
   output$lambda0_info <- renderUI({
     lam <- lambda(build_Leslie(s = input$mat_fill_vr[,1], f = input$mat_fill_vr[,2]))
     withMathJax(sprintf("$$\\lambda = %.02f$$", lam))
-    #$$P(X \\leq %.03f ) = %.03f$$"
     })
 
 

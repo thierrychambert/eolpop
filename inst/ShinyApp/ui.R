@@ -148,9 +148,8 @@ rm(list = ls(all.names = TRUE))
               ), # close fluidRow
 
 
-
-
-              ## HERE
+              # Display the intrinsic lambda(i.e., based solely on the Leslie matrix)
+              # NOTE : the first piece(tags$head...) ensures that output is left aligned
               tags$head(
                 tags$style(HTML("
                     div.MathJax_Display{
@@ -159,11 +158,9 @@ rm(list = ls(all.names = TRUE))
                 "))
               ),
 
-              #br(""),
+              # Output display (intrinsic lambda)
               h5(strong("Taux de croissance intrinsèque")),
               span(uiOutput(outputId = "lambda0_info"), style = "color:black; font-size:16px"),
-
-
 
       )}, # close column
 
