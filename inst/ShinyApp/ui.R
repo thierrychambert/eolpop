@@ -159,7 +159,18 @@ rm(list = ls(all.names = TRUE))
               ),
 
               # Output display (intrinsic lambda)
-              h5(strong("Taux de croissance intrinsèque")),
+              h5(strong("Taux de croissance intrinsèque"),
+                 bsButton("Q_lambda0_info", label = "", icon = icon("question"), size = "extra-small"),
+                 bsPopover(id = "Q_lambda0_info",
+                           title = "Taux de croissance intrinsèque",
+                           content = HTML(
+                             "Taux de croissance basé seulement sur la matrice de Leslie (survies et fécondités de l\\'espèce), <b> avant considération de la tendance de population locale</b>. <br><br>Ce taux de croissance est fourni simplement à titre informatif. La valeur qui sera utilisée dans les simulations correspond au taux de croissance fourni dans la partie \\'Tendance de population\\'."
+                           ),
+                           placement = "right",
+                           trigger = "click",
+                           options = list(container='body')
+                 )
+              ),
               span(uiOutput(outputId = "lambda0_info"), style = "color:black; font-size:16px"),
 
       )}, # close column

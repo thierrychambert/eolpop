@@ -670,7 +670,7 @@ server <- function(input, output, session){
   }
 
   # Display the table       (Note the delay : piece is just there to avoid an error message - time for parameters to be "loaded in")
-  delay(200,
+  delay(ms = 200,
         output$pop_size_by_age <- renderTable({
           if(any(is.na(param$survivals)) | any(is.na(param$fecundities))){
             matrix("Valeurs de survies et/ ou de fécondités manquantes",
@@ -766,13 +766,12 @@ server <- function(input, output, session){
   }, rownames = TRUE)
 
   # Display intrinsic lambda (based solely on Leslie matrix)
-  output$lambda0_info <- renderUI({
-    lam <- lambda(build_Leslie(s = input$mat_fill_vr[,1], f = input$mat_fill_vr[,2]))
-    withMathJax(sprintf("$$\\lambda = %.02f$$", lam))
-    })
-
-
-
+  delay(ms = 300,
+        output$lambda0_info <- renderUI({
+          lam <- lambda(build_Leslie(s = input$mat_fill_vr[,1], f = input$mat_fill_vr[,2]))
+          withMathJax(sprintf("$$\\lambda = %.02f$$", lam))
+        })
+  )
   #####
 
 
