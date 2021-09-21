@@ -654,18 +654,6 @@ server <- function(input, output, session){
   output$pop_size_mean_info <- renderText({  paste0("Moyenne : ", param$pop_size_mean) })
   output$pop_size_se_info <- renderText({  paste0("Erreur-type : ", param$pop_size_se) })
 
-
-
-
-
-
-
-
-
-
-
-
-
   ## Show Popsize by age (table)
   # Function to create the table
   make_mat_popsizes <- function(data_sf, species, pop_size, pop_size_unit, survivals, fecundities){
@@ -696,7 +684,6 @@ server <- function(input, output, session){
         rownames = FALSE,
         digits = 0)
     )
-
 
 
   #################################
@@ -778,6 +765,16 @@ server <- function(input, output, session){
     input$mat_fill_vr
   }, rownames = TRUE)
 
+
+
+
+
+
+  output$lambda0_info <- renderUI({
+    lam <- lambda(build_Leslie(s = input$mat_fill_vr[,1], f = input$mat_fill_vr[,2]))
+    withMathJax(sprintf("$$\\lambda = %.02f$$", lam))
+    #$$P(X \\leq %.03f ) = %.03f$$"
+    })
 
 
 

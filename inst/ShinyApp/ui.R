@@ -10,6 +10,7 @@ rm(list = ls(all.names = TRUE))
   library(shinyMatrix)
   library(tidyverse)
   library(eolpop)
+  library(popbio)
 
   ## Load species list
   species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")
@@ -150,6 +151,17 @@ rm(list = ls(all.names = TRUE))
 
 
               ## HERE
+              tags$head(
+                tags$style(HTML("
+                    div.MathJax_Display{
+                    text-align: left !important;
+                    }
+                "))
+              ),
+
+              #br(""),
+              h5(strong("Taux de croissance intrinsèque")),
+              span(uiOutput(outputId = "lambda0_info"), style = "color:black; font-size:16px"),
 
 
 
