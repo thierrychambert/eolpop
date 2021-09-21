@@ -695,35 +695,9 @@ server <- function(input, output, session){
     }
   })
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   ## VALUES
   output$pop_size_mean_info <- renderText({  paste0("Moyenne : ", param$pop_size_mean) })
   output$pop_size_se_info <- renderText({  paste0("Erreur-type : ", param$pop_size_se) })
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   ## Show Popsize by age (table)
   # Function to create the table
@@ -741,30 +715,18 @@ server <- function(input, output, session){
 
   # Display the table
   output$pop_size_by_age <- renderTable({
-    req(param$survivals, param$fecundities)
-    make_mat_popsizes(data_sf = data_sf, species = input$species_choice, pop_size = param$pop_size_mean,
-                      pop_size_unit = input$pop_size_unit, s = param$survivals, f = param$fecundities)
+    #req(param$survivals, param$fecundities)
+    if(any(is.na(param$survivals)) | any(is.na(param$fecundities))){
+      matrix("Valeurs de survies et/ ou de fécondités manquantes",
+             nrow = 1, dimnames = list(NULL, "Erreur"))
+    }else{
+      make_mat_popsizes(data_sf = data_sf, species = input$species_choice, pop_size = param$pop_size_mean,
+                        pop_size_unit = input$pop_size_unit, s = param$survivals, f = param$fecundities)
+    } # end if
   },
-  width = "100%",
-  rownames = FALSE)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  width = "500px",
+  rownames = FALSE,
+  digits = 0)
 
 
   #################################
@@ -804,6 +766,10 @@ server <- function(input, output, session){
   output$vital_rates_info <- renderTable({
     input$mat_fill_vr
   }, rownames = TRUE)
+
+
+
+
   #####
 
 

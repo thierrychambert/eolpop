@@ -144,7 +144,15 @@ rm(list = ls(all.names = TRUE))
                    )
                 ),
                 tableOutput(outputId = "vital_rates_info"),
-              ),
+              ), # close fluidRow
+
+
+
+
+              ## HERE
+
+
+
       )}, # close column
 
 
@@ -369,6 +377,7 @@ rm(list = ls(all.names = TRUE))
 
 
                               # Display matrix for stable age distribution
+                              h5(strong("Effectifs par classe d'âge")),
                               tableOutput("pop_size_by_age"),
 
               )}, # close conditional panel
