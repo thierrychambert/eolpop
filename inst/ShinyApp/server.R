@@ -244,51 +244,6 @@ server <- function(input, output, session){
 
   #####
 
-  ################################################
-  ## Update the vital rate matrix (mat_fill_vr)
-  ##   when changing species in the list
-  ##----------------------------------------------
-  # Function to create the matrix
-  make_mat_vr <- function(data_sf, species){
-    out_mat <- data_sf %>%
-      filter(Nom_espece == species) %>%
-      select(classes_age, survie, fecondite)
-    return(out_mat)
-  }
-
-  # Update the vital rate matrix (mat_fill_vr) when changing species in the list
-  observeEvent({
-    input$species_choice
-  }, {
-
-    if(input$species_choice == "Espèce générique") {} else {
-
-      tab_species <- make_mat_vr(data_sf = data_sf, species = input$species_choice)
-
-      if(all(is.na(tab_species))) {
-        updateMatrixInput(session, inputId = "mat_fill_vr",
-                          value = matrix(data = NA,
-                                         nrow = 4,
-                                         ncol = 2,
-                                         dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "Fécondité"))))
-
-      } else {
-        number_age_class <- nrow(tab_species)
-        ages <- tab_species$classes_age
-        survivals <- tab_species$survie
-        fecundities <- tab_species$fecondite
-
-        updateMatrixInput(session, inputId = "mat_fill_vr",
-                          value = matrix(data = c(survivals, fecundities),
-                                         nrow = number_age_class,
-                                         ncol = 2,
-                                         dimnames = list(ages, c("Survie", "Fécondité"))))
-      } # end if 2
-    } # end if 1
-
-  }) # end observeEvent species_list
-  #####
-
   ##############################################
   ## Update matrix cumulated impact
   ##-------------------------------------------
@@ -763,6 +718,47 @@ server <- function(input, output, session){
   #################################
   ## Vital rates
   ##-------------------------------
+  # Function to create the matrix
+  make_mat_vr <- function(data_sf, species){
+    out_mat <- data_sf %>%
+      filter(Nom_espece == species) %>%
+      select(classes_age, survie, fecondite)
+    return(out_mat)
+  }
+
+  # Update the vital rate matrix (mat_fill_vr) when changing species in the list
+  observeEvent({
+    input$species_choice
+  }, {
+
+    if(input$species_choice == "Espèce générique") {} else {
+
+      tab_species <- make_mat_vr(data_sf = data_sf, species = input$species_choice)
+
+      if(all(is.na(tab_species))) {
+        updateMatrixInput(session, inputId = "mat_fill_vr",
+                          value = matrix(data = NA,
+                                         nrow = 4,
+                                         ncol = 2,
+                                         dimnames = list(c("Juv 0", "Sub 1", "Sub 2", "Adulte"), c("Survie", "Fécondité"))))
+
+      } else {
+        number_age_class <- nrow(tab_species)
+        ages <- tab_species$classes_age
+        survivals <- tab_species$survie
+        fecundities <- tab_species$fecondite
+
+        updateMatrixInput(session, inputId = "mat_fill_vr",
+                          value = matrix(data = c(survivals, fecundities),
+                                         nrow = number_age_class,
+                                         ncol = 2,
+                                         dimnames = list(ages, c("Survie", "Fécondité"))))
+      } # end if 2
+    } # end if 1
+
+  }) # end observeEvent species_list
+
+  # Display output table
   output$vital_rates_info <- renderTable({
     input$mat_fill_vr
   }, rownames = TRUE)
