@@ -7,7 +7,7 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 500
+nsim = 50
 
 fatalities_mean = c(0, 20)
 fatalities_se = c(0, 2.5)
@@ -15,7 +15,7 @@ fatalities_se = c(0, 2.5)
 pop_size_mean = 220
 pop_size_se = 0
 
-pop_growth_mean = 0.95
+pop_growth_mean = 1.1
 pop_growth_se = 0
 
 survivals <- c(0.5, rep(0.71, 5), 0.59)
@@ -103,11 +103,12 @@ names(run0)
 N <- run0$N ; dim(N)
 plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
 
-abline(h = K)
-
-
+min(N)
 
 out = run0
 get_metrics(N = out$N)$scenario$impact[time_horzion, "avg",-1]
 
 res = get_metrics(N = out$N, cumulated_impacts = cumulated_impacts)
+
+x11()
+plot_impact(N)

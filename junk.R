@@ -1,44 +1,36 @@
-rm(list = ls(all.names = TRUE))
-b1 = 5
-mu = 12
-b2 = 13
-Cp = 0.99
 
-vals <- matrix(c(b1, mu, b2))
+S = 0.05
+rbinom(3, size = 1, prob = S-trunc(S))
 
-out <- elicitation(vals, Cp = Cp)
+which(is.na(N), arr.ind = TRUE)
 
-plot_elicitation(out)
-abline(v = c(b1,mu,b2))
+N[,,2,498]
 
 
 
 
+s = c(0.5, 0.75, 0.9)
+f = c(0, 0.2, 0.4)
+lambda(build_Leslie(s,f))
 
+nac = 3
+N1 = c(0,0,0)
+h = 0.03
+s_corr_factor = f_corr_factor = 1.2
 
+# Survivors using the "s_realized" from reference scenarios
+S <- N1*(1-h)*s*s_corr_factor
 
+# Active rounding
+S <- round(trunc(S) + rbinom(nac, size = 1, prob = S-trunc(S)))
 
+N2 <- c(rep(0, nac-1), tail(S,1)) + c(0, head(S,-1))
 
+# Births
+B <- sum(f*f_corr_factor*N2)
 
+# Active rounding
+B <- round(trunc(B) + rbinom(1, size = 1, prob = B-trunc(B)))
 
-
-
-vals[vals == 0] <- min(min(vals[vals != 0])/100, 0.0001)
-
-# Get probability of quantiles
-probs <- sapply(X = Cp, FUN = function(Cp) c((1-Cp)/2, 0.5, Cp+(1-Cp)/2))
-
-# Fit
-fit_raw <- SHELF::fitdist(vals = vals, probs = probs, lower = lower, upper = upper, weights = weights)
-
-## Extract values (gamma)
-shape_raw <- fit_raw$Gamma$shape
-rate_raw <- fit_raw$Gamma$rate
-
-## Smoothing
-v_new <- seq(min(vals), max(vals), length.out = 100)
-p_new <- SHELF::plinearpool(fit = fit_raw, x = v_new, d = "gamma", w = 1)
-fit_smooth <- SHELF::fitdist(vals = v_new, probs = p_new, lower = lower, upper = upper, weights = 1)
-
-v_new
-p_new
+N2[1] <- B
+N2

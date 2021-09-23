@@ -439,12 +439,12 @@ rm(list = ls(all.names = TRUE))
                                            # Interval
                                            numericInput(inputId = "pop_growth_lower",
                                                         label = "Borne inférieure (taux d'accroissement)",
-                                                        value = 1.05,
+                                                        value = 1.03,
                                                         min = 0, max = Inf, step = 0.01),
 
                                            numericInput(inputId = "pop_growth_upper",
                                                         label = "Borne supérieure (taux d'accroissement)",
-                                                        value = 1.10,
+                                                        value = 1.07,
                                                         min = 0, max = Inf, step = 0.01),
 
                                            ## Input values: mean and se

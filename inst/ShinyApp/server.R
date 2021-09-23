@@ -407,8 +407,8 @@ server <- function(input, output, session){
     clip(xx[1], xx[2], -100, y_mu)
     abline(v = mu, lwd = 2, col = "darkblue", lty = 2)
 
-    if(show_mode) mtext(text = paste("Mode = ", round(MU, 1)), side = 3, line = 4, cex = 1.2, adj = 0)
-    if(show_mean) mtext(text = paste("Moyenne = ", round(mu, 1)), side = 3, line = 2.5, cex = 1.2, adj = 0)
+    if(show_mode) mtext(text = paste("Mode = ", round(MU, 2)), side = 3, line = 4, cex = 1.2, adj = 0)
+    if(show_mean) mtext(text = paste("Moyenne = ", round(mu, 2)), side = 3, line = 2.5, cex = 1.2, adj = 0)
     if(show_se) mtext(text = paste("Erreur-type = ", round(se, 2)), side = 3, line = 1, cex = 1.2, adj = 0)
   } # end function plot_gamma
 
