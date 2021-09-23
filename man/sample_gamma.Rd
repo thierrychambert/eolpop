@@ -2,7 +2,7 @@
 % Please edit documentation in R/sample_gamma.R
 \name{sample_gamma}
 \alias{sample_gamma}
-\title{Draw values from a Custom Gamma Distribution to force a Normal shape (symmetrical bell curve)}
+\title{Draw values from a Custom Gamma Distribution using mean and standard deviation as inputs}
 \usage{
 sample_gamma(n, mu, sd, r = 3)
 }
@@ -19,7 +19,7 @@ sample_gamma(n, mu, sd, r = 3)
 a vector of drawn values.
 }
 \description{
-Draw values from a Custom Gamma Distribution to force a Normal shape (symmetrical bell curve)
+Draw values from a Custom Gamma Distribution using mean and standard deviation as inputs
 }
 \examples{
 sample_gamma(n= 5, mu = 4, sd = 1.5)

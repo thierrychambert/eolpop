@@ -1,40 +1,42 @@
 rm(list = ls(all.names = TRUE))
 graphics.off()
 library(popbio)
+library(magrittr)
 
 ## Libraries
 library(eolpop)
 
 ## Inputs
-nsim = 10
+nsim = 500
 
-fatalities_mean = c(0, 10, 5)
-fatalities_se = c(0, 0.05, 0.05)
+fatalities_mean = c(0, 20)
+fatalities_se = c(0, 2.5)
 
-pop_size_mean = 200
-pop_size_se = 25
+pop_size_mean = 220
+pop_size_se = 0
 
-pop_growth_mean = 1.1
+pop_growth_mean = 0.95
 pop_growth_se = 0
 
-survivals <- c(0.5, 0.7, 0.8, 0.95)
-fecundities <- c(0, 0, 0.05, 0.55)
+survivals <- c(0.5, rep(0.71, 5), 0.59)
+fecundities <- c(0, 0.21, rep(1.08, 5))
 
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
 time_horzion = 30
-coeff_var_environ = 0.10
+coeff_var_environ = 0
 fatal_constant = "h"
-pop_size_type = "Ntotal"
+pop_size_type = "Npair"
 
-cumulated_impacts = TRUE
+cumulated_impacts = FALSE
 
 onset_year = c(2010, 2013, 2016)
 onset_time = onset_year - min(onset_year) + 1
 onset_time = c(min(onset_time), onset_time)
 
 # Pop size total
-sum(pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = survivals, f = fecundities))
-
+N000 <- pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = survivals, f = fecundities)
+sum(N000)
+rm(N000)
 
 # Define K
 carrying_capacity = 500
@@ -50,6 +52,7 @@ rMAX_species
 pop_growth_mean <- min(1 + rMAX_species, pop_growth_mean)
 pop_growth_mean
 
+lambda( build_Leslie(s = survivals, f = fecundities) )
 
 ##--------------------------------------------
 ##  Calibration                             --
@@ -62,21 +65,10 @@ f_calibrated <- tail(vr_calibrated, length(fecundities))
 
 lambda( build_Leslie(s = s_calibrated, f = f_calibrated) )
 
-
-
-#pop_size_mean = 200
-#pop_growth_mean = 1.1
-#fatal_constant = "M"
-#cumulated_impacts = FALSE
-
-pop_growth_mean = 1.1
-pop_size_type = "Ntotal"
-carrying_capacity = 500
-
-
 ##==============================================================================
 ##                         Analyses (simulations)                             ==
 ##==============================================================================
+system.time(
 run0 <- run_simul(nsim = nsim,
                             cumulated_impacts = cumulated_impacts,
 
@@ -102,7 +94,7 @@ run0 <- run_simul(nsim = nsim,
                             time_horzion = time_horzion,
                             coeff_var_environ = coeff_var_environ,
                             fatal_constant = fatal_constant)
-
+)
 
 #####################################################
 
@@ -110,6 +102,7 @@ run0 <- run_simul(nsim = nsim,
 names(run0)
 N <- run0$N ; dim(N)
 plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
+
 abline(h = K)
 
 
@@ -118,5 +111,3 @@ out = run0
 get_metrics(N = out$N)$scenario$impact[time_horzion, "avg",-1]
 
 res = get_metrics(N = out$N, cumulated_impacts = cumulated_impacts)
-round(t(res$indiv_farm$impact[time_horzion, -2, -1]),2)*100
-

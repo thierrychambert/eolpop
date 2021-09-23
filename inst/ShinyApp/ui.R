@@ -10,6 +10,7 @@ rm(list = ls(all.names = TRUE))
   library(shinyMatrix)
   library(tidyverse)
   library(eolpop)
+  library(popbio)
 
   ## Load species list
   species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")
@@ -21,9 +22,10 @@ rm(list = ls(all.names = TRUE))
 
   # Fixed parameters (for now)
   nsim = 10
-  coeff_var_environ = 0.10
+  coeff_var_environ = 0.03
   time_horzion = 30
   theta = 1 # DD parameter theta
+  CP = 0.99 # Coverage probability for lower - upper values
 }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
@@ -111,7 +113,7 @@ rm(list = ls(all.names = TRUE))
 
               # Choose species (selectInput)
               {selectInput(inputId = "species_choice",
-                          selected = 1, width = '80%',
+                          selected = "Faucon crécerellette", width = '80%',
                           label = h4(strong("Sélectionner une espèce"),
                                      bsButton("Q_species_choice", label = "", icon = icon("question"), size = "extra-small"),
                                      bsPopover(id = "Q_species_choice",
@@ -143,7 +145,34 @@ rm(list = ls(all.names = TRUE))
                    )
                 ),
                 tableOutput(outputId = "vital_rates_info"),
+              ), # close fluidRow
+
+
+              # Display the intrinsic lambda(i.e., based solely on the Leslie matrix)
+              # NOTE : the first piece(tags$head...) ensures that output is left aligned
+              tags$head(
+                tags$style(HTML("
+                    div.MathJax_Display{
+                    text-align: left !important;
+                    }
+                "))
               ),
+
+              # Output display (intrinsic lambda)
+              h5(strong("Taux de croissance intrinsèque"),
+                 bsButton("Q_lambda0_info", label = "", icon = icon("question"), size = "extra-small"),
+                 bsPopover(id = "Q_lambda0_info",
+                           title = "Taux de croissance intrinsèque",
+                           content = HTML(
+                             "Taux de croissance basé seulement sur la matrice de Leslie (survies et fécondités de l\\'espèce), <b> avant considération de la tendance de population locale</b>. <br><br>Ce taux de croissance est fourni simplement à titre informatif. La valeur qui sera utilisée dans les simulations correspond au taux de croissance fourni dans la partie \\'Tendance de population\\'. <br><br>NOTE : &lambda; = 1.05 correspond à 5% de croissance annuelle. &lambda; = 0.93 correspond à 7% de déclin par an. "
+                           ),
+                           placement = "right",
+                           trigger = "click",
+                           options = list(container='body')
+                 )
+              ),
+              span(uiOutput(outputId = "lambda0_info", inline = TRUE), style = "color:black; font-size:16px"),
+
       )}, # close column
 
 
@@ -220,16 +249,30 @@ rm(list = ls(all.names = TRUE))
 
                                            radioButtons(inputId = "fatalities_input_type",
                                                         label = "Type de saisie",
-                                                        choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
+                                                        choices = c("Intervalle" = "itvl",
+                                                                    "Valeurs" = "val",
+                                                                    "Elicitation d'expert" = "eli_exp")),
+
+                                           # Interval
+                                           numericInput(inputId = "fatalities_lower",
+                                                        label = "Borne inférieure (mortalités annuelles)",
+                                                        value = 4.9,
+                                                        min = 0, max = Inf, step = 0.5),
+
+                                           numericInput(inputId = "fatalities_upper",
+                                                        label = "Borne supérieure (mortalités annuelles)",
+                                                        value = 38.7,
+                                                        min = 0, max = Inf, step = 0.5),
 
                                            # Values
                                            numericInput(inputId = "fatalities_mean",
-                                                        label = "Moyenne des mortalités annuelles",
-                                                        value = 5,
+                                                        label = "Moyenne (mortalités annuelles)",
+                                                        value = 2.2,
                                                         min = 0, max = Inf, step = 0.5),
+
                                            numericInput(inputId = "fatalities_se",
-                                                        label = "Erreur-type des mortalités annuelles",
-                                                        value = 0.05,
+                                                        label = "Erreur-type (mortalités annuelles)",
+                                                        value = 0.5,
                                                         min = 0, max = Inf, step = 0.1),
 
                                            # Matrix for expert elicitation
@@ -251,6 +294,18 @@ rm(list = ls(all.names = TRUE))
                                                         value = 3, min = 2, max = Inf, step = 1),
 
                                            matrixInput(inputId = "fatalities_mat_cumulated",
+                                                       label = span("Mortalités dans chaque parc",
+                                                                      bsButton("Q_fatalities_mat_cumulated", label = "", icon = icon("question"), size = "extra-small"),
+                                                                      bsPopover(id = "Q_fatalities_mat_cumulated",
+                                                                                title = "Mortalités cumulées",
+                                                                                content = HTML(
+                                                                                  "1 ligne = 1 parc <br><br>Les parcs doivent être fournis dans l\\'<b>ordre chronologique</b> de leur mise en service (\\'Année début\\'). <br><br>Pour chaque parc, veuillez indiquer la <u>moyenne</u> et l\\'<u>erreur-type</u> du nombre de mortalités estimées, ainsi que son <u>année de mise en service</u>."
+                                                                                  ),
+                                                                                placement = "right",
+                                                                                trigger = "click",
+                                                                                options = list(container='body')
+                                                                      )
+                                                       ),
                                                        value = matrix(init_cumul, 3, 3,
                                                                       dimnames = list(c(paste0("Parc num.", c(1:3))),
                                                                                       c("Moyenne",
@@ -294,15 +349,29 @@ rm(list = ls(all.names = TRUE))
                                  radioButtons(inputId = "pop_size_unit", inline = TRUE,
                                               label = "Unité",
                                               choices = c("Nombre de couples" = "Npair", "Effectif total" = "Ntotal"),
-                                              selected = "Ntotal"),
+                                              selected = "Npair"),
                               )}, # close wellPanel 1
 
                               {wellPanel(style = "background:#F0F8FF",
 
                                          radioButtons(inputId = "pop_size_input_type",
                                                       label = "Type de saisie",
-                                                      choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
+                                                      choices = c("Intervalle" = "itvl",
+                                                                  "Valeurs" = "val",
+                                                                  "Elicitation d'expert" = "eli_exp")),
 
+                                         # Interval
+                                         numericInput(inputId = "pop_size_lower",
+                                                      label = "Borne inférieure (taille population)",
+                                                      value = 220,
+                                                      min = 0, max = Inf, step = 10),
+
+                                         numericInput(inputId = "pop_size_upper",
+                                                      label = "Borne supérieure (taille population)",
+                                                      value = 230,
+                                                      min = 0, max = Inf, step = 10),
+
+                                         # Values
                                          numericInput(inputId = "pop_size_mean",
                                                       label = "Moyenne de la taille de la population",
                                                       value = 200,
@@ -313,6 +382,7 @@ rm(list = ls(all.names = TRUE))
                                                       value = 25,
                                                       min = 0, max = Inf, step = 1),
 
+                                         # Matrix for expert elicitation
                                          matrixInput(inputId = "pop_size_mat_expert",
                                                      value = matrix(data = eli_pop_size, nrow = 4, ncol = 5,
                                                                     dimnames = list(c("#1", "#2", "#3", "#4"),
@@ -324,6 +394,11 @@ rm(list = ls(all.names = TRUE))
 
                                          actionButton(inputId = "pop_size_run_expert", label = "Utiliser valeurs experts"),
                               )}, # close wellPanel 2
+
+
+                              # Display matrix for stable age distribution
+                              h5(strong("Effectifs par classe d'âge")),
+                              tableOutput("pop_size_by_age"),
 
               )}, # close conditional panel
 
@@ -357,19 +432,30 @@ rm(list = ls(all.names = TRUE))
 
                                            radioButtons(inputId = "pop_growth_input_type",
                                                         label = "Type de saisie",
-                                                        choices = c("Taux de croissance" = "val",
+                                                        choices = c("Intervalle" = "itvl",
+                                                                    "Taux d'accroissement" = "val",
                                                                     "Elicitation d'expert" = "eli_exp",
                                                                     "Tendance locale ou régionale" = "trend")),
+                                           # Interval
+                                           numericInput(inputId = "pop_growth_lower",
+                                                        label = "Borne inférieure (taux d'accroissement)",
+                                                        value = 1.05,
+                                                        min = 0, max = Inf, step = 0.01),
+
+                                           numericInput(inputId = "pop_growth_upper",
+                                                        label = "Borne supérieure (taux d'accroissement)",
+                                                        value = 1.10,
+                                                        min = 0, max = Inf, step = 0.01),
 
                                            ## Input values: mean and se
                                            numericInput(inputId = "pop_growth_mean",
-                                                        label = "Moyenne de la croissance de la population",
-                                                        value = 1.1,
+                                                        label = "Moyenne (taux d'accroissement)",
+                                                        value = 0.99,
                                                         min = 0, max = Inf, step = 0.01),
 
                                            numericInput(inputId = "pop_growth_se",
-                                                        label = "Erreur-type de la croissance de la population",
-                                                        value = 0.01,
+                                                        label = "Erreur-type (taux d'accroissement)",
+                                                        value = 0,
                                                         min = 0, max = Inf, step = 0.01),
 
                                            ## Input expert elicitation: table
@@ -450,7 +536,7 @@ rm(list = ls(all.names = TRUE))
 
                                            numericInput(inputId = "carrying_capacity",
                                                         label = "Capacité de charge",
-                                                        value = 500,
+                                                        value = 1000,
                                                         min = 0, max = Inf, step = 100),
 
                                            matrixInput(inputId = "carrying_cap_mat_expert",

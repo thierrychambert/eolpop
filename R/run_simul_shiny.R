@@ -133,14 +133,14 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
         vr <- calibrate_params(inits = inits, f = fecundities, s = survivals, lam0 = lam0)
         s <- head(vr, length(survivals))
         f <- tail(vr, length(fecundities))
-        lam_it[sim] <- lambda(build_Leslie(s,f))
+        lam_it[sim] <- round(lambda(build_Leslie(s,f)),2)
 
       }else{
 
         # No parameter uncertainty on population growth
         s <- survivals
         f <- fecundities
-        lam_it[sim] <- lambda(build_Leslie(s,f))
+        lam_it[sim] <- round(lambda(build_Leslie(s,f)),2)
 
       } # End if/else
 
@@ -150,7 +150,7 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
       if(is.null(model_demo)){
 
         ## Define the complete model by default
-        model_demo <- M4_WithDD_WithDemoStoch
+        model_demo <- M1_noDD_noDemoStoch # M4_WithDD_WithDemoStoch
 
         # DECLINING (or stable), but initially LARGE population
         if(lam_it[sim] <= 1 & sum(N0) > 3000) model_demo <- M1_noDD_noDemoStoch

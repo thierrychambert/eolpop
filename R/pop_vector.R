@@ -30,7 +30,13 @@ pop_vector <- function(pop_size, pop_size_type = "Npair", s, f){
   if(match.arg(arg = pop_size_type, choices = c("Npair","Ntotal")) == "Npair"){
 
     # If N0 is nb of pairs
-    N0 <- round(stable.stage(A) * (N00*2)/tail(stable.stage(A),1))
+
+    mature <- which(f != 0) # identify mature age classes
+
+    N0 <- round(stable.stage(A) * (N00*2)/sum(stable.stage(A)[mature]))
+
+    # Correct small difference due to rounding (not always needed)
+    N0[mature][1] <- N0[mature][1] - (sum(N0[mature]) - (N00*2))
 
   }else{
 

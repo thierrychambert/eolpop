@@ -76,7 +76,8 @@ M2_noDD_WithDemoStoch <- function(N1, s, f, h, DD_params = NULL){
   nac = length(s)
 
   # Survivors (to "natural mortality" (s) and Wind Turbine Fatalities (1-h))
-  S <- rbinom(nac, N1, (1-h)*s)
+  S <- rbinom(nac, N1, s)
+  S <- round((1-h)*S)
   N2 <- c(rep(0, nac-1), tail(S,1)) + c(0, head(S,-1))
 
   # Births
@@ -151,9 +152,9 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params){
 
 
   ## Check if approximation is close enough to desired lambda
-  if( abs((lambda(build_Leslie(s = s_Nt, f = f_Nt)) - lam_Nt) / lam_Nt) > 0.005 ){
+ if( abs((lambda(build_Leslie(s = s_Nt, f = f_Nt)) - lam_Nt) / lam_Nt) > 0.05 ){
 
-    # If difference is too large : Use optimisation function for better calibration
+    #If difference is too large : Use optimisation function for better calibration
     inits <- c(tail(vr_Nt, length(f)), head(vr_Nt, length(s)) %>% sapply(min, 0.999))
     inits <- inits[inits != 0]
     vr_calib <- calibrate_params(inits = inits, f = f_Nt, s = s_Nt, lam0 = lam_Nt)
@@ -226,7 +227,7 @@ M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params){
 
 
   ## Check if approximation is close enough to desired lambda
-  if( abs((lambda(build_Leslie(s = s_Nt, f = f_Nt)) - lam_Nt) / lam_Nt) > 0.005 ){
+  if( abs((lambda(build_Leslie(s = s_Nt, f = f_Nt)) - lam_Nt) / lam_Nt) > 0.05 ){
 
     # If difference is too large : Use optimisation function for better calibration
     inits <- c(tail(vr_Nt, length(f)), head(vr_Nt, length(s)) %>% sapply(min, 0.999))
@@ -242,7 +243,8 @@ M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params){
   nac = length(s)
 
   # Survivors (to "natural mortality" (s) and Wind Turbine Fatalities (1-h))
-  S <- rbinom(nac, N1, (1-h)*s_Nt)
+  S <- rbinom(nac, N1, s_Nt)
+  S <- round((1-h)*S)
   N2 <- c(rep(0, nac-1), tail(S,1)) + c(0, head(S,-1))
 
   # Births

@@ -62,23 +62,24 @@ server <- function(input, output, session){
     #------------
     # Hide all
     #------------
-    #shinyjs::hide("fatal_constant")
-    #shinyjs::hide("fatalities_input_type")
     shinyjs::hide("fatalities_mean")
     shinyjs::hide("fatalities_se")
+    shinyjs::hide("fatalities_lower")
+    shinyjs::hide("fatalities_upper")
     shinyjs::hide("fatalities_mat_expert")
     shinyjs::hide("fatalities_run_expert")
     shinyjs::hide("farm_number_cumulated")
     shinyjs::hide("fatalities_mat_cumulated")
 
-    #shinyjs::hide("pop_size_unit")
-    #shinyjs::hide("pop_size_input_type")
+    shinyjs::hide("pop_size_lower")
+    shinyjs::hide("pop_size_upper")
     shinyjs::hide("pop_size_mean")
     shinyjs::hide("pop_size_se")
     shinyjs::hide("pop_size_mat_expert")
     shinyjs::hide("pop_size_run_expert")
 
-    #shinyjs::hide("pop_growth_input_type")
+    shinyjs::hide("pop_growth_lower")
+    shinyjs::hide("pop_growth_upper")
     shinyjs::hide("pop_growth_mean")
     shinyjs::hide("pop_growth_se")
     shinyjs::hide("pop_growth_mat_expert")
@@ -86,8 +87,6 @@ server <- function(input, output, session){
     shinyjs::hide("pop_trend")
     shinyjs::hide("pop_trend_strength")
 
-
-    #shinyjs::hide("carrying_cap_input_type")
     shinyjs::hide("carrying_capacity")
     shinyjs::hide("carrying_cap_mat_expert")
     shinyjs::hide("carrying_cap_run_expert")
@@ -106,6 +105,10 @@ server <- function(input, output, session){
       if(input$analysis_choice == "scenario"){
         shinyjs::show("fatalities_input_type")
 
+        if(input$fatalities_input_type == "itvl"){
+          shinyjs::show("fatalities_lower")
+          shinyjs::show("fatalities_upper")
+        }
         if(input$fatalities_input_type == "val"){
           shinyjs::show("fatalities_mean")
           shinyjs::show("fatalities_se")
@@ -128,8 +131,11 @@ server <- function(input, output, session){
 
     # Show inputs for population size part
     if(input$button_pop_size%%2 == 1){
-      #shinyjs::show("pop_size_unit")
       shinyjs::show("pop_size_input_type")
+      if(input$pop_size_input_type == "itvl"){
+        shinyjs::show("pop_size_lower")
+        shinyjs::show("pop_size_upper")
+      }
       if(input$pop_size_input_type == "val"){
         shinyjs::show("pop_size_mean")
         shinyjs::show("pop_size_se")
@@ -143,6 +149,11 @@ server <- function(input, output, session){
     # Show inputs for population trend/growth part
     if(input$button_pop_growth%%2 == 1){
       shinyjs::show("pop_growth_input_type")
+
+      if(input$pop_growth_input_type == "itvl"){
+        shinyjs::show("pop_growth_lower")
+        shinyjs::show("pop_growth_upper")
+      }
       if(input$pop_growth_input_type == "val"){
         shinyjs::show("pop_growth_mean")
         shinyjs::show("pop_growth_se")
@@ -194,9 +205,11 @@ server <- function(input, output, session){
                           cumulated_impacts = FALSE,
 
                           fatalities_mean = NULL,
+                          fatalities_mean_use = NULL,
                           fatalities_se = NULL,
                           onset_time = NULL,
                           onset_year = NULL,
+                          out_fatal = NULL,
 
                           pop_size_mean = NULL,
                           pop_size_se = NULL,
@@ -229,51 +242,6 @@ server <- function(input, output, session){
 
 
 
-  #####
-
-  ################################################
-  ## Update the vital rate matrix (mat_fill_vr)
-  ##   when changing species in the list
-  ##----------------------------------------------
-  # Function to create the matrix
-  create.matrice <- function(data_sf, species){
-    out_mat <- data_sf %>%
-      filter(species == data_sf$Nom_espece) %>%
-      select(classes_age, survie, fecondite)
-    return(out_mat)
-  }
-
-  # Update the vital rate matrix (mat_fill_vr) when changing species in the list
-  observeEvent({
-    input$species_choice
-  }, {
-
-    if(input$species_choice == "Espèce générique") {} else {
-
-      tab_species <- create.matrice(data_sf = data_sf, species = input$species_choice)
-
-      if(all(is.na(tab_species))) {
-        updateMatrixInput(session, inputId = "mat_fill_vr",
-                          value = matrix(data = NA,
-                                         nrow = 4,
-                                         ncol = 2,
-                                         dimnames = list(c("Juv 1", "Juv 2", "Juv 3", "Adulte"), c("Survie", "Fécondité"))))
-
-      } else {
-        number_age_class <- nrow(tab_species)
-        ages <- tab_species$classes_age
-        survivals <- tab_species$survie
-        fecundities <- tab_species$fecondite
-
-        updateMatrixInput(session, inputId = "mat_fill_vr",
-                          value = matrix(data = c(survivals, fecundities),
-                                         nrow = number_age_class,
-                                         ncol = 2,
-                                         dimnames = list(ages, c("Survie", "Fécondité"))))
-      } # end if 2
-    } # end if 1
-
-  }) # end observeEvent species_list
   #####
 
   ##############################################
@@ -415,23 +383,32 @@ server <- function(input, output, session){
   ##--------------------------------------------
 
   # Function to plot a gamma distribution
-  plot_gamma <- function(mu, se, show_mean = TRUE, show_se = TRUE, ...){
+  plot_gamma <- function(mu, se, show_mode = TRUE, show_mean = TRUE, show_se = TRUE, ...){
 
     ## Define shape and scale parameter of gamma distribution
     shape = (mu/se)^2
     scale = se^2/mu
 
     ## Plot the curve
+    par(mar = c(5, 4, 6, 2))
     curve(dgamma(x, shape=shape, scale=scale), from = max(0,mu-3*se), to = mu+4*se, lwd = 3, col = "darkblue", yaxt = "n",
           ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2)
     mtext(text = "Densité de probabilité", side = 2, line = 2, cex = 1.2)
 
-    y2 <- dgamma(x = mu, shape = shape, scale = scale)
+    # show mode
+    MU <- (shape-1)*scale
+    y_MU <- dgamma(x = MU, shape = shape, scale = scale)
     xx <- qgamma(p = c(0.01,0.99), shape = shape, scale = scale)
-    clip(xx[1], xx[2], -100, y2)
-    abline(v = mu, lwd = 3, col = "darkblue")
+    clip(xx[1], xx[2], -100, y_MU)
+    abline(v = MU, lwd = 3, col = "darkblue")
 
-    if(show_mean) mtext(text = paste("Moyenne = ", round(mu, 2)), side = 3, line = 2.5, cex = 1.2, adj = 0)
+    # show mean
+    y_mu <- dgamma(x = mu, shape = shape, scale = scale)
+    clip(xx[1], xx[2], -100, y_mu)
+    abline(v = mu, lwd = 2, col = "darkblue", lty = 2)
+
+    if(show_mode) mtext(text = paste("Mode = ", round(MU, 1)), side = 3, line = 4, cex = 1.2, adj = 0)
+    if(show_mean) mtext(text = paste("Moyenne = ", round(mu, 1)), side = 3, line = 2.5, cex = 1.2, adj = 0)
     if(show_se) mtext(text = paste("Erreur-type = ", round(se, 2)), side = 3, line = 1, cex = 1.2, adj = 0)
   } # end function plot_gamma
 
@@ -490,16 +467,26 @@ server <- function(input, output, session){
     input$button_fatalities
     input$fatalities_input_type
     input$fatalities_run_expert
-
     input$farm_number_cumulated
     input$fatalities_mat_cumulated
   },{
+
     if(input$analysis_choice != "cumulated"){
 
-      # Show from input values: if button is ON and input_type is set on "value"
-      if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "val"){
+      # Show from input values: if button is ON and input_type is set on "value" or "itvl" (thus not "eli_exp")
+      if(input$button_fatalities%%2 == 1 & input$fatalities_input_type != "eli_exp"){
         output$title_distri_plot <- renderText({ "Mortalités annuelles" })
-        output$distri_plot <- renderPlot({ plot_gamma(mu = input$fatalities_mean, se = input$fatalities_se) })
+
+        output$distri_plot <- renderPlot({
+          if(input$fatalities_input_type == "itvl"){
+            req(input$fatalities_lower, input$fatalities_upper)
+            plot_gamma(mu = tail(param$fatalities_mean, -1), se = tail(param$fatalities_se, -1))
+          }else{
+            req(input$fatalities_mean, input$fatalities_se)
+            plot_gamma(mu = tail(param$fatalities_mean, -1), se = tail(param$fatalities_se, -1))
+          }
+        })
+
       } else {
         # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
         if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "eli_exp"){
@@ -538,13 +525,18 @@ server <- function(input, output, session){
   ## Population size
   ##----------------------
   observeEvent({
-    input$pop_size_input_type
     input$button_pop_size
+    input$pop_size_input_type
   },{
     # Show from input values: if button is ON and input_type is set on "value"
-    if(input$button_pop_size%%2 == 1 & input$pop_size_input_type == "val"){
+    if(input$button_pop_size%%2 == 1 & input$pop_size_input_type != "eli_exp"){
       output$title_distri_plot <- renderText({ "Taille initiale de la population" })
-      output$distri_plot <- renderPlot({ plot_gamma(mu = input$pop_size_mean, se = input$pop_size_se) })
+
+      output$distri_plot <- renderPlot({
+        req(param$pop_size_mean, param$pop_size_se)
+        plot_gamma(mu = param$pop_size_mean, se = param$pop_size_se)
+      })
+
     } else {
       # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
       if(input$button_pop_size%%2 == 1 & input$pop_size_input_type == "eli_exp"){
@@ -571,10 +563,16 @@ server <- function(input, output, session){
     input$pop_growth_input_type
     input$button_pop_growth
   },{
-    # Show from input values: if button is ON and input_type is set on "value"
-    if(input$button_pop_growth%%2 == 1 & input$pop_growth_input_type == "val"){
+
+    # Show from input values: if button is ON and input_type is set on "value" or "interval"
+    if(input$button_pop_growth%%2 == 1 & input$pop_growth_input_type != "eli_exp" & input$pop_growth_input_type != "trend"){
       output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
-      output$distri_plot <- renderPlot({ plot_gamma(mu = input$pop_growth_mean, se = input$pop_growth_se) })
+
+      output$distri_plot <- renderPlot({
+        req(param$pop_growth_mean, param$pop_growth_se > 0)
+        plot_gamma(mu = param$pop_growth_mean, se = param$pop_growth_se)
+      })
+
     } else {
       # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
       if(input$button_pop_growth%%2 == 1 & input$pop_growth_input_type == "eli_exp"){
@@ -656,13 +654,43 @@ server <- function(input, output, session){
   output$pop_size_mean_info <- renderText({  paste0("Moyenne : ", param$pop_size_mean) })
   output$pop_size_se_info <- renderText({  paste0("Erreur-type : ", param$pop_size_se) })
 
+  ## Show Popsize by age (table)
+  # Function to create the table
+  make_mat_popsizes <- function(data_sf, species, pop_size, pop_size_unit, survivals, fecundities){
+    nam <- data_sf %>%
+      filter(Nom_espece == species) %>%
+      select(classes_age) %>%
+      unlist %>%
+      as.vector
+
+    matrix(round(pop_vector(pop_size = pop_size, pop_size_type = pop_size_unit, s = survivals, f = fecundities)),
+           nrow = 1,
+           dimnames = list("Effectifs", nam)
+    )
+  }
+
+  # Display the table       (Note the delay : piece is just there to avoid an error message - time for parameters to be "loaded in")
+  delay(ms = 200,
+        output$pop_size_by_age <- renderTable({
+          if(any(is.na(param$survivals)) | any(is.na(param$fecundities))){
+            matrix("Valeurs de survies et/ ou de fécondités manquantes",
+                   nrow = 1, dimnames = list(NULL, "Erreur"))
+          }else{
+            make_mat_popsizes(data_sf = data_sf, species = input$species_choice, pop_size = param$pop_size_mean,
+                              pop_size_unit = input$pop_size_unit, s = param$survivals, f = param$fecundities)
+          } # end if
+        },
+        width = "500px",
+        rownames = FALSE,
+        digits = 0)
+    )
+
 
   #################################
   ## Population growth
   ##-------------------------------
   output$pop_growth_mean_info <- renderText({  paste0("Moyenne : ", param$pop_growth_mean) })
   output$pop_growth_se_info <- renderText({  paste0("Erreur-type : ", param$pop_growth_se) })
-
 
   #################################
   ## Carrying capacity
@@ -692,9 +720,58 @@ server <- function(input, output, session){
   #################################
   ## Vital rates
   ##-------------------------------
+  # Function to create the matrix
+  make_mat_vr <- function(data_sf, species){
+    out_mat <- data_sf %>%
+      filter(Nom_espece == species) %>%
+      select(classes_age, survie, fecondite)
+    return(out_mat)
+  }
+
+  # Update the vital rate matrix (mat_fill_vr) when changing species in the list
+  observeEvent({
+    input$species_choice
+  }, {
+
+    if(input$species_choice == "Espèce générique") {} else {
+
+      tab_species <- make_mat_vr(data_sf = data_sf, species = input$species_choice)
+
+      if(all(is.na(tab_species))) {
+        updateMatrixInput(session, inputId = "mat_fill_vr",
+                          value = matrix(data = NA,
+                                         nrow = 4,
+                                         ncol = 2,
+                                         dimnames = list(c("Juv 0", "Sub 1", "Sub 2", "Adulte"), c("Survie", "Fécondité"))))
+
+      } else {
+        number_age_class <- nrow(tab_species)
+        ages <- tab_species$classes_age
+        survivals <- tab_species$survie
+        fecundities <- tab_species$fecondite
+
+        updateMatrixInput(session, inputId = "mat_fill_vr",
+                          value = matrix(data = c(survivals, fecundities),
+                                         nrow = number_age_class,
+                                         ncol = 2,
+                                         dimnames = list(ages, c("Survie", "Fécondité"))))
+      } # end if 2
+    } # end if 1
+
+  }) # end observeEvent species_list
+
+  # Display vital rates output table
   output$vital_rates_info <- renderTable({
     input$mat_fill_vr
   }, rownames = TRUE)
+
+  # Display intrinsic lambda (based solely on Leslie matrix)
+  delay(ms = 300,
+        output$lambda0_info <- renderUI({
+          lam <- lambda(build_Leslie(s = input$mat_fill_vr[,1], f = input$mat_fill_vr[,2]))
+          withMathJax(sprintf("$$\\lambda = %.02f$$", lam))
+        })
+  )
   #####
 
 
@@ -703,6 +780,10 @@ server <- function(input, output, session){
   ##--------------------------------------------
   ## Select parameter values for simulations
   ##--------------------------------------------
+  # Functions to calculate mean and SD from lower & upper values
+  get_mu <- function(lower, upper) (lower + upper)/2
+  get_sd <- function(lower, upper, coverage) ((abs(upper - lower)/2))/qnorm(1-((1-coverage)/2))
+
   #################################
   ## Cumulated impacts or not ?
   ##-------------------------------
@@ -728,7 +809,7 @@ server <- function(input, output, session){
         if(!(is.null(param$fatalities_eli_result))){
           param$fatalities_mean <- c(0, round(param$fatalities_eli_result$mean, 2))
           param$onset_time <- NULL
-          param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE, 2))
+          param$fatalities_se <- c(0, round(param$fatalities_eli_result$SE, 3))
           ready$fatalities <- TRUE
         } else {
           ready$fatalities <- FALSE
@@ -736,12 +817,21 @@ server <- function(input, output, session){
 
       } else {
 
-        # Case 1.2 : Values directly provided (i.e., not from expert elicitation)
-        ready$fatalities <- TRUE
-        param$fatalities_mean <- c(0, input$fatalities_mean)
-        param$onset_year <- NULL
-        param$onset_time <- NULL
-        param$fatalities_se <- c(0, input$fatalities_se)
+        if(input$fatalities_input_type == "val"){
+          # Case 1.2 : Values directly provided as mean & SE
+          param$fatalities_mean <- c(0, input$fatalities_mean)
+          param$onset_time <- NULL
+          param$fatalities_se <- c(0, input$fatalities_se)
+          ready$fatalities <- TRUE
+
+        }else{
+          # Case 1.3 : Values directly provided as lower/upper interval
+          param$fatalities_mean <- c(0, round(get_mu(lower = input$fatalities_lower, upper = input$fatalities_upper), 2))
+          param$onset_time <- NULL
+          param$fatalities_se <- c(0, round(get_sd(lower = input$fatalities_lower, upper = input$fatalities_upper, coverage = CP), 3))
+          ready$fatalities <- TRUE
+        } # end (if3)
+
       } # end (if2)
 
       # Case 2 : Cumulated effects (if-else 1)
@@ -770,11 +860,21 @@ server <- function(input, output, session){
         ready$pop_size <- FALSE
       }
 
-      # Case 2 : Values directly provided (i.e., not from expert elicitation)
     } else {
-      ready$pop_size <- TRUE
-      param$pop_size_mean <- input$pop_size_mean
-      param$pop_size_se <- input$pop_size_se
+
+      if(input$pop_size_input_type == "val"){
+        # Case 2 : Values directly provided as mean & SE
+        ready$pop_size <- TRUE
+        param$pop_size_mean <- input$pop_size_mean
+        param$pop_size_se <- input$pop_size_se
+
+      }else{
+        # Case 3 : Values directly provided as lower/upper interval
+        ready$pop_size <- TRUE
+        param$pop_size_mean <- round(get_mu(lower = input$pop_size_lower, upper = input$pop_size_upper), 2)
+        param$pop_size_se <- round(get_sd(lower = input$pop_size_lower, upper = input$pop_size_upper, coverage = CP), 3)
+      } # end (if3)
+
     }
     param$pop_size_unit <- input$pop_size_unit
   })
@@ -819,14 +919,27 @@ server <- function(input, output, session){
         } else {
           param$pop_growth_mean <- 1
         }
-        param$pop_growth_se <- 0.03
+        param$pop_growth_se <- 0
 
 
         # Case 3 : Values directly provided (i.e., not from expert elicitation)
       } else {
-        ready$pop_growth <- TRUE
-        param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 2)
-        param$pop_growth_se <- input$pop_growth_se
+
+        if(input$pop_growth_input_type == "val"){
+          # Case 2 : Values directly provided as mean & SE
+          ready$pop_growth <- TRUE
+          param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 3)
+          param$pop_growth_se <- input$pop_growth_se
+
+        }else{
+          # Case 3 : Values directly provided as lower/upper interval
+          ready$pop_growth <- TRUE
+          param$pop_growth_mean <- round(min(1 + param$rMAX_species,
+                                             round(get_mu(lower = input$pop_growth_lower, upper = input$pop_growth_upper), 2)
+                                             ), 3)
+          param$pop_growth_se <- round(get_sd(lower = input$pop_growth_lower, upper = input$pop_growth_upper, coverage = CP), 3)
+        } # end (if3)
+
       }
     }
   })
@@ -852,12 +965,9 @@ server <- function(input, output, session){
   #############################################
   ## Survivals, fecundities and rMAX_species
   ##-------------------------------------------
-  observeEvent({
-    input$run
-  }, {
+  observe({
     param$survivals <- input$mat_fill_vr[,1]
     param$fecundities <- input$mat_fill_vr[,2]
-    param$rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
   }) # end observeEvent
   #####
 
@@ -867,6 +977,10 @@ server <- function(input, output, session){
   observeEvent({
     input$run
   },{
+
+    # we also define rMAX here
+    param$rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
+
     param$vr_calibrated <- calibrate_params(
       inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
       f = param$fecundities, s = param$survivals, lam0 = param$pop_growth_mean
