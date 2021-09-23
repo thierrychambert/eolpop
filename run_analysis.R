@@ -1,21 +1,22 @@
 rm(list = ls(all.names = TRUE))
 graphics.off()
 library(popbio)
+library(magrittr)
 
 ## Libraries
 library(eolpop)
 
 ## Inputs
-nsim = 100
+nsim = 500
 
 fatalities_mean = c(0, 20)
-fatalities_se = c(0, 6.5)
+fatalities_se = c(0, 2.5)
 
 pop_size_mean = 220
 pop_size_se = 0
 
-pop_growth_mean = 1.05
-pop_growth_se = 0.01
+pop_growth_mean = 0.95
+pop_growth_se = 0
 
 survivals <- c(0.5, rep(0.71, 5), 0.59)
 fecundities <- c(0, 0.21, rep(1.08, 5))
