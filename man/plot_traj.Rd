@@ -4,10 +4,12 @@
 \alias{plot_traj}
 \title{Plot demographic trajectories}
 \usage{
-plot_traj(N, ...)
+plot_traj(N, len = 50, ...)
 }
 \arguments{
 \item{N}{a 4-D array containing demographic projection outputs}
+
+\item{len}{number of individual trajectories to show on the plot}
 
 \item{...}{any other graphical input similar to the R plot function}
 }

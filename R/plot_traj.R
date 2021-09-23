@@ -4,6 +4,7 @@
 #' Plot demographic trajectories
 #'
 #' @param N a 4-D array containing demographic projection outputs
+#' @param len number of individual trajectories to show on the plot
 #' @param ... any other graphical input similar to the R plot function
 #'
 #' @return a plot of individual trajectories, from each simulation run,
@@ -15,9 +16,10 @@
 #'
 #' @examples
 #' plot_traj(demo_proj, xlab = "year", ylab = "pop size")
-plot_traj <- function(N, ...){
+plot_traj <- function(N, len = 50, ...){
   TH <- dim(N)[2]
   nsim <- dim(N)[4]
+  len <- min(len, nsim)
 
   # Average trend
   N_avg <- apply(N, c(1,2,3), mean)
@@ -30,11 +32,13 @@ plot_traj <- function(N, ...){
   plot(x = 1:TH, y = colSums(N_avg[,,"sc0"]), type = 'n', col=1, lwd=3, ylim = c(0,max(colSums(N))), ...)
 
   ## Plot individual trajectories
+  sel <- sample(x = nsim, size = len)
+
   # Scenario 0
-  for(sim in 1:nsim) points(x = 1:TH, y = colSums(N[,,"sc0",sim]), type = 'l', col=col_sc0[sim])
+  for(k in 1:length(sel)) points(x = 1:TH, y = colSums(N[,,"sc0",sel[k]]), type = 'l', col=col_sc0[k])
 
   # Scenario 1
-  for(sim in 1:nsim) points(x = 1:TH, y = colSums(N[,,"sc1",sim]), type = 'l', col=col_sc1[sim])
+  for(k in 1:length(sel)) points(x = 1:TH, y = colSums(N[,,"sc1",sel[k]]), type = 'l', col=col_sc1[k])
 
   ## Plot average trend for each scenario
   # Scenario 0
