@@ -93,10 +93,19 @@ pop_project_cumulated_impacts <- function(fatalities,
 
     ## Projection : apply the LESLIE matrix calculation forward
     # Scenario 0
-    for(j in 1:nsc){
-      set.seed(seed)
-      N[,t,j] <- model_demo(N1 = N[,t-1,j], s = ss, f = ff, h = h[j], DD_params = DD_params)
-    } # j
+    j=1
+    run00 <- model_demo(N1 = N[,t-1,j], s = ss, f = ff, h = h[j], DD_params = DD_params,
+                        use_ref_vr = FALSE, s_corr_factor = NULL, f_corr_factor = NULL)
+    N[,t,j] <- run00$N2
+
+    # Other scenarios
+    if(nsc > 1){
+      for(j in 2:nsc){
+        run01 <- model_demo(N1 = N[,t-1,j], s = ss, f = ff, h = h[j], DD_params = DD_params,
+                            use_ref_vr = TRUE, s_corr_factor = run00$s_corr_factor, f_corr_factor = run00$f_corr_factor)
+        N[,t,j] <- run01$N2
+      } # j
+    } # if
 
   } # t
 

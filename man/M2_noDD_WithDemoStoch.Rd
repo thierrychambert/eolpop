@@ -7,7 +7,16 @@ In addition to natural survivals and fecundities, this demographic model include
 a specific harvest / fatality parameter.
 NOTE : This is a POST-BREEDING demographic model.}
 \usage{
-M2_noDD_WithDemoStoch(N1, s, f, h, DD_params = NULL)
+M2_noDD_WithDemoStoch(
+  N1,
+  s,
+  f,
+  h,
+  DD_params,
+  use_ref_vr = FALSE,
+  s_corr_factor = NULL,
+  f_corr_factor = NULL
+)
 }
 \arguments{
 \item{N1}{a vector of population sizes for each age class at time t1}
@@ -19,6 +28,14 @@ M2_noDD_WithDemoStoch(N1, s, f, h, DD_params = NULL)
 \item{h}{a number. The harvest or fatality rate}
 
 \item{DD_params}{density-dependence parameters. Not used in this model.}
+
+\item{use_ref_vr}{logical. If FALSE, classic demographic stichasticity is used in the model.
+If TRUE, demographic stichasticity is not applied - instead it would be mimicked from the stochasticity of a reference run
+(one must then provide s_corr_factor and f_corr_factor).}
+
+\item{s_corr_factor}{Correction factor (on survivals) used to mimick demographic stochasticity.}
+
+\item{f_corr_factor}{Correction factor (on fecundities) used to mimick demographic stochasticity.}
 }
 \value{
 a vector of population sizes for each age class at time t2
