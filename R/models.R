@@ -76,7 +76,8 @@ M2_noDD_WithDemoStoch <- function(N1, s, f, h, DD_params = NULL){
   nac = length(s)
 
   # Survivors (to "natural mortality" (s) and Wind Turbine Fatalities (1-h))
-  S <- rbinom(nac, N1, (1-h)*s)
+  S <- rbinom(nac, N1, s)
+  S <- round((1-h)*S)
   N2 <- c(rep(0, nac-1), tail(S,1)) + c(0, head(S,-1))
 
   # Births
@@ -242,7 +243,8 @@ M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params){
   nac = length(s)
 
   # Survivors (to "natural mortality" (s) and Wind Turbine Fatalities (1-h))
-  S <- rbinom(nac, N1, (1-h)*s_Nt)
+  S <- rbinom(nac, N1, s_Nt)
+  S <- round((1-h)*S)
   N2 <- c(rep(0, nac-1), tail(S,1)) + c(0, head(S,-1))
 
   # Births
