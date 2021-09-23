@@ -34,12 +34,6 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
   warning <- NULL
 
   ### Impact of each SCENARIO #####
-  ## Relative difference of population size
-  DR_N <- array(NA, dim = dim(N)[2:4],
-                dimnames = list(paste0("year", 1:dim(N)[2]),
-                                paste0("sc", (1:dim(N)[3])-1)
-                ))
-
   impact_sc <- array(NA, dim = c(dim(N)[2], 4, dim(N)[3]),
                      dimnames = list(paste0("year", 1:dim(N)[2]),
                                      c("avg", "se", "lci", "uci"),
@@ -70,18 +64,24 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
   for(j in 1:dim(N)[3]){
     # Relative Difference of Population Size
-    DR_N[,j,] <- (colSums(N[,,j,]) - N_ref) / N_ref
+    DR_N <- (colSums(N[,,j,]) - N_ref) / N_ref
+
+    # Remove cases where impact > 0
+    sel <- which(DR_N > 0, arr.ind = TRUE)
+    if(length(sel) > 0){
+      DR_N <- DR_N[,-unique(sel[sel[,"row"] > 5, "col"])]
+    }
 
     # Impact metric : Average value
-    impact_sc[,"avg",j] <- apply(DR_N[,j,], 1, mean, na.rm = TRUE)
+    impact_sc[,"avg",j] <- apply(DR_N, 1, mean, na.rm = TRUE)
 
     # Impact metric : SE
-    impact_sc[,"se",j] <- apply(DR_N[,j,], 1, sd, na.rm = TRUE)
+    impact_sc[,"se",j] <- apply(DR_N, 1, sd, na.rm = TRUE)
 
     # Impact metric : Upper and Lower Confidence Intervals for DR_N
-    impact_sc[,"uci",j] <- apply(DR_N[,j,], 1, quantile, probs = 0.025, na.rm = TRUE)
+    impact_sc[,"uci",j] <- apply(DR_N, 1, quantile, probs = 0.025, na.rm = TRUE)
     impact_sc[,"lci",j] <-
-      apply(DR_N[,j,], 1, quantile, probs = 0.975, na.rm = TRUE) %>%
+      apply(DR_N, 1, quantile, probs = 0.975, na.rm = TRUE) %>%
       sapply(min, 0)
 
   } # j
@@ -94,7 +94,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
   for(j in 1:dim(N)[3]){
 
-    Pext_sc[j] <- mean(colSums(N[,TH,j,]) == 0)
+    Pext_sc[j] <- mean(colSums(N[,TH,j,]) == 0 | colSums(N[,TH,"sc0",]) == 0)
     DR_Pext_sc[j] <- (Pext_sc[j] - Pext_ref) / Pext_ref
 
     DR_Pext_sc[DR_Pext_sc == Inf] <- Pext_sc[DR_Pext_sc == Inf]
@@ -126,15 +126,9 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
   Pext_indiv <- DR_Pext_indiv <- NA
 
   if(cumulated_impacts){
+
     ## Relative difference of population size
-    DR_N <- array(NA, dim = dim(N)[2:4],
-                  dimnames = list(paste0("year", 1:dim(N)[2]),
-                                  paste0("sc", (1:dim(N)[3])-1)
-                  ))
-
-
     impact_indiv[,,1] <- 0
-
 
     for(j in 2:dim(N)[3]){
 
@@ -160,16 +154,22 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
 
       # Relative Difference of Population Size
-      DR_N[,j,] <- (colSums(N[,,j,]) - N_ref) / N_ref
+      DR_N <- (colSums(N[,,j,]) - N_ref) / N_ref
+
+      # Remove cases where impact > 0
+      sel <- which(DR_N > 0, arr.ind = TRUE)
+      if(length(sel) > 0){
+        DR_N <- DR_N[,-unique(sel[sel[,"row"] > 5, "col"])]
+      }
 
       # Remove rare cases where sc0 = 0 and sc1 > 0 (making DR = +Inf)
-      impact_indiv[,"avg",j] <- apply(DR_N[,j,], 1, mean, na.rm = TRUE)
-      impact_indiv[,"se",j] <- apply(DR_N[,j,], 1, sd, na.rm = TRUE)
+      impact_indiv[,"avg",j] <- apply(DR_N, 1, mean, na.rm = TRUE)
+      impact_indiv[,"se",j] <- apply(DR_N, 1, sd, na.rm = TRUE)
 
       # Upper and Lower Confidence Intervals for DR_N
-      impact_indiv[,"uci",j] <- apply(DR_N[,j,], 1, quantile, probs = 0.025, na.rm = TRUE)
+      impact_indiv[,"uci",j] <- apply(DR_N, 1, quantile, probs = 0.025, na.rm = TRUE)
       impact_indiv[,"lci",j] <-
-        apply(DR_N[,j,], 1, quantile, probs = 0.975, na.rm = TRUE) %>%
+        apply(DR_N, 1, quantile, probs = 0.975, na.rm = TRUE) %>%
         sapply(min, 0)
 
     } # j
