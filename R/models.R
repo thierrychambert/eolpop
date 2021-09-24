@@ -33,10 +33,10 @@ M1_noDD_noDemoStoch <- function(N1, s, f, h, DD_params,
   ## M1_noDD_noDemoStoch
 
   # Build the LESLIE matrix
-  A <- build_Leslie(s = s, f = f)
+  A <- build_Leslie(s = s*(1-h), f = f)
 
   # Apply the LESLIE matrix calculation at t+1
-  N2 <- A%*%N1*(1-h)
+  N2 <- A%*%N1
 
   s_corr_factor <- s_corr_factor <- NULL
   return(list(N2 = N2, s_corr_factor = s_corr_factor, f_corr_factor = f_corr_factor))
@@ -209,10 +209,10 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params,
   } # if
 
   # Build the LESLIE matrix
-  A_Nt <- build_Leslie(s = s_Nt, f = f_Nt)
+  A_Nt <- build_Leslie(s = s_Nt*(1-h), f = f_Nt)
 
   # Apply the LESLIE matrix calculation at t+1
-  N2 <- A_Nt%*%N1*(1-h)
+  N2 <- A_Nt%*%N1
 
 
   s_corr_factor <- s_corr_factor <- NULL
