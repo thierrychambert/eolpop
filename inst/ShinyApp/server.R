@@ -1000,7 +1000,7 @@ server <- function(input, output, session){
     }
   })
   #############################################
-  ## Survivals, fecundities and rMAX_species
+  ## Survivals, fecundities
   ##-------------------------------------------
   observe({
     param$survivals <- input$mat_fill_vr[,1]
