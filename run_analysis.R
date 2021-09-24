@@ -7,15 +7,15 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 50
+nsim = 500
 
-fatalities_mean = c(0, 20)
-fatalities_se = c(0, 2.5)
+fatalities_mean = c(0, 20, 12, 2)
+fatalities_se = c(0, 6.5, 2.5, 0.2)
 
 pop_size_mean = 220
 pop_size_se = 0
 
-pop_growth_mean = 1.1
+pop_growth_mean = 0.98
 pop_growth_se = 0
 
 survivals <- c(0.5, rep(0.71, 5), 0.59)
@@ -27,11 +27,12 @@ coeff_var_environ = 0
 fatal_constant = "h"
 pop_size_type = "Npair"
 
-cumulated_impacts = FALSE
+cumulated_impacts = TRUE
 
 onset_year = c(2010, 2013, 2016)
 onset_time = onset_year - min(onset_year) + 1
 onset_time = c(min(onset_time), onset_time)
+onset_time
 
 # Pop size total
 N000 <- pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = survivals, f = fecundities)
