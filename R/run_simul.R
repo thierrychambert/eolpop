@@ -20,6 +20,7 @@
 #' @param carrying_capacity a strictly positive number.
 #' Carrying capacity (= maximum size that the population can reach). Here, the unit is the same as pop_size_type.
 #' It can thus be expressed as the total population or the number of pair.
+#'
 #' @param theta a strictly positive number. Parameter defining the shape of the density-dependence relationship.
 #' The relationship is defined as : r <- rMAX*(1-(N/K)^theta)
 #' Note lambda = r + 1
@@ -30,7 +31,7 @@
 #'
 #' References :
 #' Niel, C., and J. Lebreton. 2005. Using demographic invariants to detect overharvested bird
-#' populations from incomplete data. Conservation Biology 19:826–835.
+#' populations from incomplete data. Conservation Biology 19:826-835.
 #'
 #' @param model_demo is NULL, by default, because the model choice will be made inside each iteration (simulation),
 #' base on the values of N0 and lam0 that are drawn.

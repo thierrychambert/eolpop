@@ -66,7 +66,7 @@ It can be calculated using the function rMAX_spp. See ?rMAX_spp for details.
 
 References :
 Niel, C., and J. Lebreton. 2005. Using demographic invariants to detect overharvested bird
-populations from incomplete data. Conservation Biology 19:826–835.}
+populations from incomplete data. Conservation Biology 19:826-835.}
 
 \item{model_demo}{is NULL, by default, because the model choice will be made inside each iteration (simulation),
 base on the values of N0 and lam0 that are drawn.
