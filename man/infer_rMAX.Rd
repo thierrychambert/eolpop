@@ -33,7 +33,7 @@ Calculates the rMAX of a density-dependence relationship, based on K and current
 }
 \examples{
 ## Infer rMAX
-infer_rMAX(rMAX = NULL, K = 2000, theta = 1, pop_size_current = 200, pop_growth_current = 1.08)
+infer_rMAX(K = 2000, theta = 1, pop_size_current = 200, pop_growth_current = 1.08)
 
 
 }
