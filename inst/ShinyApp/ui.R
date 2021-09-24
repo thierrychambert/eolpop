@@ -245,6 +245,14 @@ rm(list = ls(all.names = TRUE))
               {conditionalPanel("output.hide_fatalities",
                                 br(),
 
+                                {wellPanel(style = "background:#FFF8DC",
+                                           radioButtons(inputId = "fatalities_unit", inline = FALSE,
+                                                        label = "Unité",
+                                                        choices = c("Taux de mortalité (%)" = "h",
+                                                                    "Nombre de mortalités" = "M"),
+                                                        selected = "M"),
+                                )}, # close wellPanel 1
+
                                 {wellPanel(style = "background:#F0F8FF",
 
                                            radioButtons(inputId = "fatalities_input_type",
@@ -318,7 +326,7 @@ rm(list = ls(all.names = TRUE))
 
               )}, # close conditional panel
 
-      )}, # end column "mortalité"
+      )}, # end column "fatalities"
 
       ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
@@ -402,7 +410,7 @@ rm(list = ls(all.names = TRUE))
 
               )}, # close conditional panel
 
-      )}, # end column "mortalite"
+      )}, # end column "pop size"
       ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
@@ -439,12 +447,12 @@ rm(list = ls(all.names = TRUE))
                                            # Interval
                                            numericInput(inputId = "pop_growth_lower",
                                                         label = "Borne inférieure (taux d'accroissement)",
-                                                        value = 1.03,
+                                                        value = 0.97,
                                                         min = 0, max = Inf, step = 0.01),
 
                                            numericInput(inputId = "pop_growth_upper",
                                                         label = "Borne supérieure (taux d'accroissement)",
-                                                        value = 1.07,
+                                                        value = 0.99,
                                                         min = 0, max = Inf, step = 0.01),
 
                                            ## Input values: mean and se
@@ -495,7 +503,7 @@ rm(list = ls(all.names = TRUE))
 
               )}, # close conditional panel
 
-      )}, # end column "mortalite"
+      )}, # end column "pop growth"
       ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
@@ -554,7 +562,7 @@ rm(list = ls(all.names = TRUE))
 
               )}, # close conditional panel
 
-      )}, # end column "fatalities"
+      )}, # end column "carrying capacity"
       ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
 
@@ -583,6 +591,8 @@ rm(list = ls(all.names = TRUE))
       # Mortalites annuelles
       {wellPanel(style = "background:#DCDCDC",
                  p("Mortalités annuelles", style="font-size:20px; font-weight: bold"),
+                 shiny::tags$u(textOutput(outputId = "fatalities_unit_info"), style="font-size:16px"),
+                 p(""),
                  span(textOutput(outputId = "fatalities_mean_info"), style="font-size:16px"),
                  span(textOutput(outputId = "fatalities_se_info"), style="font-size:16px"),
       )},
@@ -626,7 +636,6 @@ rm(list = ls(all.names = TRUE))
                  br(),
                  hr(),
 
-                 #h3("Mortalites annuelles", align = "center"),
                  span(textOutput(outputId = "title_distri_plot"), style="font-size:24px; font-weight:bold"),
                  plotOutput(outputId = "distri_plot"),
 
@@ -639,11 +648,6 @@ rm(list = ls(all.names = TRUE))
                  numericInput(inputId = "nsim",
                               label = "Nombre de simulations",
                               value = 10, min = 0, max = Inf, step = 10),
-
-                 radioButtons(inputId = "fatal_constant",
-                              label = "Modélisation",
-                              choices = c("Taux de mortalités (h) constant" = "h",
-                                          "Nombre de mortalités (M) constant" = "M")),
 
                  br(),
 

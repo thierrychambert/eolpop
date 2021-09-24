@@ -205,8 +205,9 @@ server <- function(input, output, session){
                           cumulated_impacts = FALSE,
 
                           fatalities_mean = NULL,
-                          fatalities_mean_use = NULL,
+                          fatalities_mean_nb = NULL,
                           fatalities_se = NULL,
+                          fatalities_se_nb = NULL,
                           onset_time = NULL,
                           onset_year = NULL,
                           out_fatal = NULL,
@@ -623,15 +624,30 @@ server <- function(input, output, session){
   #################################
   ## Fatalities
   ##-------------------------------
+  ## UNIT
+  output$fatalities_unit_info <- renderText({
+    if(!is.null(input$fatalities_unit)){
+      if(input$fatalities_unit == "h"){
+        paste0("Taux de mortalité")
+      } else {
+        paste0("Nombre de mortalités")
+      }
+    }
+  })
+
+  ## Values
   output$fatalities_mean_info <- renderText({
-      paste0(c("Moyenne : ",
-               paste0(c(tail(param$fatalities_mean, -1)), collapse = ", ")
-      ), collapse = "")
-    })
+    if(input$fatalities_unit == "h") add_perc <- "%" else add_perc <- ""
+    paste0(c("Moyenne : ",
+             paste0(tail(param$fatalities_mean, -1), add_perc, collapse = ", ")
+    ), collapse = "")
+  })
+
 
   output$fatalities_se_info <- renderText({
+    if(input$fatalities_unit == "h") add_perc <- "%" else add_perc <- ""
     paste0(c("Erreur-type : ",
-             paste0(c(tail(param$fatalities_se, -1)), collapse = ", ")
+             paste0(tail(param$fatalities_se, -1), add_perc, collapse = ", ")
     ), collapse = "")
   })
 
@@ -846,6 +862,27 @@ server <- function(input, output, session){
   }) # end observe
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
+
+  # Make sure fatalities are expressed as "number" (not rate) for the run_simul function
+  se_prod2 <- function(mu1, se1, mu2, se2) sqrt((se1^2 * se2^2) + (se1^2 * mu2^2) + (mu1^2 * se2^2))
+
+  observeEvent({
+    input$run
+  },{
+    if(input$fatalities_unit == "h"){
+      pop_size_tot <- sum(pop_vector(pop_size = param$pop_size_mean, pop_size_type = param$pop_size_type, s = param$survivals, f = param$fecundities)[-1])
+      param$fatalities_mean_nb <- (param$fatalities_mean/100) * pop_size_tot
+      param$fatalities_se_nb <- se_prod2(mu1 = param$fatalities_mean/100,
+                                         se1 = param$fatalities_se/100,
+                                         mu2 = pop_size_tot,
+                                         se2 = (pop_size_tot/param$pop_size_mean) * param$pop_size_se)
+    }else{
+      param$fatalities_mean_nb <- param$fatalities_mean
+      param$fatalities_se_nb <- param$fatalities_se
+    }
+  })
+
+
   #################################
   ## Population size
   ##-------------------------------
@@ -998,7 +1035,7 @@ server <- function(input, output, session){
 
     # simple inputs
     param$nsim <- input$nsim
-    param$fatal_constant <- input$fatal_constant
+    param$fatal_constant <- "h" # input$fatalities_unit
 
     # fixed in global environment (for now)
     param$theta = theta
@@ -1022,8 +1059,8 @@ server <- function(input, output, session){
         out$run <- run_simul_shiny(nsim = param$nsim,
                                    cumulated_impacts = param$cumulated_impacts,
 
-                                   fatalities_mean = param$fatalities_mean,
-                                   fatalities_se = param$fatalities_se,
+                                   fatalities_mean = param$fatalities_mean_nb,
+                                   fatalities_se = param$fatalities_se_nb,
                                    onset_time = param$onset_time,
 
                                    pop_size_mean = param$pop_size_mean,
