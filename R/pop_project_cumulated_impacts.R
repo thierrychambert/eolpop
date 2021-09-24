@@ -83,9 +83,9 @@ pop_project_cumulated_impacts <- function(fatalities,
 
     # Fatalities : constant number (M) or constant rate (h)
     if(fatal_constant == "M"){
-      h <- sapply(Mc[,t-1]/apply(N[,t-1,], 2, sum), min, 1)
+      h <- sapply(Mc[-1,t-1]/apply(N[,t-1,], 2, sum), min, 1)
     } else {
-      h <- sapply(Mc[,t-1]/apply(N[,1,], 2, sum), min, 1)
+      h <- sapply(Mc[-1,t-1]/apply(N[,1,], 2, sum), min, 1)
     }
 
     # Sample a seed for RNG
