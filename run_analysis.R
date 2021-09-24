@@ -12,7 +12,7 @@ nsim = 500
 fatalities_mean = c(0, 20, 12, 2)
 fatalities_se = c(0, 6.5, 2.5, 0.2)
 
-pop_size_mean = 220
+pop_size_mean = 286
 pop_size_se = 0
 
 pop_growth_mean = 0.98
@@ -37,7 +37,6 @@ onset_time
 # Pop size total
 N000 <- pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = survivals, f = fecundities)
 sum(N000)
-rm(N000)
 
 # Define K
 carrying_capacity = 500
