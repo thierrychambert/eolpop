@@ -248,9 +248,9 @@ rm(list = ls(all.names = TRUE))
                                 {wellPanel(style = "background:#FFF8DC",
                                            radioButtons(inputId = "fatalities_unit", inline = FALSE,
                                                         label = "Unité",
-                                                        choices = c("Taux de mortalité (%)" = "h",
-                                                                    "Nombre de mortalités" = "M"),
-                                                        selected = "M"),
+                                                        choices = c("Nombre de mortalités" = "M",
+                                                                    "Taux de mortalité (%)" = "h"),
+                                                        selected = "h"),
                                 )}, # close wellPanel 1
 
                                 {wellPanel(style = "background:#F0F8FF",
@@ -259,28 +259,29 @@ rm(list = ls(all.names = TRUE))
                                                         label = "Type de saisie",
                                                         choices = c("Intervalle" = "itvl",
                                                                     "Valeurs" = "val",
-                                                                    "Elicitation d'expert" = "eli_exp")),
+                                                                    "Elicitation d'expert" = "eli_exp"),
+                                                        selected = "val"),
 
                                            # Interval
                                            numericInput(inputId = "fatalities_lower",
                                                         label = "Borne inférieure (mortalités annuelles)",
-                                                        value = 4.9,
+                                                        value = 3.1,
                                                         min = 0, max = Inf, step = 0.5),
 
                                            numericInput(inputId = "fatalities_upper",
                                                         label = "Borne supérieure (mortalités annuelles)",
-                                                        value = 38.7,
+                                                        value = 6.4,
                                                         min = 0, max = Inf, step = 0.5),
 
                                            # Values
                                            numericInput(inputId = "fatalities_mean",
                                                         label = "Moyenne (mortalités annuelles)",
-                                                        value = 2.2,
+                                                        value = 4.8,
                                                         min = 0, max = Inf, step = 0.5),
 
                                            numericInput(inputId = "fatalities_se",
                                                         label = "Erreur-type (mortalités annuelles)",
-                                                        value = 0.5,
+                                                        value = 0.7,
                                                         min = 0, max = Inf, step = 0.1),
 
                                            # Matrix for expert elicitation
