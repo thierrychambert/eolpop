@@ -541,7 +541,9 @@ rm(list = ls(all.names = TRUE))
 
                                            radioButtons(inputId = "carrying_cap_input_type",
                                                         label = "Type de saisie",
-                                                        choices = c("Valeurs" = "val", "Elicitation d'expert" = "eli_exp")),
+                                                        choices = c("Valeur" = "val",
+                                                                    "Elicitation d'expert" = "eli_exp",
+                                                                    "Valeur Inconnue" = "unknown")),
 
                                            numericInput(inputId = "carrying_capacity",
                                                         label = "Capacité de charge",

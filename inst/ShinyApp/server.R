@@ -1007,8 +1007,13 @@ server <- function(input, output, session){
         ready$carrying_capacity <- FALSE
       }
     } else {
-      ready$carrying_capacity <- TRUE
-      param$carrying_capacity <- input$carrying_capacity
+      if(input$carrying_cap_input_type == "unknown"){
+        ready$carrying_capacity <- TRUE
+        param$carrying_capacity <- max(param$pop_size_mean*100, 1e8) # use a very large K
+      }else{
+        ready$carrying_capacity <- TRUE
+        param$carrying_capacity <- input$carrying_capacity
+      }
     }
   })
   #############################################
