@@ -264,6 +264,13 @@ server <- function(input, output, session){
   #####
 
 
+  ##############################################
+  ## Define some functions
+  ##-------------------------------------------
+  ###
+  # Get lambda from +/-X% growth rate
+  make_lambda <- function(pop_growth)  1 + (pop_growth/100)
+
   #####
   ##--------------------------------------------
   ##  Run expert elicitation
@@ -339,10 +346,13 @@ server <- function(input, output, session){
   observeEvent({
     input$pop_growth_run_expert
   },{
-    if(all(!is.na(input$pop_growth_mat_expert))) {
+    if(all(!is.na(input$pop_growth_mat_expert))){
+
+      lambda_mat_expert <- input$pop_growth_mat_expert
+      lambda_mat_expert[,2:4] <- make_lambda(lambda_mat_expert[,2:4])
 
       ## run elicitation analysis
-      param$pop_growth_eli_result <- func_eli(input$pop_growth_mat_expert)
+      param$pop_growth_eli_result <- func_eli(lambda_mat_expert)
 
       ## plot distribution
       output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
@@ -965,16 +975,18 @@ server <- function(input, output, session){
         if(input$pop_growth_input_type == "val"){
           # Case 2 : Values directly provided as mean & SE
           ready$pop_growth <- TRUE
-          param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 3)
-          param$pop_growth_se <- input$pop_growth_se
+          param$pop_growth_mean <- round(min(1 + param$rMAX_species, make_lambda(input$pop_growth_mean)), 3)
+          param$pop_growth_se <- input$pop_growth_se/100
 
         }else{
           # Case 3 : Values directly provided as lower/upper interval
           ready$pop_growth <- TRUE
           param$pop_growth_mean <- round(min(1 + param$rMAX_species,
-                                             round(get_mu(lower = input$pop_growth_lower, upper = input$pop_growth_upper), 2)
+                                             round(get_mu(lower = make_lambda(input$pop_growth_lower),
+                                                          upper = make_lambda(input$pop_growth_upper)), 2)
                                              ), 3)
-          param$pop_growth_se <- round(get_sd(lower = input$pop_growth_lower, upper = input$pop_growth_upper, coverage = CP), 3)
+          param$pop_growth_se <- round(get_sd(lower = make_lambda(input$pop_growth_lower),
+                                              upper = make_lambda(input$pop_growth_upper), coverage = CP), 3)
         } # end (if3)
 
       }

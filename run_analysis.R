@@ -7,19 +7,27 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 500
-
-fatalities_mean = c(0, 20, 12, 2)
-fatalities_se = c(0, 6.5, 2.5, 0.2)
+nsim = 100
 
 pop_size_mean = 286
 pop_size_se = 0
 
-pop_growth_mean = 0.98
-pop_growth_se = 0
+carrying_capacity = 1e8
 
-survivals <- c(0.5, rep(0.71, 5), 0.59)
-fecundities <- c(0, 0.21, rep(1.08, 5))
+
+#(4.8/100)*sum(N000[-1])
+#(0.7/100)*sum(N000[-1])
+fatalities_mean = c(0, 27.5) #c(0, 20, 12, 2)
+fatalities_se = c(0, 4) #c(0, 6.5, 2.5, 0.2)
+
+
+survivals <- c(0.47, 0.67, 0.67)
+fecundities <- c(0, 0.30, 1.16)
+
+pop_growth_mean = 1.12
+# lambda( build_Leslie(s = survivals, f = fecundities) )
+pop_growth_se = 0.01
+
 
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
 time_horzion = 30
@@ -27,7 +35,7 @@ coeff_var_environ = 0
 fatal_constant = "h"
 pop_size_type = "Npair"
 
-cumulated_impacts = TRUE
+if(length(fatalities_mean) > 2) cumulated_impacts = TRUE else cumulated_impacts = FALSE
 
 onset_year = c(2010, 2013, 2016)
 onset_time = onset_year - min(onset_year) + 1
@@ -39,7 +47,6 @@ N000 <- pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = 
 sum(N000)
 
 # Define K
-carrying_capacity = 500
 theta = 1
 K = pop_vector(pop_size = carrying_capacity, pop_size_type = pop_size_type, s = survivals, f = fecundities) %>% sum
 K
@@ -106,7 +113,7 @@ plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
 min(N)
 
 out = run0
-get_metrics(N = out$N)$scenario$impact[time_horzion, "avg",-1]
+get_metrics(N = out$N)$scenario$impact[time_horzion, ,-1] %>% round(.,2)
 
 res = get_metrics(N = out$N, cumulated_impacts = cumulated_impacts)
 

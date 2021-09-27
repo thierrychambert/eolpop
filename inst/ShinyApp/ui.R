@@ -52,10 +52,10 @@ rm(list = ls(all.names = TRUE))
                         0.3, 100, 1200, 1500, 0.70)
 
   # population growth rate
-  eli_pop_growth <- c(1 , 0.95, 0.98, 1.00, 0.95,
-                      0.2, 0.97, 1.00, 1.01, 0.90,
-                      0.5, 0.92, 0.96, 0.99, 0.90,
-                      0.3, 0.90, 0.95, 0.98, 0.70)
+  eli_pop_growth <- c(1.0, -5, -2, 0, 0.95,
+                      0.2, -3, 0, 1, 0.90,
+                      0.5, -8, -4, -1, 0.90,
+                      0.3, -10, -5, -2, 0.70)
 
   ## Other pre-fill data
   # fatality table for cumulated impacts (several wind farms)
@@ -427,8 +427,8 @@ rm(list = ls(all.names = TRUE))
               bsPopover(id = "button_pop_growth",
                         title = "Tendance de la population",
                         content = HTML(
-                        "<b>Taux de croissance annuel (&lambda;) </b> de la population (avec &lambda; = 1 pour une population stable). <br>A défaut, on pourra juste cocher la <b>tendance globale</b> (déclin, stabilité ou croissance) et l\\'intensité de cette tendance (faible, moyenne, forte)."
-                        ),
+                          "Taux d\\'accroissement annuel de la population <b>en %</b> : valeur positive pour une population en croissance; valeur <b>négative</b> pour une population en <b>déclin</b> (ex : « -4 » pour un déclin de 4% par an) ; 0 pour une population stable. <br>A défaut, on pourra juste cocher la <b>tendance globale</b> (déclin, stabilité ou croissance) et l\\'intensité de cette tendance (faible, moyenne, forte).<br><br><b>NOTE</b> : les valeurs fournies seront traduites en <b>taux de croissance annuel (&lambda;)</b> (avec &lambda; = 1 pour une population stable, &lambda; < 1 pour une population en déclin, et &lambda; > 1 pour une population croissante)."
+                          ),
                         placement = "top",
                         trigger = "hover",
                         options = list(container='body')
@@ -442,30 +442,30 @@ rm(list = ls(all.names = TRUE))
                                            radioButtons(inputId = "pop_growth_input_type",
                                                         label = "Type de saisie",
                                                         choices = c("Intervalle" = "itvl",
-                                                                    "Taux d'accroissement" = "val",
+                                                                    "Valeurs" = "val",
                                                                     "Elicitation d'expert" = "eli_exp",
                                                                     "Tendance locale ou régionale" = "trend")),
                                            # Interval
                                            numericInput(inputId = "pop_growth_lower",
-                                                        label = "Borne inférieure (taux d'accroissement)",
-                                                        value = 0.97,
-                                                        min = 0, max = Inf, step = 0.01),
+                                                        label = HTML("Borne inférieure<br>(taux d'accroissement en %)"),
+                                                        value = -3,
+                                                        min = -100, max = 100, step = 1),
 
                                            numericInput(inputId = "pop_growth_upper",
-                                                        label = "Borne supérieure (taux d'accroissement)",
-                                                        value = 0.99,
-                                                        min = 0, max = Inf, step = 0.01),
+                                                        label = HTML("Borne supérieure<br>(taux d'accroissement en %)"),
+                                                        value = 3,
+                                                        min = -100, max = 100, step = 1),
 
                                            ## Input values: mean and se
                                            numericInput(inputId = "pop_growth_mean",
-                                                        label = "Moyenne (taux d'accroissement)",
-                                                        value = 0.99,
-                                                        min = 0, max = Inf, step = 0.01),
+                                                        label = "Moyenne (taux d'accroissement en %)",
+                                                        value = -1,
+                                                        min = -100, max = 100, step = 1),
 
                                            numericInput(inputId = "pop_growth_se",
-                                                        label = "Erreur-type (taux d'accroissement)",
+                                                        label = "Erreur-type (aussi en %)",
                                                         value = 0,
-                                                        min = 0, max = Inf, step = 0.01),
+                                                        min = 0, max = Inf, step = 0.5),
 
                                            ## Input expert elicitation: table
                                            matrixInput(inputId = "pop_growth_mat_expert",
@@ -610,7 +610,7 @@ rm(list = ls(all.names = TRUE))
 
       # Tendance de la population
       {wellPanel(style = "background:#DCDCDC",
-                 p("Tendance de la population", style="font-size:20px; font-weight: bold"),
+                 p(HTML("Taux de croissance (&lambda;)"), style="font-size:20px; font-weight: bold"),
                  span(textOutput(outputId = "pop_growth_mean_info"), style="font-size:16px"),
                  span(textOutput(outputId = "pop_growth_se_info"), style="font-size:16px"),
       )},
