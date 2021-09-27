@@ -1207,7 +1207,9 @@ server <- function(input, output, session){
   ##-------------------------------------------
   # Function to plot trajectories
   plot_out_traj <- function(){
-    if(is.null(out$run)) {} else {plot_traj(N = out$run$N, xlab = "year", ylab = "pop size")}
+    if(is.null(out$run)) {
+    } else {
+      plot_traj(N = out$run$N, xlab = "Année", ylab = "Taille de population (toutes classes d'âges)")}
   }
 
   output$title_traj_plot <- renderText({
