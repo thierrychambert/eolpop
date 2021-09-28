@@ -372,18 +372,18 @@ rm(list = ls(all.names = TRUE))
                                          # Interval
                                          numericInput(inputId = "pop_size_lower",
                                                       label = "Borne inférieure (taille population)",
-                                                      value = 286,
+                                                      value = 254,
                                                       min = 0, max = Inf, step = 10),
 
                                          numericInput(inputId = "pop_size_upper",
                                                       label = "Borne supérieure (taille population)",
-                                                      value = 286,
+                                                      value = 254,
                                                       min = 0, max = Inf, step = 10),
 
                                          # Values
                                          numericInput(inputId = "pop_size_mean",
                                                       label = "Moyenne de la taille de la population",
-                                                      value = 286,
+                                                      value = 254,
                                                       min = 0, max = Inf, step = 50),
 
                                          numericInput(inputId = "pop_size_se",
