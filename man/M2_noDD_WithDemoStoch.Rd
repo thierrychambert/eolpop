@@ -12,7 +12,7 @@ M2_noDD_WithDemoStoch(
   s,
   f,
   h,
-  DD_params,
+  DD_params = NULL,
   use_ref_vr = FALSE,
   s_corr_factor = NULL,
   f_corr_factor = NULL
