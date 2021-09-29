@@ -38,7 +38,7 @@ M1_noDD_noDemoStoch <- function(N1, s, f, h, DD_params,
   # Apply the LESLIE matrix calculation at t+1
   N2 <- A%*%N1
 
-  s_corr_factor <- s_corr_factor <- NULL
+  s_corr_factor <- f_corr_factor <- NULL
   return(list(N2 = N2, s_corr_factor = s_corr_factor, f_corr_factor = f_corr_factor))
 
 } # END FUNCTION
@@ -121,7 +121,7 @@ M2_noDD_WithDemoStoch <- function(N1, s, f, h, DD_params,
     B <- round(trunc(B) + rbinom(1, size = 1, prob = B-trunc(B)))
 
     N2[1] <- B
-    s_corr_factor <- s_corr_factor <- NULL
+    s_corr_factor <- f_corr_factor <- NULL
 
   } # end if
 
@@ -215,7 +215,7 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params,
   N2 <- A_Nt%*%N1
 
 
-  s_corr_factor <- s_corr_factor <- NULL
+  s_corr_factor <- f_corr_factor <- NULL
   return(list(N2 = N2, s_corr_factor = s_corr_factor, f_corr_factor = f_corr_factor))
 
 } # END FUNCTION
@@ -331,7 +331,7 @@ M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params,
     B <- round(trunc(B) + rbinom(1, size = 1, prob = B-trunc(B)))
 
     N2[1] <- B
-    s_corr_factor <- s_corr_factor <- NULL
+    s_corr_factor <- f_corr_factor <- NULL
   }
 
   return(list(N2 = N2, s_corr_factor = s_corr_factor, f_corr_factor = f_corr_factor))
