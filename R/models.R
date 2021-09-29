@@ -27,7 +27,7 @@
 #' h <- 0.05
 #' M1_noDD_noDemoStoch(N1, s, f, h)
 #'
-M1_noDD_noDemoStoch <- function(N1, s, f, h, DD_params,
+M1_noDD_noDemoStoch <- function(N1, s, f, h, DD_params = NULL,
                                 use_ref_vr = FALSE, s_corr_factor = NULL, f_corr_factor = NULL){
 
   ## M1_noDD_noDemoStoch
@@ -78,7 +78,7 @@ M1_noDD_noDemoStoch <- function(N1, s, f, h, DD_params,
 #' h <- 0.05
 #' M2_noDD_WithDemoStoch(N1, s, f, h)
 #'
-M2_noDD_WithDemoStoch <- function(N1, s, f, h, DD_params,
+M2_noDD_WithDemoStoch <- function(N1, s, f, h, DD_params = NULL,
                                   use_ref_vr = FALSE, s_corr_factor = NULL, f_corr_factor = NULL){
 
   ## M2_noDD_WithDemoStoch
