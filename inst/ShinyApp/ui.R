@@ -113,7 +113,7 @@ rm(list = ls(all.names = TRUE))
 
               # Choose species (selectInput)
               {selectInput(inputId = "species_choice",
-                          selected = "Faucon crécerellette", width = '80%',
+                          selected = "Aigle de Bonelli", width = '80%',
                           label = h4(strong("Sélectionner une espèce"),
                                      bsButton("Q_species_choice", label = "", icon = icon("question"), size = "extra-small"),
                                      bsPopover(id = "Q_species_choice",
@@ -265,23 +265,23 @@ rm(list = ls(all.names = TRUE))
                                            # Interval
                                            numericInput(inputId = "fatalities_lower",
                                                         label = "Borne inférieure (mortalités annuelles)",
-                                                        value = 3.1,
+                                                        value = 1.5,
                                                         min = 0, max = Inf, step = 0.5),
 
                                            numericInput(inputId = "fatalities_upper",
                                                         label = "Borne supérieure (mortalités annuelles)",
-                                                        value = 6.4,
+                                                        value = 4.5,
                                                         min = 0, max = Inf, step = 0.5),
 
                                            # Values
                                            numericInput(inputId = "fatalities_mean",
                                                         label = "Moyenne (mortalités annuelles)",
-                                                        value = 4.8,
+                                                        value = 3.0,
                                                         min = 0, max = Inf, step = 0.5),
 
                                            numericInput(inputId = "fatalities_se",
                                                         label = "Erreur-type (mortalités annuelles)",
-                                                        value = 0.7,
+                                                        value = 0.5,
                                                         min = 0, max = Inf, step = 0.1),
 
                                            # Matrix for expert elicitation
@@ -372,23 +372,23 @@ rm(list = ls(all.names = TRUE))
                                          # Interval
                                          numericInput(inputId = "pop_size_lower",
                                                       label = "Borne inférieure (taille population)",
-                                                      value = 254,
+                                                      value = 150,
                                                       min = 0, max = Inf, step = 10),
 
                                          numericInput(inputId = "pop_size_upper",
                                                       label = "Borne supérieure (taille population)",
-                                                      value = 254,
+                                                      value = 250,
                                                       min = 0, max = Inf, step = 10),
 
                                          # Values
                                          numericInput(inputId = "pop_size_mean",
                                                       label = "Moyenne de la taille de la population",
-                                                      value = 254,
+                                                      value = 200,
                                                       min = 0, max = Inf, step = 50),
 
                                          numericInput(inputId = "pop_size_se",
                                                       label = "Erreur-type de la taille de la population",
-                                                      value = 0,
+                                                      value = 30,
                                                       min = 0, max = Inf, step = 1),
 
                                          # Matrix for expert elicitation
@@ -459,12 +459,12 @@ rm(list = ls(all.names = TRUE))
                                            ## Input values: mean and se
                                            numericInput(inputId = "pop_growth_mean",
                                                         label = "Moyenne (taux d'accroissement en %)",
-                                                        value = -1,
+                                                        value = -1.5,
                                                         min = -100, max = 100, step = 1),
 
                                            numericInput(inputId = "pop_growth_se",
                                                         label = "Erreur-type (aussi en %)",
-                                                        value = 0,
+                                                        value = 0.5,
                                                         min = 0, max = Inf, step = 0.5),
 
                                            ## Input expert elicitation: table
