@@ -248,8 +248,20 @@ server <- function(input, output, session){
   #####
 
   ##############################################
-  ## Update matrix cumulated impact
+  ## Define some functions
   ##-------------------------------------------
+  # Get lambda from +/-X% growth rate
+  make_lambda <- function(pop_growth)  1 + (pop_growth/100)
+  #####
+
+  #####
+  ##------------------------------------------
+  ## Update elicitation matrices
+  ##------------------------------------------
+
+  ###############################
+  ## Cumulated Impacts Matrix
+  ##-----------------------------
   observeEvent({
     input$farm_number_cumulated
   }, {
@@ -270,9 +282,9 @@ server <- function(input, output, session){
   })
   #####
 
-  ##############################################
-  ## Update elicitation matrix : fatalities
-  ##-------------------------------------------
+  ########################
+  ## Fatalities Matrix
+  ##----------------------
   observeEvent({
     input$fatalities_number_expert
   }, {
@@ -293,13 +305,76 @@ server <- function(input, output, session){
   })
   #####
 
+  ########################
+  ## Pop Size Matrix
+  ##----------------------
+  observeEvent({
+    input$pop_size_number_expert
+  }, {
+    req(input$pop_size_number_expert > 0)
+    current_mat <- input$pop_size_mat_expert
+    n_experts <- input$pop_size_number_expert
+    if(n_experts > nrow(current_mat)){
+      fill_mat <- c(as.vector(t(current_mat)), rep(NA,(5*(n_experts-nrow(current_mat)))))
+    }else{
+      fill_mat <- as.vector(t(current_mat[1:n_experts,]))
+    }
+    updateMatrixInput(session, inputId = "pop_size_mat_expert",
+                      value = matrix(fill_mat, nrow = n_experts, ncol = 5, byrow = TRUE,
+                                     dimnames = list(paste0("#", 1:n_experts),
+                                                     c("Poids", "Min", "Best", "Max", "% IC" ))
+                      )
+    )
+  })
+  #####
 
-  ##############################################
-  ## Define some functions
-  ##-------------------------------------------
-  ###
-  # Get lambda from +/-X% growth rate
-  make_lambda <- function(pop_growth)  1 + (pop_growth/100)
+  ########################
+  ## Pop Growth Matrix
+  ##----------------------
+  observeEvent({
+    input$pop_growth_number_expert
+  }, {
+    req(input$pop_growth_number_expert > 0)
+    current_mat <- input$pop_growth_mat_expert
+    n_experts <- input$pop_growth_number_expert
+    if(n_experts > nrow(current_mat)){
+      fill_mat <- c(as.vector(t(current_mat)), rep(NA,(5*(n_experts-nrow(current_mat)))))
+    }else{
+      fill_mat <- as.vector(t(current_mat[1:n_experts,]))
+    }
+    updateMatrixInput(session, inputId = "pop_growth_mat_expert",
+                      value = matrix(fill_mat, nrow = n_experts, ncol = 5, byrow = TRUE,
+                                     dimnames = list(paste0("#", 1:n_experts),
+                                                     c("Poids", "Min", "Best", "Max", "% IC" ))
+                      )
+    )
+  })
+  #####
+
+  ############################
+  ## Carrying Capacity Matrix
+  ##--------------------------
+  observeEvent({
+    input$carrying_cap_number_expert
+  }, {
+    req(input$carrying_cap_number_expert > 0)
+    current_mat <- input$carrying_cap_mat_expert
+    n_experts <- input$carrying_cap_number_expert
+    if(n_experts > nrow(current_mat)){
+      fill_mat <- c(as.vector(t(current_mat)), rep(NA,(5*(n_experts-nrow(current_mat)))))
+    }else{
+      fill_mat <- as.vector(t(current_mat[1:n_experts,]))
+    }
+    updateMatrixInput(session, inputId = "carrying_cap_mat_expert",
+                      value = matrix(fill_mat, nrow = n_experts, ncol = 5, byrow = TRUE,
+                                     dimnames = list(paste0("#", 1:n_experts),
+                                                     c("Poids", "Min", "Best", "Max", "% IC" ))
+                      )
+    )
+  })
+  #####
+
+
 
   #####
   ##--------------------------------------------

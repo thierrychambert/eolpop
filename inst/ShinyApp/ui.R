@@ -384,6 +384,10 @@ rm(list = ls(all.names = TRUE))
                                                       min = 0, max = Inf, step = 1),
 
                                          # Matrix for expert elicitation
+                                         numericInput(inputId = "pop_size_number_expert",
+                                                      label = "Nombre d'experts",
+                                                      value = 4, min = 1, max = Inf, step = 1),
+
                                          matrixInput(inputId = "pop_size_mat_expert",
                                                      value = matrix(data = eli_pop_size, nrow = 4, ncol = 5,
                                                                     dimnames = list(c("#1", "#2", "#3", "#4"),
@@ -460,6 +464,10 @@ rm(list = ls(all.names = TRUE))
                                                         min = 0, max = Inf, step = 0.5),
 
                                            ## Input expert elicitation: table
+                                           numericInput(inputId = "pop_growth_number_expert",
+                                                        label = "Nombre d'experts",
+                                                        value = 4, min = 1, max = Inf, step = 1),
+
                                            matrixInput(inputId = "pop_growth_mat_expert",
                                                        value = matrix(data = eli_pop_growth, nrow = 4, ncol = 5,
                                                                       dimnames = list(c("#1", "#2", "#3", "#4"),
@@ -537,10 +545,16 @@ rm(list = ls(all.names = TRUE))
                                                                     "Elicitation d'expert" = "eli_exp",
                                                                     "Valeur Inconnue" = "unknown")),
 
+                                           # Value
                                            numericInput(inputId = "carrying_capacity",
                                                         label = "Capacité de charge",
                                                         value = 1000,
                                                         min = 0, max = Inf, step = 100),
+
+                                           # Expert Elicitation Matrix
+                                           numericInput(inputId = "carrying_cap_number_expert",
+                                                        label = "Nombre d'experts",
+                                                        value = 4, min = 1, max = Inf, step = 1),
 
                                            matrixInput(inputId = "carrying_cap_mat_expert",
                                                        value = matrix(data = eli_carrying_cap, nrow = 4, ncol = 5,
