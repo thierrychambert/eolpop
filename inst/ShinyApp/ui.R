@@ -260,7 +260,7 @@ rm(list = ls(all.names = TRUE))
                                                         choices = c("Intervalle" = "itvl",
                                                                     "Valeurs" = "val",
                                                                     "Elicitation d'expert" = "eli_exp"),
-                                                        selected = "val"),
+                                                        selected = "itvl"),
 
                                            # Interval
                                            numericInput(inputId = "fatalities_lower",
@@ -285,6 +285,10 @@ rm(list = ls(all.names = TRUE))
                                                         min = 0, max = Inf, step = 0.1),
 
                                            # Matrix for expert elicitation
+                                           numericInput(inputId = "fatalities_number_expert",
+                                                        label = "Nombre d'experts",
+                                                        value = 4, min = 1, max = Inf, step = 1),
+
                                            matrixInput(inputId = "fatalities_mat_expert",
                                                        value = matrix(data = eli_fatalities, nrow = 4, ncol = 5,
                                                                       dimnames = list(c("#1", "#2", "#3", "#4"),

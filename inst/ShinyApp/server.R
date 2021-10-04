@@ -66,6 +66,7 @@ server <- function(input, output, session){
     shinyjs::hide("fatalities_se")
     shinyjs::hide("fatalities_lower")
     shinyjs::hide("fatalities_upper")
+    shinyjs::hide("fatalities_number_expert")
     shinyjs::hide("fatalities_mat_expert")
     shinyjs::hide("fatalities_run_expert")
     shinyjs::hide("farm_number_cumulated")
@@ -114,6 +115,7 @@ server <- function(input, output, session){
           shinyjs::show("fatalities_se")
         }
         if(input$fatalities_input_type == "eli_exp"){
+          shinyjs::show("fatalities_number_expert")
           shinyjs::show("fatalities_mat_expert")
           shinyjs::show("fatalities_run_expert")
         }
@@ -253,13 +255,36 @@ server <- function(input, output, session){
   }, {
 
     nfarm <- input$farm_number_cumulated
-    init_cumul_new  <- init_cumul[1:nfarm,]
+    init_cumul_new <- init_cumul[1:nfarm,]
     updateMatrixInput(session, inputId = "fatalities_mat_cumulated",
                       value =  matrix(init_cumul_new, nrow = nfarm, ncol = 3, byrow = FALSE,
                                       dimnames = list(paste("Parc", c(1:nfarm)),
                                                       c("Moyenne",
                                                         "Erreur-type",
                                                         "Année (début)"))))
+  })
+  #####
+
+  ##############################################
+  ## Update elicitation matrix : fatalities
+  ##-------------------------------------------
+  observeEvent({
+    input$fatalities_number_expert
+  }, {
+    req(input$fatalities_number_expert > 0)
+    current_mat <- input$fatalities_mat_expert
+    n_experts <- input$fatalities_number_expert
+    if(n_experts > nrow(current_mat)){
+      fill_mat <- c(as.vector(t(current_mat)), rep(NA,(5*(n_experts-nrow(current_mat)))))
+    }else{
+      fill_mat <- as.vector(t(current_mat[1:n_experts,]))
+    }
+    updateMatrixInput(session, inputId = "fatalities_mat_expert",
+                      value = matrix(fill_mat, nrow = n_experts, ncol = 5, byrow = TRUE,
+                                     dimnames = list(paste0("#", 1:n_experts),
+                                                     c("Poids", "Min", "Best", "Max", "% IC" ))
+                                     )
+                      )
   })
   #####
 
