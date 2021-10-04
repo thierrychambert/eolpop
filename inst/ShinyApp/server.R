@@ -253,12 +253,17 @@ server <- function(input, output, session){
   observeEvent({
     input$farm_number_cumulated
   }, {
-
-    nfarm <- input$farm_number_cumulated
-    init_cumul_new <- init_cumul[1:nfarm,]
+    req(input$farm_number_cumulated > 0)
+    current_mat <- input$fatalities_mat_cumulated
+    n_farm <- input$farm_number_cumulated
+    if(n_farm > nrow(current_mat)){
+      fill_mat <- c(as.vector(t(current_mat)), rep(NA,(3*(n_farm-nrow(current_mat)))))
+    }else{
+      fill_mat <- as.vector(t(current_mat[1:n_farm,]))
+    }
     updateMatrixInput(session, inputId = "fatalities_mat_cumulated",
-                      value =  matrix(init_cumul_new, nrow = nfarm, ncol = 3, byrow = FALSE,
-                                      dimnames = list(paste("Parc", c(1:nfarm)),
+                      value =  matrix(fill_mat, nrow = n_farm, ncol = 3, byrow = TRUE,
+                                      dimnames = list(paste("Parc", c(1:n_farm)),
                                                       c("Moyenne",
                                                         "Erreur-type",
                                                         "Année (début)"))))
@@ -1150,11 +1155,11 @@ server <- function(input, output, session){
 
   ## Functions to print the output as text (non cumulated impacts)
   print_impact_table <- function(res){
-    nfarm <- (dim(res$indiv_farm$impact)[3]-1)
+    n_farm <- (dim(res$indiv_farm$impact)[3]-1)
     fil <- paste0(round(t(res$indiv_farm$impact[time_horzion, -2, -1]),2)*100, "%")
     matrix(fil,
-           nrow = nfarm,
-           dimnames = list(paste("Parc",1:nfarm), c("Impact", "IC (min)", "IC (max)"))
+           nrow = n_farm,
+           dimnames = list(paste("Parc",1:n_farm), c("Impact", "IC (min)", "IC (max)"))
     )
   } # end function print_impact_table
 

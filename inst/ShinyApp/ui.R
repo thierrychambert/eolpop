@@ -56,21 +56,6 @@ rm(list = ls(all.names = TRUE))
                       0.2, -3, 0, 1, 0.90,
                       0.5, -8, -4, -1, 0.90,
                       0.3, -10, -5, -2, 0.70)
-
-  ## Other pre-fill data
-  # fatality table for cumulated impacts (several wind farms)
-  set.seed(seed = 200)
-  init_cumul <-
-    matrix(
-      round(c(
-        runif(n = 20, 1, 10),
-        runif(n = 20, 0.01, 0.20),
-        sort(sample(x = 2000:2050, size = 20, replace = TRUE))
-      ), 2),
-    nrow = 20, ncol = 3, byrow = FALSE)
-
-  # Undo last 'set.seed'
-  set.seed(  ((((Sys.time() %>% as.numeric) %% 1e10) * 1e9) %% 1e5) %>% round  )
 }
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
@@ -319,7 +304,10 @@ rm(list = ls(all.names = TRUE))
                                                                                 options = list(container='body')
                                                                       )
                                                        ),
-                                                       value = matrix(init_cumul, 3, 3,
+                                                       value = matrix(c(5, 0.5, 2010,
+                                                                        3, 0.5, 2015,
+                                                                        4, 0.5, 2018),
+                                                                      nrow = 3, ncol = 3, byrow = TRUE,
                                                                       dimnames = list(c(paste0("Parc num.", c(1:3))),
                                                                                       c("Moyenne",
                                                                                         "Erreur-type",
