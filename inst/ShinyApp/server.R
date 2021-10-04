@@ -76,6 +76,7 @@ server <- function(input, output, session){
     shinyjs::hide("pop_size_upper")
     shinyjs::hide("pop_size_mean")
     shinyjs::hide("pop_size_se")
+    shinyjs::hide("pop_size_number_expert")
     shinyjs::hide("pop_size_mat_expert")
     shinyjs::hide("pop_size_run_expert")
 
@@ -83,12 +84,14 @@ server <- function(input, output, session){
     shinyjs::hide("pop_growth_upper")
     shinyjs::hide("pop_growth_mean")
     shinyjs::hide("pop_growth_se")
+    shinyjs::hide("pop_growth_number_expert")
     shinyjs::hide("pop_growth_mat_expert")
     shinyjs::hide("pop_growth_run_expert")
     shinyjs::hide("pop_trend")
     shinyjs::hide("pop_trend_strength")
 
     shinyjs::hide("carrying_capacity")
+    shinyjs::hide("carrying_cap_number_expert")
     shinyjs::hide("carrying_cap_mat_expert")
     shinyjs::hide("carrying_cap_run_expert")
 
@@ -143,6 +146,7 @@ server <- function(input, output, session){
         shinyjs::show("pop_size_se")
       }
       if(input$pop_size_input_type == "eli_exp"){
+        shinyjs::show("pop_size_number_expert")
         shinyjs::show("pop_size_mat_expert")
         shinyjs::show("pop_size_run_expert")
       }
@@ -161,6 +165,7 @@ server <- function(input, output, session){
         shinyjs::show("pop_growth_se")
       }
       if(input$pop_growth_input_type == "eli_exp"){
+        shinyjs::show("pop_growth_number_expert")
         shinyjs::show("pop_growth_mat_expert")
         shinyjs::show("pop_growth_run_expert")
       }
@@ -179,6 +184,7 @@ server <- function(input, output, session){
         shinyjs::show("carrying_capacity")
       }
       if(input$carrying_cap_input_type == "eli_exp"){
+        shinyjs::show("carrying_cap_number_expert")
         shinyjs::show("carrying_cap_mat_expert")
         shinyjs::show("carrying_cap_run_expert")
       }
