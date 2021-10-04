@@ -250,7 +250,7 @@ rm(list = ls(all.names = TRUE))
                                                         label = "Unité",
                                                         choices = c("Nombre de mortalités" = "M",
                                                                     "Taux de mortalité (%)" = "h"),
-                                                        selected = "h"),
+                                                        selected = "M"),
                                 )}, # close wellPanel 1
 
                                 {wellPanel(style = "background:#F0F8FF",
