@@ -12,6 +12,8 @@ sample_gamma_v1(n, lower, upper, coverage = 0.95)
 \item{lower}{lower limit}
 
 \item{upper}{upper limit}
+
+\item{coverage}{coverage (0 - 1) of the interval between lower and upper. Eg: 0.95 for a 95\% coverage.}
 }
 \value{
 a vector of drawn values.

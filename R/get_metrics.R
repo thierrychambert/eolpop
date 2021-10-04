@@ -68,8 +68,9 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
     # Remove cases where impact > 0
     sel <- which(DR_N > 0, arr.ind = TRUE)
-    if(length(sel) > 0){
-      DR_N <- DR_N[,-unique(sel[sel[,"row"] > 5, "col"])]
+    sel2 <- unique(sel[sel[,"row"] > 5, "col"])
+    if(length(sel2) > 0){
+      DR_N <- DR_N[,-sel2]
     }
 
     # Impact metric : Average value
@@ -158,8 +159,9 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
       # Remove cases where impact > 0
       sel <- which(DR_N > 0, arr.ind = TRUE)
-      if(length(sel) > 0){
-        DR_N <- DR_N[,-unique(sel[sel[,"row"] > 5, "col"])]
+      sel2 <- unique(sel[sel[,"row"] > 5, "col"])
+      if(length(sel2) > 0){
+        DR_N <- DR_N[,-sel2]
       }
 
       # Remove rare cases where sc0 = 0 and sc1 > 0 (making DR = +Inf)

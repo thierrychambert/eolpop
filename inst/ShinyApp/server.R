@@ -205,8 +205,9 @@ server <- function(input, output, session){
                           cumulated_impacts = FALSE,
 
                           fatalities_mean = NULL,
-                          fatalities_mean_use = NULL,
+                          fatalities_mean_nb = NULL,
                           fatalities_se = NULL,
+                          fatalities_se_nb = NULL,
                           onset_time = NULL,
                           onset_year = NULL,
                           out_fatal = NULL,
@@ -262,6 +263,13 @@ server <- function(input, output, session){
   })
   #####
 
+
+  ##############################################
+  ## Define some functions
+  ##-------------------------------------------
+  ###
+  # Get lambda from +/-X% growth rate
+  make_lambda <- function(pop_growth)  1 + (pop_growth/100)
 
   #####
   ##--------------------------------------------
@@ -338,10 +346,13 @@ server <- function(input, output, session){
   observeEvent({
     input$pop_growth_run_expert
   },{
-    if(all(!is.na(input$pop_growth_mat_expert))) {
+    if(all(!is.na(input$pop_growth_mat_expert))){
+
+      lambda_mat_expert <- input$pop_growth_mat_expert
+      lambda_mat_expert[,2:4] <- make_lambda(lambda_mat_expert[,2:4])
 
       ## run elicitation analysis
-      param$pop_growth_eli_result <- func_eli(input$pop_growth_mat_expert)
+      param$pop_growth_eli_result <- func_eli(lambda_mat_expert)
 
       ## plot distribution
       output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
@@ -407,8 +418,8 @@ server <- function(input, output, session){
     clip(xx[1], xx[2], -100, y_mu)
     abline(v = mu, lwd = 2, col = "darkblue", lty = 2)
 
-    if(show_mode) mtext(text = paste("Mode = ", round(MU, 1)), side = 3, line = 4, cex = 1.2, adj = 0)
-    if(show_mean) mtext(text = paste("Moyenne = ", round(mu, 1)), side = 3, line = 2.5, cex = 1.2, adj = 0)
+    if(show_mode) mtext(text = paste("Mode = ", round(MU, 2)), side = 3, line = 4, cex = 1.2, adj = 0)
+    if(show_mean) mtext(text = paste("Moyenne = ", round(mu, 2)), side = 3, line = 2.5, cex = 1.2, adj = 0)
     if(show_se) mtext(text = paste("Erreur-type = ", round(se, 2)), side = 3, line = 1, cex = 1.2, adj = 0)
   } # end function plot_gamma
 
@@ -623,15 +634,30 @@ server <- function(input, output, session){
   #################################
   ## Fatalities
   ##-------------------------------
+  ## UNIT
+  output$fatalities_unit_info <- renderText({
+    if(!is.null(input$fatalities_unit)){
+      if(input$fatalities_unit == "h"){
+        paste0("Taux de mortalité")
+      } else {
+        paste0("Nombre de mortalités")
+      }
+    }
+  })
+
+  ## Values
   output$fatalities_mean_info <- renderText({
-      paste0(c("Moyenne : ",
-               paste0(c(tail(param$fatalities_mean, -1)), collapse = ", ")
-      ), collapse = "")
-    })
+    if(input$fatalities_unit == "h") add_perc <- "%" else add_perc <- ""
+    paste0(c("Moyenne : ",
+             paste0(tail(param$fatalities_mean, -1), add_perc, collapse = ", ")
+    ), collapse = "")
+  })
+
 
   output$fatalities_se_info <- renderText({
+    if(input$fatalities_unit == "h") add_perc <- "%" else add_perc <- ""
     paste0(c("Erreur-type : ",
-             paste0(c(tail(param$fatalities_se, -1)), collapse = ", ")
+             paste0(tail(param$fatalities_se, -1), add_perc, collapse = ", ")
     ), collapse = "")
   })
 
@@ -846,6 +872,27 @@ server <- function(input, output, session){
   }) # end observe
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
+
+  # Make sure fatalities are expressed as "number" (not rate) for the run_simul function
+  se_prod2 <- function(mu1, se1, mu2, se2) sqrt((se1^2 * se2^2) + (se1^2 * mu2^2) + (mu1^2 * se2^2))
+
+  observeEvent({
+    input$run
+  },{
+    if(input$fatalities_unit == "h"){
+      pop_size_tot <- sum(pop_vector(pop_size = param$pop_size_mean, pop_size_type = param$pop_size_type, s = param$survivals, f = param$fecundities)[-1])
+      param$fatalities_mean_nb <- (param$fatalities_mean/100) * pop_size_tot
+      param$fatalities_se_nb <- se_prod2(mu1 = param$fatalities_mean/100,
+                                         se1 = param$fatalities_se/100,
+                                         mu2 = pop_size_tot,
+                                         se2 = (pop_size_tot/param$pop_size_mean) * param$pop_size_se)
+    }else{
+      param$fatalities_mean_nb <- param$fatalities_mean
+      param$fatalities_se_nb <- param$fatalities_se
+    }
+  })
+
+
   #################################
   ## Population size
   ##-------------------------------
@@ -928,16 +975,18 @@ server <- function(input, output, session){
         if(input$pop_growth_input_type == "val"){
           # Case 2 : Values directly provided as mean & SE
           ready$pop_growth <- TRUE
-          param$pop_growth_mean <- round(min(1 + param$rMAX_species, input$pop_growth_mean), 3)
-          param$pop_growth_se <- input$pop_growth_se
+          param$pop_growth_mean <- round(min(1 + param$rMAX_species, make_lambda(input$pop_growth_mean)), 3)
+          param$pop_growth_se <- input$pop_growth_se/100
 
         }else{
           # Case 3 : Values directly provided as lower/upper interval
           ready$pop_growth <- TRUE
           param$pop_growth_mean <- round(min(1 + param$rMAX_species,
-                                             round(get_mu(lower = input$pop_growth_lower, upper = input$pop_growth_upper), 2)
+                                             round(get_mu(lower = make_lambda(input$pop_growth_lower),
+                                                          upper = make_lambda(input$pop_growth_upper)), 2)
                                              ), 3)
-          param$pop_growth_se <- round(get_sd(lower = input$pop_growth_lower, upper = input$pop_growth_upper, coverage = CP), 3)
+          param$pop_growth_se <- round(get_sd(lower = make_lambda(input$pop_growth_lower),
+                                              upper = make_lambda(input$pop_growth_upper), coverage = CP), 3)
         } # end (if3)
 
       }
@@ -958,12 +1007,17 @@ server <- function(input, output, session){
         ready$carrying_capacity <- FALSE
       }
     } else {
-      ready$carrying_capacity <- TRUE
-      param$carrying_capacity <- input$carrying_capacity
+      if(input$carrying_cap_input_type == "unknown"){
+        ready$carrying_capacity <- TRUE
+        param$carrying_capacity <- max(param$pop_size_mean*100, 1e8) # use a very large K
+      }else{
+        ready$carrying_capacity <- TRUE
+        param$carrying_capacity <- input$carrying_capacity
+      }
     }
   })
   #############################################
-  ## Survivals, fecundities and rMAX_species
+  ## Survivals, fecundities
   ##-------------------------------------------
   observe({
     param$survivals <- input$mat_fill_vr[,1]
@@ -998,7 +1052,7 @@ server <- function(input, output, session){
 
     # simple inputs
     param$nsim <- input$nsim
-    param$fatal_constant <- input$fatal_constant
+    param$fatal_constant <- "h" # input$fatalities_unit
 
     # fixed in global environment (for now)
     param$theta = theta
@@ -1022,8 +1076,8 @@ server <- function(input, output, session){
         out$run <- run_simul_shiny(nsim = param$nsim,
                                    cumulated_impacts = param$cumulated_impacts,
 
-                                   fatalities_mean = param$fatalities_mean,
-                                   fatalities_se = param$fatalities_se,
+                                   fatalities_mean = param$fatalities_mean_nb,
+                                   fatalities_se = param$fatalities_se_nb,
                                    onset_time = param$onset_time,
 
                                    pop_size_mean = param$pop_size_mean,
@@ -1170,7 +1224,9 @@ server <- function(input, output, session){
   ##-------------------------------------------
   # Function to plot trajectories
   plot_out_traj <- function(){
-    if(is.null(out$run)) {} else {plot_traj(N = out$run$N, xlab = "year", ylab = "pop size")}
+    if(is.null(out$run)) {
+    } else {
+      plot_traj(N = out$run$N, xlab = "Année", ylab = "Taille de population (toutes classes d'âges)")}
   }
 
   output$title_traj_plot <- renderText({

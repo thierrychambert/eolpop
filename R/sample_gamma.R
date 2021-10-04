@@ -21,26 +21,14 @@ sample_gamma <- function(n, mu, sd, r=3) {
     if(sd <= 0){
       xx <- rep(mu,n)
     }else{
-      if(mu < 100){
-        mu = mu*10^r
-        sd = sd*10^r
-        shape = (mu/sd)^2 ; shape
-        scale = sd^2/mu ; scale
-        xx = rgamma(n, shape = shape, scale = scale) / 10^r
-
-      } else {
-
         shape = (mu/sd)^2
         scale = sd^2/mu
         xx = rgamma(n, shape = shape, scale = scale)
-      }
     }
   }
   return(xx)
 } # End function
 ################################################################################
-
-
 
 
 
@@ -52,6 +40,7 @@ sample_gamma <- function(n, mu, sd, r=3) {
 #' @param n number of value to draw.
 #' @param lower lower limit
 #' @param upper upper limit
+#' @param coverage coverage (0 - 1) of the interval between lower and upper. Eg: 0.95 for a 95% coverage.
 #'
 #' @return a vector of drawn values.
 #' @export

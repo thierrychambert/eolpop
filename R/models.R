@@ -13,6 +13,9 @@
 #' @param f a vector of fecundity values for each age class
 #' @param h a number. The harvest or fatality rate
 #' @param DD_params density-dependence parameters. Not used in this model.
+#' @param use_ref_vr Not used in this model, as there is no demographic stochasticity.
+#' @param s_corr_factor Not used in this model, as there is no demographic stochasticity.
+#' @param f_corr_factor Not used in this model, as there is no demographic stochasticity.
 #'
 #' @return a vector of population sizes for each age class at time t2
 #' @export
@@ -24,17 +27,19 @@
 #' h <- 0.05
 #' M1_noDD_noDemoStoch(N1, s, f, h)
 #'
-M1_noDD_noDemoStoch <- function(N1, s, f, h, DD_params = NULL){
+M1_noDD_noDemoStoch <- function(N1, s, f, h, DD_params = NULL,
+                                use_ref_vr = FALSE, s_corr_factor = NULL, f_corr_factor = NULL){
 
   ## M1_noDD_noDemoStoch
 
   # Build the LESLIE matrix
-  A <- build_Leslie(s = s, f = f)
+  A <- build_Leslie(s = s*(1-h), f = f)
 
   # Apply the LESLIE matrix calculation at t+1
-  N2 <- A%*%N1*(1-h)
+  N2 <- A%*%N1
 
-  return(N2)
+  s_corr_factor <- f_corr_factor <- NULL
+  return(list(N2 = N2, s_corr_factor = s_corr_factor, f_corr_factor = f_corr_factor))
 
 } # END FUNCTION
 ################################################################################
@@ -54,6 +59,11 @@ M1_noDD_noDemoStoch <- function(N1, s, f, h, DD_params = NULL){
 #' @param f a vector of fecundity values for each age class
 #' @param h a number. The harvest or fatality rate
 #' @param DD_params density-dependence parameters. Not used in this model.
+#' @param use_ref_vr logical. If FALSE, classic demographic stichasticity is used in the model.
+#' If TRUE, demographic stichasticity is not applied - instead it would be mimicked from the stochasticity of a reference run
+#' (one must then provide s_corr_factor and f_corr_factor).
+#' @param s_corr_factor Correction factor (on survivals) used to mimick demographic stochasticity.
+#' @param f_corr_factor Correction factor (on fecundities) used to mimick demographic stochasticity.
 #'
 #' @return a vector of population sizes for each age class at time t2
 #' @export
@@ -68,26 +78,57 @@ M1_noDD_noDemoStoch <- function(N1, s, f, h, DD_params = NULL){
 #' h <- 0.05
 #' M2_noDD_WithDemoStoch(N1, s, f, h)
 #'
-M2_noDD_WithDemoStoch <- function(N1, s, f, h, DD_params = NULL){
+M2_noDD_WithDemoStoch <- function(N1, s, f, h, DD_params = NULL,
+                                  use_ref_vr = FALSE, s_corr_factor = NULL, f_corr_factor = NULL){
 
   ## M2_noDD_WithDemoStoch
 
   # Number of age classes
   nac = length(s)
 
-  # Survivors (to "natural mortality" (s) and Wind Turbine Fatalities (1-h))
-  S <- rbinom(nac, N1, s)
-  S <- round((1-h)*S)
-  N2 <- c(rep(0, nac-1), tail(S,1)) + c(0, head(S,-1))
+  # If this is a reference scenario : apply classic demographic stichasticity
+  if(!use_ref_vr){
 
-  # Births
-  N2[1] <- sum(rpois(nac, f*N2))
+    # Survivors (to "natural mortality" (s) and Wind Turbine Fatalities (1-h))
+    S <- rbinom(nac, N1, (1-h)*s)
+    s_corr_factor <- S/((1-h)*s*N1)
+    s_corr_factor[is.nan(s_corr_factor)] <- 0
 
-  return(N2)
+    N2 <- c(rep(0, nac-1), tail(S,1)) + c(0, head(S,-1))
+
+    # Births
+    B <- rpois(nac, f*N2)
+    f_corr_factor <- B/(f*N2)
+    f_corr_factor[is.nan(f_corr_factor)] <- 0
+
+    N2[1] <- sum(B)
+
+
+    # Otherwise, use realized vital rates (s and f) values from the reference scenario
+  }else{
+    # Survivors using the "s_realized" from reference scenarios
+    S <- N1*(1-h)*s*s_corr_factor
+
+    # Active rounding
+    S <- round(trunc(S) + rbinom(nac, size = 1, prob = S-trunc(S)))
+
+    N2 <- c(rep(0, nac-1), tail(S,1)) + c(0, head(S,-1))
+
+    # Births
+    B <- sum(f*f_corr_factor*N2)
+
+    # Active rounding
+    B <- round(trunc(B) + rbinom(1, size = 1, prob = B-trunc(B)))
+
+    N2[1] <- B
+    s_corr_factor <- f_corr_factor <- NULL
+
+  } # end if
+
+  return(list(N2 = N2, s_corr_factor = s_corr_factor, f_corr_factor = f_corr_factor))
 
 } # END FUNCTION
 ################################################################################
-
 
 
 
@@ -114,6 +155,9 @@ M2_noDD_WithDemoStoch <- function(N1, s, f, h, DD_params = NULL){
 #' rMAX (maximum population intinsic rate of increase: lambda_max - 1),
 #' K (carrying capacity), and
 #' theta (shape of DD relationshp)
+#' @param use_ref_vr Not used in this model, as there is no demographic stochasticity.
+#' @param s_corr_factor Not used in this model, as there is no demographic stochasticity.
+#' @param f_corr_factor Not used in this model, as there is no demographic stochasticity.
 #'
 #' @return a vector of population sizes for each age class at time t2
 #' @export
@@ -129,7 +173,8 @@ M2_noDD_WithDemoStoch <- function(N1, s, f, h, DD_params = NULL){
 #' DD_params <- list(rMAX = 0.15, K = 1200, theta = 1)
 #' M3_WithDD_noDemoStoch(N1, s, f, h,DD_params = DD_params)
 #'
-M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params){
+M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params,
+                                  use_ref_vr = FALSE, s_corr_factor = NULL, f_corr_factor = NULL){
 
   ## M3_WithDD_noDemoStoch
 
@@ -164,12 +209,14 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params){
   } # if
 
   # Build the LESLIE matrix
-  A_Nt <- build_Leslie(s = s_Nt, f = f_Nt)
+  A_Nt <- build_Leslie(s = s_Nt*(1-h), f = f_Nt)
 
   # Apply the LESLIE matrix calculation at t+1
-  N2 <- A_Nt%*%N1*(1-h)
+  N2 <- A_Nt%*%N1
 
-  return(N2)
+
+  s_corr_factor <- f_corr_factor <- NULL
+  return(list(N2 = N2, s_corr_factor = s_corr_factor, f_corr_factor = f_corr_factor))
 
 } # END FUNCTION
 ################################################################################
@@ -189,6 +236,11 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params){
 #' @param f a vector of fecundity values for each age class
 #' @param h a number. The harvest or fatality rate
 #' @param DD_params density-dependence parameters. Not used in this model.
+#' @param use_ref_vr logical. If FALSE, classic demographic stichasticity is used in the model.
+#' If TRUE, demographic stichasticity is not applied - instead it would be mimicked from the stochasticity of a reference run
+#' (one must then provide s_corr_factor and f_corr_factor).
+#' @param s_corr_factor Correction factor (on survivals) used to mimick demographic stochasticity.
+#' @param f_corr_factor Correction factor (on fecundities) used to mimick demographic stochasticity.
 #'
 #' @import popbio
 #' @import magrittr
@@ -204,7 +256,8 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params){
 #' DD_params <- list(rMAX = 0.15, K = 1200, theta = 1)
 #' M4_WithDD_WithDemoStoch(N1, s, f, h, DD_params = DD_params)
 #'
-M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params){
+M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params,
+                                    use_ref_vr = FALSE, s_corr_factor = NULL, f_corr_factor = NULL){
 
   ## M4_WithDD_WithDemoStoch
 
@@ -242,15 +295,45 @@ M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params){
   # Number of age classes
   nac = length(s)
 
-  # Survivors (to "natural mortality" (s) and Wind Turbine Fatalities (1-h))
-  S <- rbinom(nac, N1, s_Nt)
-  S <- round((1-h)*S)
-  N2 <- c(rep(0, nac-1), tail(S,1)) + c(0, head(S,-1))
 
-  # Births
-  N2[1] <- sum(rpois(nac, f_Nt*N2))
+  # If this is a reference scenario : apply classic demographic stichasticity
+  if(!use_ref_vr){
 
-  return(N2)
+    # Survivors (to "natural mortality" (s) and Wind Turbine Fatalities (1-h))
+    S <- rbinom(nac, N1, (1-h)*s_Nt)
+    s_corr_factor <- S/((1-h)*s_Nt*N1)
+    s_corr_factor[is.nan(s_corr_factor)] <- 0
 
+    N2 <- c(rep(0, nac-1), tail(S,1)) + c(0, head(S,-1))
+
+    # Births
+    B <- rpois(nac, f_Nt*N2)
+    f_corr_factor <- B/(f_Nt*N2)
+    f_corr_factor[is.nan(f_corr_factor)] <- 0
+
+    N2[1] <- sum(B)
+
+
+  }else{
+
+    # Survivors using the "correction factor" from reference scenarios
+    S <- N1*(1-h)*s_Nt*s_corr_factor
+
+    # Active rounding
+    S <- round(trunc(S) + rbinom(nac, size = 1, prob = S-trunc(S)))
+
+    N2 <- c(rep(0, nac-1), tail(S,1)) + c(0, head(S,-1))
+
+    # Births
+    B <- sum(f_Nt*f_corr_factor*N2)
+
+    # Active rounding
+    B <- round(trunc(B) + rbinom(1, size = 1, prob = B-trunc(B)))
+
+    N2[1] <- B
+    s_corr_factor <- f_corr_factor <- NULL
+  }
+
+  return(list(N2 = N2, s_corr_factor = s_corr_factor, f_corr_factor = f_corr_factor))
 } # END FUNCTION
 ################################################################################
