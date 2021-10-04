@@ -112,6 +112,26 @@ rm(list = ls(all.names = TRUE))
                                      )
                           ),
                           choices = species_list)},
+
+              br(),
+              # Show dispersal distances : mean and d = 5%
+              h4(strong("Distances de dispersion"),
+                 bsButton("Q_dispersal_info", label = "", icon = icon("question"), size = "extra-small"),
+                 bsPopover(id = "Q_dispersal_info",
+                           title = "Distances de dispersion",
+                           content = HTML(
+                             "(1) <b>Distance moyenne de dispersion</b> de l\\'espèce, estimée à partir des relations allométriques publiées dans l\\'article de Claramunt (2021).<br><br> (2) Distance équivalente à un <b>taux de dispersion relatif de 5%</b>, sous l\\'hypothèse que la distance de dispersion suit une loi exponentielle.<br><br><u>Reference citée</u> : Claramunt, S. (2021). Flight efficiency explains differences in natal dispersal distances in birds. <i>Ecology</i>, e03442."
+                             ),
+                           placement = "right",
+                           trigger = "click",
+                           options = list(container='body')
+                 )
+              ),
+              #br(),
+              span(textOutput(outputId = "dispersal_mean_info"), style="font-size:16px"),
+              #br(),
+              span(textOutput(outputId = "dispersal_d05p_info"), style="font-size:16px"),
+
       )}, # close column
 
       # Show vital rate values (tableOutput)

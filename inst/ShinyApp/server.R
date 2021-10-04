@@ -200,6 +200,8 @@ server <- function(input, output, session){
   ##--------------------------------------------
   out <- reactiveValues(run = NULL, msg = NULL)
 
+  rv <- reactiveValues(distAVG = NULL, dist05p = NULL)
+
   ready <- reactiveValues(fatalities = TRUE, pop_size = TRUE, pop_growth = TRUE, carrying_capacity = TRUE)
 
   param <- reactiveValues(N1 = NULL,
@@ -789,7 +791,7 @@ server <- function(input, output, session){
   # Function to create the table
   make_mat_popsizes <- function(data_sf, species, pop_size, pop_size_unit, survivals, fecundities){
     nam <- data_sf %>%
-      filter(Nom_espece == species) %>%
+      filter(NomEspece == species) %>%
       select(classes_age) %>%
       unlist %>%
       as.vector
@@ -854,7 +856,7 @@ server <- function(input, output, session){
   # Function to create the matrix
   make_mat_vr <- function(data_sf, species){
     out_mat <- data_sf %>%
-      filter(Nom_espece == species) %>%
+      filter(NomEspece == species) %>%
       select(classes_age, survie, fecondite)
     return(out_mat)
   }
@@ -903,6 +905,33 @@ server <- function(input, output, session){
           withMathJax(sprintf("$$\\lambda = %.02f$$", lam))
         })
   )
+
+
+  #####
+
+  #################################
+  ## Dispersal
+  ##-------------------------------
+  observeEvent({
+    input$species_choice
+  }, {
+    distAVG <- species_data %>%
+      filter(NomEspece == input$species_choice) %>%
+      select(DistDispMoyKM)
+
+    rv$distAVG <- round(distAVG, 1)
+
+    rv$dist05p <- round(-log(0.05)*rv$distAVG, 1)
+  })
+
+  output$dispersal_mean_info <- renderText({
+    paste0("Distance moyenne de dispersion : ", rv$distAVG, " km")
+    })
+
+  output$dispersal_d05p_info <- renderText({
+    paste0("Distance équiv. 5% de dispersion : ", rv$dist05p, " km")
+  })
+
   #####
 
 
