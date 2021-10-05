@@ -46,7 +46,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
   # Remove cases where pop size under sc0 is too small (N < 30)
   ## to get accurate proportion (avg) and uncertainty metrics
-  N_ref[N_ref < 30] <- NaN
+  #N_ref[N_ref < 30] <- NaN
 
   ## Create a warning if the sample size (number of useable iterations for calculation) becomes too small
   spl_size <- apply(N_ref, 1,
@@ -138,7 +138,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
       # Remove cases where pop size under sc0 is too small (N < 30)
       ## to get accurate proportion (avg) and uncertainty metrics
-      N_ref[N_ref < 30] <- NaN
+      #N_ref[N_ref < 30] <- NaN
 
       ## Create a warning if the sample size (number of useable iterations for calculation) becomes too small
       spl_size <- apply(N_ref, 1,
