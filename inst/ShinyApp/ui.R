@@ -709,6 +709,11 @@ rm(list = ls(all.names = TRUE))
                  actionButton(inputId = "run", label = "Lancer l'analyse"),
                  hr(),
 
+                 span(textOutput("title_indiv_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
+                 strong(span(tableOutput("indiv_impact_table"), style="color:orange; font-size:18px", align = "left")),
+
+                 hr(),
+
                  span(textOutput("title_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
                  strong(span(tableOutput("impact_table"), style="color:blue; font-size:18px", align = "left")),
 

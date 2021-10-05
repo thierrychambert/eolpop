@@ -1276,38 +1276,57 @@ server <- function(input, output, session){
   ##                                OUTPUTS
   ##-----------------------------------------------------------------------------------
 
-  ##-------------------------------------------
-  ## Impact
-  ##-------------------------------------------
+  #######################################################################
+  ## Impact : individual farms (for "cumulated impact" analysis only)
+  ##---------------------------------------------------------------------
+  print_indiv_impact <- function(){
+    req(out$run)
+    res = get_metrics(N = out$run$N, cumulated_impacts = TRUE)
+    n_farm <- (dim(res$indiv_farm$impact)[3]-1)
+    fil <- paste0(round(t(res$indiv_farm$impact[time_horzion, -2, -1]),2)*100, "%")
+    matrix(fil,
+           nrow = n_farm,
+           dimnames = list(paste("Parc",1:n_farm), c("Impact", "IC (min)", "IC (max)"))
+    )
+  } # end function print_impact
+
+  # Display title
+  output$title_indiv_impact_result <- renderText({
+    req(input$run > 0, out$analysis_choice == "cumulated")
+    "Résultat : Impact de chaque parc éolien, estimé au bout de 30 ans"
+  })
+
+  # Display impact result (table)
+  output$indiv_impact_table <- renderTable({
+    req(input$run & out$analysis_choice == "cumulated")
+    print_indiv_impact()
+  }, rownames = TRUE)
+
+
+  ##################################################
+  ## Impact : GLOBAL (for all types of analysis)
+  ##------------------------------------------------
   print_impact <- function(){
     req(out$run)
-      # cumulated impact
-      if(param$cumulated_impacts){
-        res = get_metrics(N = out$run$N, cumulated_impacts = TRUE)
-        n_farm <- (dim(res$indiv_farm$impact)[3]-1)
-        fil <- paste0(round(t(res$indiv_farm$impact[time_horzion, -2, -1]),2)*100, "%")
-        matrix(fil,
-               nrow = n_farm,
-               dimnames = list(paste("Parc",1:n_farm), c("Impact", "IC (min)", "IC (max)"))
-        )
+    res = get_metrics(N = out$run$N, cumulated_impacts = FALSE)
+    n_scen <- (dim(res$scenario$impact)[3]-1)
 
-      # Not cumulated impacts
-      }else{
-        res = get_metrics(N = out$run$N, cumulated_impacts = FALSE)
-        n_scen <- (dim(res$scenario$impact)[3]-1)
-        fil <- paste0(round(t(res$scenario$impact[time_horzion, -2, -1]),2)*100, "%")
-        matrix(fil,
-               nrow = n_scen,
-               dimnames = list(paste("Scenario",1:n_scen), c("Impact", "IC (min)", "IC (max)"))
-        )
-      }
+    RowNam <- NULL
+    if(out$analysis_choice == "single_farm") RowNam <- c("Parc 1")
+    if(out$analysis_choice == "cumulated") RowNam <- c("Parc 1", paste("... + Parc", (2:n_scen)))
+    if(out$analysis_choice == "multi_scenario") RowNam <- paste("Scenario", (1:n_scen))
+
+    fil <- paste0(round(t(res$scenario$impact[time_horzion, -2, -1]),2)*100, "%")
+    matrix(fil,
+           nrow = n_scen,
+           dimnames = list(RowNam, c("Impact", "IC (min)", "IC (max)"))
+    )
   } # end function print_impact
 
   # Display title
   output$title_impact_result <- renderText({
-    if(input$run > 0){
-      "Résultat : Impact estimé au bout de 30 ans"
-    }
+    req(input$run)
+    "Résultat : Impact global estimé au bout de 30 ans"
   })
 
   # Display impact result (table)
@@ -1317,8 +1336,7 @@ server <- function(input, output, session){
   }, rownames = TRUE)
 
 
-
-  ##-------------------------------------------
+  #############################################
   ## Probability of extinction
   ##-------------------------------------------
   print_PrExt <- function(){
@@ -1340,9 +1358,8 @@ server <- function(input, output, session){
 
   # Display title
   output$title_PrExt_result <- renderText({
-    if(input$run > 0){
-      "Résultat : Probabilité d'extinction à 30 ans"
-    }
+    req(input$run)
+    "Résultat : Probabilité d'extinction à 30 ans"
   })
 
   # Display impact result (table)
@@ -1352,7 +1369,7 @@ server <- function(input, output, session){
   }, rownames = TRUE)
 
 
-  ##-------------------------------------------
+  #############################################
   ## Plot Impacts
   ##-------------------------------------------
   ## Function to plot the impact
@@ -1373,7 +1390,7 @@ server <- function(input, output, session){
     plot_out_impact()
   })
 
-  ##-------------------------------------------
+  #############################################
   ## Plot Demographic Trajectories
   ##-------------------------------------------
   # Function to plot trajectories
