@@ -56,21 +56,6 @@ rm(list = ls(all.names = TRUE))
                       0.2, -3, 0, 1, 0.90,
                       0.5, -8, -4, -1, 0.90,
                       0.3, -10, -5, -2, 0.70)
-
-  ## Other pre-fill data
-  # fatality table for cumulated impacts (several wind farms)
-  set.seed(seed = 200)
-  init_cumul <-
-    matrix(
-      round(c(
-        runif(n = 20, 1, 10),
-        runif(n = 20, 0.01, 0.20),
-        sort(sample(x = 2000:2050, size = 20, replace = TRUE))
-      ), 2),
-    nrow = 20, ncol = 3, byrow = FALSE)
-
-  # Undo last 'set.seed'
-  set.seed(  ((((Sys.time() %>% as.numeric) %% 1e10) * 1e9) %% 1e5) %>% round  )
 }
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
@@ -113,7 +98,7 @@ rm(list = ls(all.names = TRUE))
 
               # Choose species (selectInput)
               {selectInput(inputId = "species_choice",
-                          selected = "Faucon crécerellette", width = '80%',
+                          selected = "Aigle de Bonelli", width = '80%',
                           label = h4(strong("Sélectionner une espèce"),
                                      bsButton("Q_species_choice", label = "", icon = icon("question"), size = "extra-small"),
                                      bsPopover(id = "Q_species_choice",
@@ -127,6 +112,26 @@ rm(list = ls(all.names = TRUE))
                                      )
                           ),
                           choices = species_list)},
+
+              br(),
+              # Show dispersal distances : mean and d = 5%
+              h4(strong("Distances de dispersion"),
+                 bsButton("Q_dispersal_info", label = "", icon = icon("question"), size = "extra-small"),
+                 bsPopover(id = "Q_dispersal_info",
+                           title = "Distances de dispersion",
+                           content = HTML(
+                             "(1) <b>Distance moyenne de dispersion</b> de l\\'espèce, estimée à partir des relations allométriques publiées dans l\\'article de Claramunt (2021).<br><br> (2) Distance équivalente à un <b>taux de dispersion relatif de 5%</b>, sous l\\'hypothèse que la distance de dispersion suit une loi exponentielle.<br><br><u>Reference citée</u> : Claramunt, S. (2021). Flight efficiency explains differences in natal dispersal distances in birds. <i>Ecology</i>, e03442."
+                             ),
+                           placement = "right",
+                           trigger = "click",
+                           options = list(container='body')
+                 )
+              ),
+              #br(),
+              span(textOutput(outputId = "dispersal_mean_info"), style="font-size:16px"),
+              #br(),
+              span(textOutput(outputId = "dispersal_d05p_info"), style="font-size:16px"),
+
       )}, # close column
 
       # Show vital rate values (tableOutput)
@@ -250,7 +255,7 @@ rm(list = ls(all.names = TRUE))
                                                         label = "Unité",
                                                         choices = c("Nombre de mortalités" = "M",
                                                                     "Taux de mortalité (%)" = "h"),
-                                                        selected = "h"),
+                                                        selected = "M"),
                                 )}, # close wellPanel 1
 
                                 {wellPanel(style = "background:#F0F8FF",
@@ -260,31 +265,35 @@ rm(list = ls(all.names = TRUE))
                                                         choices = c("Intervalle" = "itvl",
                                                                     "Valeurs" = "val",
                                                                     "Elicitation d'expert" = "eli_exp"),
-                                                        selected = "val"),
+                                                        selected = "itvl"),
 
                                            # Interval
                                            numericInput(inputId = "fatalities_lower",
                                                         label = "Borne inférieure (mortalités annuelles)",
-                                                        value = 3.1,
+                                                        value = 1.5,
                                                         min = 0, max = Inf, step = 0.5),
 
                                            numericInput(inputId = "fatalities_upper",
                                                         label = "Borne supérieure (mortalités annuelles)",
-                                                        value = 6.4,
+                                                        value = 4.5,
                                                         min = 0, max = Inf, step = 0.5),
 
                                            # Values
                                            numericInput(inputId = "fatalities_mean",
                                                         label = "Moyenne (mortalités annuelles)",
-                                                        value = 4.8,
+                                                        value = 3.0,
                                                         min = 0, max = Inf, step = 0.5),
 
                                            numericInput(inputId = "fatalities_se",
                                                         label = "Erreur-type (mortalités annuelles)",
-                                                        value = 0.7,
+                                                        value = 0.5,
                                                         min = 0, max = Inf, step = 0.1),
 
                                            # Matrix for expert elicitation
+                                           numericInput(inputId = "fatalities_number_expert",
+                                                        label = "Nombre d'experts",
+                                                        value = 4, min = 1, max = Inf, step = 1),
+
                                            matrixInput(inputId = "fatalities_mat_expert",
                                                        value = matrix(data = eli_fatalities, nrow = 4, ncol = 5,
                                                                       dimnames = list(c("#1", "#2", "#3", "#4"),
@@ -315,7 +324,10 @@ rm(list = ls(all.names = TRUE))
                                                                                 options = list(container='body')
                                                                       )
                                                        ),
-                                                       value = matrix(init_cumul, 3, 3,
+                                                       value = matrix(c(5, 0.5, 2010,
+                                                                        3, 0.5, 2015,
+                                                                        4, 0.5, 2018),
+                                                                      nrow = 3, ncol = 3, byrow = TRUE,
                                                                       dimnames = list(c(paste0("Parc num.", c(1:3))),
                                                                                       c("Moyenne",
                                                                                         "Erreur-type",
@@ -372,26 +384,30 @@ rm(list = ls(all.names = TRUE))
                                          # Interval
                                          numericInput(inputId = "pop_size_lower",
                                                       label = "Borne inférieure (taille population)",
-                                                      value = 254,
+                                                      value = 150,
                                                       min = 0, max = Inf, step = 10),
 
                                          numericInput(inputId = "pop_size_upper",
                                                       label = "Borne supérieure (taille population)",
-                                                      value = 254,
+                                                      value = 250,
                                                       min = 0, max = Inf, step = 10),
 
                                          # Values
                                          numericInput(inputId = "pop_size_mean",
                                                       label = "Moyenne de la taille de la population",
-                                                      value = 254,
+                                                      value = 200,
                                                       min = 0, max = Inf, step = 50),
 
                                          numericInput(inputId = "pop_size_se",
                                                       label = "Erreur-type de la taille de la population",
-                                                      value = 0,
+                                                      value = 30,
                                                       min = 0, max = Inf, step = 1),
 
                                          # Matrix for expert elicitation
+                                         numericInput(inputId = "pop_size_number_expert",
+                                                      label = "Nombre d'experts",
+                                                      value = 4, min = 1, max = Inf, step = 1),
+
                                          matrixInput(inputId = "pop_size_mat_expert",
                                                      value = matrix(data = eli_pop_size, nrow = 4, ncol = 5,
                                                                     dimnames = list(c("#1", "#2", "#3", "#4"),
@@ -459,15 +475,19 @@ rm(list = ls(all.names = TRUE))
                                            ## Input values: mean and se
                                            numericInput(inputId = "pop_growth_mean",
                                                         label = "Moyenne (taux d'accroissement en %)",
-                                                        value = -1,
+                                                        value = -1.5,
                                                         min = -100, max = 100, step = 1),
 
                                            numericInput(inputId = "pop_growth_se",
                                                         label = "Erreur-type (aussi en %)",
-                                                        value = 0,
+                                                        value = 0.5,
                                                         min = 0, max = Inf, step = 0.5),
 
                                            ## Input expert elicitation: table
+                                           numericInput(inputId = "pop_growth_number_expert",
+                                                        label = "Nombre d'experts",
+                                                        value = 4, min = 1, max = Inf, step = 1),
+
                                            matrixInput(inputId = "pop_growth_mat_expert",
                                                        value = matrix(data = eli_pop_growth, nrow = 4, ncol = 5,
                                                                       dimnames = list(c("#1", "#2", "#3", "#4"),
@@ -545,10 +565,16 @@ rm(list = ls(all.names = TRUE))
                                                                     "Elicitation d'expert" = "eli_exp",
                                                                     "Valeur Inconnue" = "unknown")),
 
+                                           # Value
                                            numericInput(inputId = "carrying_capacity",
                                                         label = "Capacité de charge",
                                                         value = 1000,
                                                         min = 0, max = Inf, step = 100),
+
+                                           # Expert Elicitation Matrix
+                                           numericInput(inputId = "carrying_cap_number_expert",
+                                                        label = "Nombre d'experts",
+                                                        value = 4, min = 1, max = Inf, step = 1),
 
                                            matrixInput(inputId = "carrying_cap_mat_expert",
                                                        value = matrix(data = eli_carrying_cap, nrow = 4, ncol = 5,

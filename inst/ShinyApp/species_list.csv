@@ -1,58 +1,57 @@
-NomEspece,OrdreFamille
-Aigle de Bonelli,Accipitriformes
-Aigle royal,Accipitriformes
-Autour des palombes,Accipitriformes
-Balbuzard pêcheur,Accipitriformes
-Bondrée apivore,Accipitriformes
-Busard cendré,Accipitriformes
-Busard des roseaux,Accipitriformes
-Busard Saint-Martin,Accipitriformes
-Buse variable,Accipitriformes
-Elanion blanc,Accipitriformes
-Epervier d'Europe,Accipitriformes
-Faucon crécerelle,Accipitriformes
-Faucon crécerellette,Accipitriformes
-Faucon pélerin,Accipitriformes
-Gypaète barbu,Accipitriformes
-Milan noir,Accipitriformes
-Milan royal ,Accipitriformes
-Pygarge à queue blanche,Accipitriformes
-Vautour fauve,Accipitriformes
-Vautour moine,Accipitriformes
-Vautour percnoptère,Accipitriformes
-Martinet noir,Caprimulgiformes
-Oedicnème criard,Charadriiformes
-Pluvier doré,Charadriiformes
-Sterne pierregarin,Charadriiformes
-Vanneau huppé,Charadriiformes
-Caille des blés,Galliformes
-Perdrix grise,Galliformes
-Perdrix rouge,Galliformes
-Grue cendrée,Gruiformes
-Goéland argenté,Laridés
-Mouette rieuse,Laridés
-Outarde canepetière,Otidiformes
-Alouette des champs,Passeriformes
-Alouette lulu,Passeriformes
-Bruant proyer,Passeriformes
-Bruant jaune,Passeriformes
-Chardonneret élégant,Passeriformes
-Etourneau sansonnet,Passeriformes
-Gobemouche noir,Passeriformes
-Grive musicienne,Passeriformes
-Hirondelle de fenetre,Passeriformes
-Linotte mélodieuse,Passeriformes
-Merle noir,Passeriformes
-Moineau domestique,Passeriformes
-Moineau friquet,Passeriformes
-Pies-grièches (4 espèces en PNA),Passeriformes
-Pouillot véloce,Passeriformes
-Roitelet huppé,Passeriformes
-Roitelet triple-bandeau,Passeriformes
-Rouge-gorge familier,Passeriformes
-Verdier d'Europe,Passeriformes
-Cigogne blanche,Pelecaniformes
-Cigogne noire,Pelecaniformes
-Grand Duc d'Europe,Strigiformes
-Hibou des marais,Strigiformes
-Espèce générique,NA
+NumMAPE,NomEspece,NomScientifique,OrdreFamille,DistDispMoyKM
+1,Aigle de Bonelli,Hieraaetus fasciatus,Accipitriformes,38.4
+2,Aigle royal,Aquila chrysaetos,Accipitriformes,35.3
+3,Autour des palombes,Accipiter gentilis,Accipitriformes,28.7
+4,Balbuzard pêcheur,Pandion haliaetus,Accipitriformes,25.2
+5,Bondrée apivore,Pernis apivorus,Accipitriformes,22
+6,Busard cendré,Circus pygargus,Accipitriformes,33.9
+7,Busard des roseaux,Circus aeruginosus,Accipitriformes,42
+8,Busard Saint-Martin,Circus cyaneus,Accipitriformes,26.8
+9,Buse variable,Buteo buteo,Accipitriformes,28.4
+10,Elanion blanc,Elanus caeruleus,Accipitriformes,39.9
+11,Epervier d'Europe,Accipiter nisus,Accipitriformes,19.8
+12,Faucon crécerelle,Falco tinnunculus,Accipitriformes,33.5
+13,Faucon crécerellette,Falco naumanni,Accipitriformes,19.8
+14,Faucon pélerin,Falco peregrinus,Accipitriformes,27.6
+15,Gypaète barbu,Gypaetus barbatus,Accipitriformes,NA
+16,Milan noir,Milvus migrans,Accipitriformes,32.9
+17,Milan royal,Milvus milvus,Accipitriformes,68.5
+18,Pygarge à queue blanche,Haliaeetus albicilla,Accipitriformes,20.9
+19,Vautour fauve,Gyps fulvus,Accipitriformes,35.9
+20,Vautour moine,Aegypius monachus,Accipitriformes,17.6
+21,Vautour percnoptère,Neophron percnopterus,Accipitriformes,23.4
+22,Martinet noir,Apus apus,Caprimulgiformes,24.8
+23,Oedicnème criard,Burhinus oedicnemus,Charadriiformes,NA
+24,Pluvier doré,Pluvialis apricaria,Charadriiformes,15.1
+25,Sterne pierregarin,Sterna hirundo,Charadriiformes,36.6
+26,Vanneau huppé,Vanellus vanellus,Charadriiformes,18.2
+27,Caille des blés,Coturnix coturnix,Galliformes,13.5
+28,Perdrix grise,Perdix perdix,Galliformes,NA
+29,Perdrix rouge,Alectoris rufa,Galliformes,NA
+30,Grue cendrée,Grus grus,Gruiformes,23.9
+31,Goéland argenté,Larus argentatus,Laridés,52.3
+32,Mouette rieuse,Larus ridibundus,Laridés,57
+33,Outarde canepetière,Tetrax tetrax,Otidiformes,NA
+34,Alouette des champs,Alauda arvensis,Passeriformes,15.9
+35,Alouette lulu,Lullula arborea,Passeriformes,12.6
+36,Bruant proyer,Emberiza calandra,Passeriformes,NA
+37,Bruant jaune,Emberiza citrinella,Passeriformes,NA
+38,Chardonneret élégant,Carduelis carduelis,Passeriformes,14.2
+39,Etourneau sansonnet,Sturnus vulgaris,Passeriformes,12.7
+40,Gobemouche noir,Ficedula hypoleuca,Passeriformes,15.7
+41,Grive musicienne,Turdus philomelos,Passeriformes,13.1
+42,Hirondelle de fenêtre,Delichon urbica,Passeriformes,18
+43,Linotte mélodieuse,Carduelis cannabina,Passeriformes,14
+44,Merle noir,Turdus merula,Passeriformes,8.7
+45,Moineau domestique,Passer domesticus,Passeriformes,NA
+46,Moineau friquet,Passer montanus,Passeriformes,NA
+47,Pies-grièches (4 espèces en PNA),Lanius spp.,Passeriformes,15
+48,Pouillot véloce,Phylloscopus collybita,Passeriformes,NA
+49,Roitelet huppé,Regulus regulus,Passeriformes,8.9
+50,Roitelet triple-bandeau,Regulus ignicapillus,Passeriformes,6.8
+51,Rouge-gorge familier,Erithacus rubecula,Passeriformes,8.7
+52,Verdier d'Europe,Carduelis chloris,Passeriformes,11
+53,Cigogne blanche,Ciconia ciconia,Pelecaniformes,19.2
+54,Cigogne noire,Ciconia nigra,Pelecaniformes,18.6
+55,Grand Duc d'Europe,Bubo bubo,Strigiformes,NA
+56,Hibou des marais,Asio flammeus,Strigiformes,26.6

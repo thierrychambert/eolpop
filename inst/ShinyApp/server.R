@@ -66,6 +66,7 @@ server <- function(input, output, session){
     shinyjs::hide("fatalities_se")
     shinyjs::hide("fatalities_lower")
     shinyjs::hide("fatalities_upper")
+    shinyjs::hide("fatalities_number_expert")
     shinyjs::hide("fatalities_mat_expert")
     shinyjs::hide("fatalities_run_expert")
     shinyjs::hide("farm_number_cumulated")
@@ -75,6 +76,7 @@ server <- function(input, output, session){
     shinyjs::hide("pop_size_upper")
     shinyjs::hide("pop_size_mean")
     shinyjs::hide("pop_size_se")
+    shinyjs::hide("pop_size_number_expert")
     shinyjs::hide("pop_size_mat_expert")
     shinyjs::hide("pop_size_run_expert")
 
@@ -82,12 +84,14 @@ server <- function(input, output, session){
     shinyjs::hide("pop_growth_upper")
     shinyjs::hide("pop_growth_mean")
     shinyjs::hide("pop_growth_se")
+    shinyjs::hide("pop_growth_number_expert")
     shinyjs::hide("pop_growth_mat_expert")
     shinyjs::hide("pop_growth_run_expert")
     shinyjs::hide("pop_trend")
     shinyjs::hide("pop_trend_strength")
 
     shinyjs::hide("carrying_capacity")
+    shinyjs::hide("carrying_cap_number_expert")
     shinyjs::hide("carrying_cap_mat_expert")
     shinyjs::hide("carrying_cap_run_expert")
 
@@ -114,6 +118,7 @@ server <- function(input, output, session){
           shinyjs::show("fatalities_se")
         }
         if(input$fatalities_input_type == "eli_exp"){
+          shinyjs::show("fatalities_number_expert")
           shinyjs::show("fatalities_mat_expert")
           shinyjs::show("fatalities_run_expert")
         }
@@ -141,6 +146,7 @@ server <- function(input, output, session){
         shinyjs::show("pop_size_se")
       }
       if(input$pop_size_input_type == "eli_exp"){
+        shinyjs::show("pop_size_number_expert")
         shinyjs::show("pop_size_mat_expert")
         shinyjs::show("pop_size_run_expert")
       }
@@ -159,6 +165,7 @@ server <- function(input, output, session){
         shinyjs::show("pop_growth_se")
       }
       if(input$pop_growth_input_type == "eli_exp"){
+        shinyjs::show("pop_growth_number_expert")
         shinyjs::show("pop_growth_mat_expert")
         shinyjs::show("pop_growth_run_expert")
       }
@@ -177,6 +184,7 @@ server <- function(input, output, session){
         shinyjs::show("carrying_capacity")
       }
       if(input$carrying_cap_input_type == "eli_exp"){
+        shinyjs::show("carrying_cap_number_expert")
         shinyjs::show("carrying_cap_mat_expert")
         shinyjs::show("carrying_cap_run_expert")
       }
@@ -197,6 +205,8 @@ server <- function(input, output, session){
   ##  Reactive values
   ##--------------------------------------------
   out <- reactiveValues(run = NULL, msg = NULL)
+
+  rv <- reactiveValues(distAVG = NULL, dist05p = NULL)
 
   ready <- reactiveValues(fatalities = TRUE, pop_size = TRUE, pop_growth = TRUE, carrying_capacity = TRUE)
 
@@ -246,30 +256,133 @@ server <- function(input, output, session){
   #####
 
   ##############################################
-  ## Update matrix cumulated impact
+  ## Define some functions
   ##-------------------------------------------
+  # Get lambda from +/-X% growth rate
+  make_lambda <- function(pop_growth)  1 + (pop_growth/100)
+  #####
+
+  #####
+  ##------------------------------------------
+  ## Update elicitation matrices
+  ##------------------------------------------
+
+  ###############################
+  ## Cumulated Impacts Matrix
+  ##-----------------------------
   observeEvent({
     input$farm_number_cumulated
   }, {
-
-    nfarm <- input$farm_number_cumulated
-    init_cumul_new  <- init_cumul[1:nfarm,]
+    req(input$farm_number_cumulated > 0)
+    current_mat <- input$fatalities_mat_cumulated
+    n_farm <- input$farm_number_cumulated
+    if(n_farm > nrow(current_mat)){
+      fill_mat <- c(as.vector(t(current_mat)), rep(NA,(3*(n_farm-nrow(current_mat)))))
+    }else{
+      fill_mat <- as.vector(t(current_mat[1:n_farm,]))
+    }
     updateMatrixInput(session, inputId = "fatalities_mat_cumulated",
-                      value =  matrix(init_cumul_new, nrow = nfarm, ncol = 3, byrow = FALSE,
-                                      dimnames = list(paste("Parc", c(1:nfarm)),
+                      value =  matrix(fill_mat, nrow = n_farm, ncol = 3, byrow = TRUE,
+                                      dimnames = list(paste("Parc", c(1:n_farm)),
                                                       c("Moyenne",
                                                         "Erreur-type",
                                                         "Année (début)"))))
   })
   #####
 
+  ########################
+  ## Fatalities Matrix
+  ##----------------------
+  observeEvent({
+    input$fatalities_number_expert
+  }, {
+    req(input$fatalities_number_expert > 0)
+    current_mat <- input$fatalities_mat_expert
+    n_experts <- input$fatalities_number_expert
+    if(n_experts > nrow(current_mat)){
+      fill_mat <- c(as.vector(t(current_mat)), rep(NA,(5*(n_experts-nrow(current_mat)))))
+    }else{
+      fill_mat <- as.vector(t(current_mat[1:n_experts,]))
+    }
+    updateMatrixInput(session, inputId = "fatalities_mat_expert",
+                      value = matrix(fill_mat, nrow = n_experts, ncol = 5, byrow = TRUE,
+                                     dimnames = list(paste0("#", 1:n_experts),
+                                                     c("Poids", "Min", "Best", "Max", "% IC" ))
+                                     )
+                      )
+  })
+  #####
 
-  ##############################################
-  ## Define some functions
-  ##-------------------------------------------
-  ###
-  # Get lambda from +/-X% growth rate
-  make_lambda <- function(pop_growth)  1 + (pop_growth/100)
+  ########################
+  ## Pop Size Matrix
+  ##----------------------
+  observeEvent({
+    input$pop_size_number_expert
+  }, {
+    req(input$pop_size_number_expert > 0)
+    current_mat <- input$pop_size_mat_expert
+    n_experts <- input$pop_size_number_expert
+    if(n_experts > nrow(current_mat)){
+      fill_mat <- c(as.vector(t(current_mat)), rep(NA,(5*(n_experts-nrow(current_mat)))))
+    }else{
+      fill_mat <- as.vector(t(current_mat[1:n_experts,]))
+    }
+    updateMatrixInput(session, inputId = "pop_size_mat_expert",
+                      value = matrix(fill_mat, nrow = n_experts, ncol = 5, byrow = TRUE,
+                                     dimnames = list(paste0("#", 1:n_experts),
+                                                     c("Poids", "Min", "Best", "Max", "% IC" ))
+                      )
+    )
+  })
+  #####
+
+  ########################
+  ## Pop Growth Matrix
+  ##----------------------
+  observeEvent({
+    input$pop_growth_number_expert
+  }, {
+    req(input$pop_growth_number_expert > 0)
+    current_mat <- input$pop_growth_mat_expert
+    n_experts <- input$pop_growth_number_expert
+    if(n_experts > nrow(current_mat)){
+      fill_mat <- c(as.vector(t(current_mat)), rep(NA,(5*(n_experts-nrow(current_mat)))))
+    }else{
+      fill_mat <- as.vector(t(current_mat[1:n_experts,]))
+    }
+    updateMatrixInput(session, inputId = "pop_growth_mat_expert",
+                      value = matrix(fill_mat, nrow = n_experts, ncol = 5, byrow = TRUE,
+                                     dimnames = list(paste0("#", 1:n_experts),
+                                                     c("Poids", "Min", "Best", "Max", "% IC" ))
+                      )
+    )
+  })
+  #####
+
+  ############################
+  ## Carrying Capacity Matrix
+  ##--------------------------
+  observeEvent({
+    input$carrying_cap_number_expert
+  }, {
+    req(input$carrying_cap_number_expert > 0)
+    current_mat <- input$carrying_cap_mat_expert
+    n_experts <- input$carrying_cap_number_expert
+    if(n_experts > nrow(current_mat)){
+      fill_mat <- c(as.vector(t(current_mat)), rep(NA,(5*(n_experts-nrow(current_mat)))))
+    }else{
+      fill_mat <- as.vector(t(current_mat[1:n_experts,]))
+    }
+    updateMatrixInput(session, inputId = "carrying_cap_mat_expert",
+                      value = matrix(fill_mat, nrow = n_experts, ncol = 5, byrow = TRUE,
+                                     dimnames = list(paste0("#", 1:n_experts),
+                                                     c("Poids", "Min", "Best", "Max", "% IC" ))
+                      )
+    )
+  })
+  #####
+
+
 
   #####
   ##--------------------------------------------
@@ -684,7 +797,7 @@ server <- function(input, output, session){
   # Function to create the table
   make_mat_popsizes <- function(data_sf, species, pop_size, pop_size_unit, survivals, fecundities){
     nam <- data_sf %>%
-      filter(Nom_espece == species) %>%
+      filter(NomEspece == species) %>%
       select(classes_age) %>%
       unlist %>%
       as.vector
@@ -749,7 +862,7 @@ server <- function(input, output, session){
   # Function to create the matrix
   make_mat_vr <- function(data_sf, species){
     out_mat <- data_sf %>%
-      filter(Nom_espece == species) %>%
+      filter(NomEspece == species) %>%
       select(classes_age, survie, fecondite)
     return(out_mat)
   }
@@ -798,6 +911,33 @@ server <- function(input, output, session){
           withMathJax(sprintf("$$\\lambda = %.02f$$", lam))
         })
   )
+
+
+  #####
+
+  #################################
+  ## Dispersal
+  ##-------------------------------
+  observeEvent({
+    input$species_choice
+  }, {
+    distAVG <- species_data %>%
+      filter(NomEspece == input$species_choice) %>%
+      select(DistDispMoyKM)
+
+    rv$distAVG <- round(distAVG, 1)
+
+    rv$dist05p <- round(-log(0.05)*rv$distAVG, 1)
+  })
+
+  output$dispersal_mean_info <- renderText({
+    paste0("Distance moyenne de dispersion : ", rv$distAVG, " km")
+    })
+
+  output$dispersal_d05p_info <- renderText({
+    paste0("Distance équiv. 5% de dispersion : ", rv$dist05p, " km")
+  })
+
   #####
 
 
@@ -1125,11 +1265,11 @@ server <- function(input, output, session){
 
   ## Functions to print the output as text (non cumulated impacts)
   print_impact_table <- function(res){
-    nfarm <- (dim(res$indiv_farm$impact)[3]-1)
+    n_farm <- (dim(res$indiv_farm$impact)[3]-1)
     fil <- paste0(round(t(res$indiv_farm$impact[time_horzion, -2, -1]),2)*100, "%")
     matrix(fil,
-           nrow = nfarm,
-           dimnames = list(paste("Parc",1:nfarm), c("Impact", "IC (min)", "IC (max)"))
+           nrow = n_farm,
+           dimnames = list(paste("Parc",1:n_farm), c("Impact", "IC (min)", "IC (max)"))
     )
   } # end function print_impact_table
 
