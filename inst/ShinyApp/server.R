@@ -71,6 +71,7 @@ server <- function(input, output, session){
     shinyjs::hide("fatalities_run_expert")
     shinyjs::hide("farm_number_cumulated")
     shinyjs::hide("fatalities_mat_cumulated")
+    shinyjs::hide("fatalities_vec_scenario")
 
     shinyjs::hide("pop_size_lower")
     shinyjs::hide("pop_size_upper")
@@ -104,9 +105,8 @@ server <- function(input, output, session){
     if(input$button_fatalities%%2 == 1){
       #shinyjs::show("fatal_constant")
 
-      # Show inputs for none cumulated impacts scenario
-
-      if(input$analysis_choice == "scenario"){
+      # Show inputs for single farm option (non-cumulated impacts)
+      if(input$analysis_choice == "single_farm"){
         shinyjs::show("fatalities_input_type")
 
         if(input$fatalities_input_type == "itvl"){
@@ -124,12 +124,17 @@ server <- function(input, output, session){
         }
       }
 
-      # Show inputs for cumulated scenario
-
+      # Show inputs for cumulated impacts option
       if(input$analysis_choice == "cumulated"){
         shinyjs::hide("fatalities_input_type")
         shinyjs::show("farm_number_cumulated")
         shinyjs::show("fatalities_mat_cumulated")
+      }
+
+      # Show inputs for multiple scenario
+      if(input$analysis_choice == "multi_scenario"){
+        shinyjs::hide("fatalities_input_type")
+        shinyjs::show("fatalities_vec_scenario")
       }
 
     }
@@ -956,10 +961,10 @@ server <- function(input, output, session){
   observeEvent({
     input$run
   }, {
-    if(input$analysis_choice == "scenario"){
-      param$cumulated_impacts = FALSE
-    } else {
+    if(input$analysis_choice == "cumulated"){
       param$cumulated_impacts = TRUE
+    } else {
+      param$cumulated_impacts = FALSE
     } # end if
   }) # end observeEvent
 
@@ -968,7 +973,7 @@ server <- function(input, output, session){
   ##-------------------------------
   observe({
     # Case 1 : Not cumulated effects (if1)
-    if(input$analysis_choice == "scenario"){
+    if(input$analysis_choice == "single_farm"){
 
       # Case 1.1 : Values from expert elicitation (if2)
       if(input$fatalities_input_type == "eli_exp"){
@@ -1000,13 +1005,29 @@ server <- function(input, output, session){
 
       } # end (if2)
 
-      # Case 2 : Cumulated effects (if-else 1)
+      # Case 2 : Cumulated effects
     } else {
-      ready$fatalities <- TRUE
-      param$fatalities_mean <- c(0, input$fatalities_mat_cumulated[,1])
-      param$fatalities_se <- c(0, input$fatalities_mat_cumulated[,2])
-      param$onset_year <- c(min(input$fatalities_mat_cumulated[,3]), input$fatalities_mat_cumulated[,3])
-      param$onset_time <- param$onset_year - min(param$onset_year) + 1
+      if(input$analysis_choice == "cumulated"){
+        ready$fatalities <- TRUE
+        param$fatalities_mean <- c(0, input$fatalities_mat_cumulated[,1])
+        param$fatalities_se <- c(0, input$fatalities_mat_cumulated[,2])
+        param$onset_year <- c(min(input$fatalities_mat_cumulated[,3]), input$fatalities_mat_cumulated[,3])
+        param$onset_time <- param$onset_year - min(param$onset_year) + 1
+
+        # Case 3 : Scenarios
+      }else{
+        req(input$fatalities_vec_scenario)
+        vec01 <- as.numeric(unlist(strsplit(input$fatalities_vec_scenario, " ")))
+        param$fatalities_mean <- c(0, vec01)
+        param$fatalities_se <- rep(0, length(vec01)+1)
+        param$onset_time <- NULL
+        ready$fatalities <- TRUE
+      }
+
+
+
+
+
     } # end (if1)
 
   }) # end observe

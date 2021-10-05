@@ -21,7 +21,6 @@ rm(list = ls(all.names = TRUE))
   (data_sf)
 
   # Fixed parameters (for now)
-  nsim = 10
   coeff_var_environ = 0.03
   time_horzion = 30
   theta = 1 # DD parameter theta
@@ -93,7 +92,7 @@ rm(list = ls(all.names = TRUE))
                                                 options = list(container='body')
                                       )
                            ),
-                           choices = c("Impacts non cumulés" = "scenario", "Impacts cumulés" = "cumulated")
+                           choices = c("Impacts non cumulés" = "single_farm", "Impacts cumulés" = "cumulated", "Multiple scénarios" = "multi_scenario")
               )},
 
               # Choose species (selectInput)
@@ -335,6 +334,33 @@ rm(list = ls(all.names = TRUE))
                                                        class = "numeric",
                                                        rows = list(names = TRUE),
                                                        cols = list(names = TRUE)),
+
+
+                                           ### Part for "scenarios option"
+                                           selectizeInput(inputId = "fatalities_vec_scenario",
+                                             label = HTML(
+                                               "Saisir chaque valeur de mortalité<br>
+                                               (séparer par un espace)"
+                                               ),
+                                             choices = NULL,
+                                             multiple = TRUE,
+                                             options = list(
+                                               create = TRUE,
+                                               delimiter = ' ',
+                                               create = I("function(input, callback){
+                                                              return {
+                                                              value: input,
+                                                              text: input
+                                                            };
+                                                          }")
+                                             )
+                                           ),
+
+
+
+
+
+
                                 )}, # close wellPanel
 
               )}, # close conditional panel
