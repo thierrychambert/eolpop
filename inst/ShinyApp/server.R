@@ -209,7 +209,7 @@ server <- function(input, output, session){
   ##############################################
   ##  Reactive values
   ##--------------------------------------------
-  out <- reactiveValues(run = NULL, msg = NULL)
+  out <- reactiveValues(run = NULL, msg = NULL, analysis_choice = NULL)
 
   rv <- reactiveValues(distAVG = NULL, dist05p = NULL)
 
@@ -1232,6 +1232,7 @@ server <- function(input, output, session){
   }, {
 
     if(ready$fatalities & ready$pop_size & ready$pop_growth & ready$carrying_capacity){
+      out$analysis_choice <- input$analysis_choice
       withProgress(message = 'Simulation progress', value = 0, {
 
         out$run <- run_simul_shiny(nsim = param$nsim,
@@ -1276,55 +1277,31 @@ server <- function(input, output, session){
   ##-----------------------------------------------------------------------------------
 
   ##-------------------------------------------
-  ## Impact text
+  ## Impact
   ##-------------------------------------------
-  ## Functions to print the output as text (non cumulated impacts)
-  print_impact_text <- function(impact, lci, uci){
-    paste0("Impact : ", round(impact, 2)*100, "%",
-           "[", round(lci, 2)*100, "% ; ", round(uci, 2)*100, "%]")
-  } # end function print_impact_text
-
-  ## Functions to print the output as text (non cumulated impacts)
-  print_impact_table <- function(res){
-    n_farm <- (dim(res$indiv_farm$impact)[3]-1)
-    fil <- paste0(round(t(res$indiv_farm$impact[time_horzion, -2, -1]),2)*100, "%")
-    matrix(fil,
-           nrow = n_farm,
-           dimnames = list(paste("Parc",1:n_farm), c("Impact", "IC (min)", "IC (max)"))
-    )
-  } # end function print_impact_table
-
-  print_out <- function(){
-    if(!is.null(out$run)) {
-      # Print the result
-
+  print_impact <- function(){
+    req(out$run)
+      # cumulated impact
       if(param$cumulated_impacts){
-        # cumulated impact ==> Table
-        print_impact_table(res = get_metrics(N = out$run$N, cumulated_impacts = TRUE))
+        res = get_metrics(N = out$run$N, cumulated_impacts = TRUE)
+        n_farm <- (dim(res$indiv_farm$impact)[3]-1)
+        fil <- paste0(round(t(res$indiv_farm$impact[time_horzion, -2, -1]),2)*100, "%")
+        matrix(fil,
+               nrow = n_farm,
+               dimnames = list(paste("Parc",1:n_farm), c("Impact", "IC (min)", "IC (max)"))
+        )
+
+      # Not cumulated impacts
       }else{
-        # non cumulated impact ==> Text
-        print_impact_text(impact = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "avg",-1],
-                 lci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "lci",-1],
-                 uci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "uci",-1])
+        res = get_metrics(N = out$run$N, cumulated_impacts = FALSE)
+        n_scen <- (dim(res$scenario$impact)[3]-1)
+        fil <- paste0(round(t(res$scenario$impact[time_horzion, -2, -1]),2)*100, "%")
+        matrix(fil,
+               nrow = n_scen,
+               dimnames = list(paste("Scenario",1:n_scen), c("Impact", "IC (min)", "IC (max)"))
+        )
       }
-
-    } else {
-      # When run is NULL
-
-      if(!is.null(out$msg)){
-
-        # Print the error msg, if there is one
-        if(out$msg == "error_not_ready"){
-          paste0("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
-        }else{
-          paste0("Some other error occurred")
-        }
-
-      }else{
-        # When no error msg : nothing happens
-      } # if "msg"
-    } # if "run
-  } # end function print_out
+  } # end function print_impact
 
   # Display title
   output$title_impact_result <- renderText({
@@ -1333,31 +1310,47 @@ server <- function(input, output, session){
     }
   })
 
-  # Display result (text for non cumulated impacts)
-  output$impact_text <- renderText({
-    if(input$run == 0){
-      NULL
-    }else{
-      if(!param$cumulated_impacts){
-        print_out()
-      } else{
-        NULL
-      }
+  # Display impact result (table)
+  output$impact_table <- renderTable({
+    req(input$run)
+    print_impact()
+  }, rownames = TRUE)
+
+
+
+  ##-------------------------------------------
+  ## Probability of extinction
+  ##-------------------------------------------
+  print_PrExt <- function(){
+    req(out$run)
+    res = get_metrics(N = out$run$N, cumulated_impacts = FALSE)
+    n_scen <- dim(res$scenario$impact)[3]
+
+    RowNam <- NULL
+    if(out$analysis_choice == "single_farm") RowNam <- c("Sans parc", "Avec parc")
+    if(out$analysis_choice == "cumulated") RowNam <- c("Sans parc", "+ Parc 1", paste("... + Parc", (3:n_scen)-1))
+    if(out$analysis_choice == "multi_scenario") RowNam <- paste("Scenario", (1:n_scen)-1)
+
+    fil <- paste0(round(t(res$scenario$Pext),2)*100, "%")
+    matrix(fil,
+           nrow = n_scen,
+           dimnames = list(RowNam, c("Probabilité d'extinction"))
+    )
+  } # end function print_PrExt
+
+  # Display title
+  output$title_PrExt_result <- renderText({
+    if(input$run > 0){
+      "Résultat : Probabilité d'extinction à 30 ans"
     }
   })
 
-  # Display result (table for cumulated impacts)
-  output$impact_table <- renderTable({
-    if(input$run == 0){
-      NULL
-    }else{
-      if(param$cumulated_impacts){
-        print_out()
-      } else{
-        NULL
-      }
-    }
+  # Display impact result (table)
+  output$PrExt_table <- renderTable({
+    req(input$run)
+    print_PrExt()
   }, rownames = TRUE)
+
 
   ##-------------------------------------------
   ## Plot Impacts
