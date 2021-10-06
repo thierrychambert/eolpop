@@ -6,8 +6,6 @@
 #' @param N a 4-D array containing demographic projection outputs
 #' @param onset_year a vector containing the years of each wind farm start being active
 #' (thus, the year at whihc each fatality value starts kicking in)
-#' @param percent a logical value indicating whether the impact should be displayed in % (y axis).
-#' If FALSE, the impact value displayed is between 0 and -1 (negative impact).
 #' @param xlab a character string. Label for the x axis.
 #' @param ylab a character string. Label for the y axis.
 #' @param Legend a vector of character strings. The legend to show on the side of the plot.
@@ -20,10 +18,9 @@
 #' @importFrom scales pretty_breaks
 #' @import ggplot2
 #'
-#' @examples
 #'
 #'
-plot_traj <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", ylab = "Relative impact (%)",
+plot_traj <- function(N, onset_year = NULL, xlab = "Year", ylab = "Relative impact (%)",
                         Legend = NULL, ...){
 
   # Get metrics and dimensions
@@ -83,7 +80,9 @@ plot_traj <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", ylab 
   # Add y-axis on right side, and make pretty x/y axis and limits
   p <- p +
     scale_y_continuous(expand = expansion(mult = c(0.025, 0.005)),
-                       breaks = scales::pretty_breaks(n = 10)) +
+                       breaks = scales::pretty_breaks(n = 10),
+                       sec.axis = sec_axis(trans = ~.*1, name = "",
+                                           breaks = scales::pretty_breaks(n = 10))) +
     scale_x_continuous(expand = expansion(mult = c(0.015, 0)),
                        breaks = scales::pretty_breaks(n = 10))
 

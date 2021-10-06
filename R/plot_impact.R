@@ -20,8 +20,6 @@
 #' @importFrom scales pretty_breaks
 #' @import ggplot2
 #'
-#' @examples
-#'
 #'
 plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", ylab = "Relative impact (%)",
                         Legend = NULL, ...){
@@ -75,7 +73,8 @@ plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", yla
                        breaks = scales::pretty_breaks(n = 10),
                        sec.axis = sec_axis(trans = ~.*1, name = "",
                                            breaks = scales::pretty_breaks(n = 10))) +
-    scale_x_continuous(expand = c(0,0))
+    scale_x_continuous(expand = expansion(mult = c(0.015, 0)),
+                       breaks = scales::pretty_breaks(n = 10))
 
   # Add horizontal dashed lines (for better viz)
   p <- p + geom_hline(yintercept = seq(0 , -100, by = -10), size = 0.5, linetype = 3, colour = grey(0.15))

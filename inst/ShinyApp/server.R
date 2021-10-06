@@ -1375,8 +1375,15 @@ server <- function(input, output, session){
   ## Function to plot the impact
   plot_out_impact <- function(){
     if(is.null(out$run)) {} else {
+
+      n_scen <- dim(out$run$N)[3]
+      Legend <- NULL
+      if(out$analysis_choice == "single_farm") Legend <- c("Sans parc", "Avec parc")
+      if(out$analysis_choice == "cumulated") Legend <- c("Sans parc", "+ Parc 1", paste("... + Parc", (3:n_scen)-1))
+      if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", (1:n_scen)-1)
+
       plot_impact(N = out$run$N, onset_year = param$onset_year, percent = TRUE,
-                  xlab = "\nAnnée", ylab = "Impact relatif (%)\n")
+                  xlab = "\nAnnée", ylab = "Impact relatif (%)\n", Legend = Legend)
       }
   }
 
@@ -1397,7 +1404,15 @@ server <- function(input, output, session){
   plot_out_traj <- function(){
     if(is.null(out$run)) {
     } else {
-      plot_traj(N = out$run$N, xlab = "Année", ylab = "Taille de population (toutes classes d'âges)")}
+
+      n_scen <- dim(out$run$N)[3]
+      Legend <- NULL
+      if(out$analysis_choice == "single_farm") Legend <- c("Sans parc", "Avec parc")
+      if(out$analysis_choice == "cumulated") Legend <- c("Sans parc", "+ Parc 1", paste("... + Parc", (3:n_scen)-1))
+      if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", (1:n_scen)-1)
+
+      plot_traj(N = out$run$N, onset_year = param$onset_year,
+                xlab = "\nAnnée", ylab = "Taille de population\n", Legend = Legend)}
   }
 
   output$title_traj_plot <- renderText({

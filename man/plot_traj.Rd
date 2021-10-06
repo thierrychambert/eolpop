@@ -7,7 +7,6 @@
 plot_traj(
   N,
   onset_year = NULL,
-  percent = TRUE,
   xlab = "Year",
   ylab = "Relative impact (\%)",
   Legend = NULL,
@@ -19,9 +18,6 @@ plot_traj(
 
 \item{onset_year}{a vector containing the years of each wind farm start being active
 (thus, the year at whihc each fatality value starts kicking in)}
-
-\item{percent}{a logical value indicating whether the impact should be displayed in \% (y axis).
-If FALSE, the impact value displayed is between 0 and -1 (negative impact).}
 
 \item{xlab}{a character string. Label for the x axis.}
 
@@ -36,8 +32,4 @@ a plot of the relative impact of each scenario.
 }
 \description{
 Plot demographic trajectories
-}
-\examples{
-
-
 }

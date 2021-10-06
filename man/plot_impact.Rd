@@ -37,7 +37,3 @@ a plot of the relative impact of each scenario.
 \description{
 Plot the relative impact for each scenario
 }
-\examples{
-
-
-}
