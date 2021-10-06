@@ -23,7 +23,7 @@ run_simul_shiny(
   theta = 1,
   rMAX_species,
   model_demo = NULL,
-  time_horzion,
+  time_horizon,
   coeff_var_environ,
   fatal_constant
 )
@@ -68,14 +68,14 @@ It can be calculated using the function rMAX_spp. See ?rMAX_spp for details.
 
 References :
 Niel, C., and J. Lebreton. 2005. Using demographic invariants to detect overharvested bird
-populations from incomplete data. Conservation Biology 19:826–835.}
+populations from incomplete data. Conservation Biology 19:826-835.}
 
 \item{model_demo}{is NULL, by default, because the model choice will be made inside each iteration (simulation),
 base on the values of N0 and lam0 that are drawn.
 But it can be forced by setting the value, which must then be an R object corresponding to the demographic model to be used.
 The 4 possible models currently are: M1_noDD_noDemoStoch, M2_noDD_WithDemoStoch, M3_WithDD_noDemoStoch, M4_WithDD_WithDemoStoch,}
 
-\item{time_horzion}{a number. The number of years (time horizon) over which to project the population dynamics.}
+\item{time_horizon}{a number. The number of years (time horizon) over which to project the population dynamics.}
 
 \item{coeff_var_environ}{a number. The coefficient of variation to model environment stochasticity.}
 

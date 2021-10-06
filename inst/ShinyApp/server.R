@@ -71,6 +71,7 @@ server <- function(input, output, session){
     shinyjs::hide("fatalities_run_expert")
     shinyjs::hide("farm_number_cumulated")
     shinyjs::hide("fatalities_mat_cumulated")
+    shinyjs::hide("fatalities_vec_scenario")
 
     shinyjs::hide("pop_size_lower")
     shinyjs::hide("pop_size_upper")
@@ -104,9 +105,8 @@ server <- function(input, output, session){
     if(input$button_fatalities%%2 == 1){
       #shinyjs::show("fatal_constant")
 
-      # Show inputs for none cumulated impacts scenario
-
-      if(input$analysis_choice == "scenario"){
+      # Show inputs for single farm option (non-cumulated impacts)
+      if(input$analysis_choice == "single_farm"){
         shinyjs::show("fatalities_input_type")
 
         if(input$fatalities_input_type == "itvl"){
@@ -124,12 +124,17 @@ server <- function(input, output, session){
         }
       }
 
-      # Show inputs for cumulated scenario
-
+      # Show inputs for cumulated impacts option
       if(input$analysis_choice == "cumulated"){
         shinyjs::hide("fatalities_input_type")
         shinyjs::show("farm_number_cumulated")
         shinyjs::show("fatalities_mat_cumulated")
+      }
+
+      # Show inputs for multiple scenario
+      if(input$analysis_choice == "multi_scenario"){
+        shinyjs::hide("fatalities_input_type")
+        shinyjs::show("fatalities_vec_scenario")
       }
 
     }
@@ -204,7 +209,7 @@ server <- function(input, output, session){
   ##############################################
   ##  Reactive values
   ##--------------------------------------------
-  out <- reactiveValues(run = NULL, msg = NULL)
+  out <- reactiveValues(run = NULL, msg = NULL, analysis_choice = NULL)
 
   rv <- reactiveValues(distAVG = NULL, dist05p = NULL)
 
@@ -240,7 +245,7 @@ server <- function(input, output, session){
                           rMAX_species = NULL,
 
                           model_demo = NULL,
-                          time_horzion = NULL,
+                          time_horizon = NULL,
                           coeff_var_environ = NULL,
                           fatal_constant = NULL,
 
@@ -956,10 +961,10 @@ server <- function(input, output, session){
   observeEvent({
     input$run
   }, {
-    if(input$analysis_choice == "scenario"){
-      param$cumulated_impacts = FALSE
-    } else {
+    if(input$analysis_choice == "cumulated"){
       param$cumulated_impacts = TRUE
+    } else {
+      param$cumulated_impacts = FALSE
     } # end if
   }) # end observeEvent
 
@@ -968,7 +973,7 @@ server <- function(input, output, session){
   ##-------------------------------
   observe({
     # Case 1 : Not cumulated effects (if1)
-    if(input$analysis_choice == "scenario"){
+    if(input$analysis_choice == "single_farm"){
 
       # Case 1.1 : Values from expert elicitation (if2)
       if(input$fatalities_input_type == "eli_exp"){
@@ -1000,13 +1005,29 @@ server <- function(input, output, session){
 
       } # end (if2)
 
-      # Case 2 : Cumulated effects (if-else 1)
+      # Case 2 : Cumulated effects
     } else {
-      ready$fatalities <- TRUE
-      param$fatalities_mean <- c(0, input$fatalities_mat_cumulated[,1])
-      param$fatalities_se <- c(0, input$fatalities_mat_cumulated[,2])
-      param$onset_year <- c(min(input$fatalities_mat_cumulated[,3]), input$fatalities_mat_cumulated[,3])
-      param$onset_time <- param$onset_year - min(param$onset_year) + 1
+      if(input$analysis_choice == "cumulated"){
+        ready$fatalities <- TRUE
+        param$fatalities_mean <- c(0, input$fatalities_mat_cumulated[,1])
+        param$fatalities_se <- c(0, input$fatalities_mat_cumulated[,2])
+        param$onset_year <- c(min(input$fatalities_mat_cumulated[,3]), input$fatalities_mat_cumulated[,3])
+        param$onset_time <- param$onset_year - min(param$onset_year) + 1
+
+        # Case 3 : Scenarios
+      }else{
+        req(input$fatalities_vec_scenario)
+        vec01 <- as.numeric(unlist(strsplit(input$fatalities_vec_scenario, " ")))
+        param$fatalities_mean <- c(0, vec01)
+        param$fatalities_se <- rep(0, length(vec01)+1)
+        param$onset_time <- NULL
+        ready$fatalities <- TRUE
+      }
+
+
+
+
+
     } # end (if1)
 
   }) # end observe
@@ -1187,17 +1208,22 @@ server <- function(input, output, session){
   ############################################################
   ## Observe parameter values to be used in simulations run
   ##----------------------------------------------------------
-  observe({
-    param # required to ensure up-to-date values are run
-
-    # simple inputs
+  observeEvent({
+    input$run
+  }, {
     param$nsim <- input$nsim
-    param$fatal_constant <- "h" # input$fatalities_unit
+    param$fatal_constant <- input$fatalities_unit
+    param$time_horizon <- input$time_horizon
+
+  }) # Close observEvent
+
+
+  observe ({
+    param # to ensure up-to-date values are run
 
     # fixed in global environment (for now)
-    param$theta = theta
-    param$time_horzion = time_horzion
-    param$coeff_var_environ = coeff_var_environ
+    param$theta <- theta
+    param$coeff_var_environ <- coeff_var_environ
 
   }) # end observe
   #####
@@ -1211,6 +1237,7 @@ server <- function(input, output, session){
   }, {
 
     if(ready$fatalities & ready$pop_size & ready$pop_growth & ready$carrying_capacity){
+      out$analysis_choice <- input$analysis_choice
       withProgress(message = 'Simulation progress', value = 0, {
 
         out$run <- run_simul_shiny(nsim = param$nsim,
@@ -1235,7 +1262,7 @@ server <- function(input, output, session){
                                    rMAX_species = param$rMAX_species,
 
                                    model_demo = NULL,
-                                   time_horzion = param$time_horzion,
+                                   time_horizon = param$time_horizon,
                                    coeff_var_environ = param$coeff_var_environ,
                                    fatal_constant = param$fatal_constant)
       }) # Close withProgress
@@ -1254,98 +1281,114 @@ server <- function(input, output, session){
   ##                                OUTPUTS
   ##-----------------------------------------------------------------------------------
 
-  ##-------------------------------------------
-  ## Impact text
-  ##-------------------------------------------
-  ## Functions to print the output as text (non cumulated impacts)
-  print_impact_text <- function(impact, lci, uci){
-    paste0("Impact : ", round(impact, 2)*100, "%",
-           "[", round(lci, 2)*100, "% ; ", round(uci, 2)*100, "%]")
-  } # end function print_impact_text
-
-  ## Functions to print the output as text (non cumulated impacts)
-  print_impact_table <- function(res){
+  #######################################################################
+  ## Impact : individual farms (for "cumulated impact" analysis only)
+  ##---------------------------------------------------------------------
+  print_indiv_impact <- function(){
+    req(out$run)
+    res <- get_metrics(N = out$run$N, cumulated_impacts = TRUE)
     n_farm <- (dim(res$indiv_farm$impact)[3]-1)
-    fil <- paste0(round(t(res$indiv_farm$impact[time_horzion, -2, -1]),2)*100, "%")
+    fil <- paste0(round(t(res$indiv_farm$impact[param$time_horizon, -2, -1]),2)*100, "%")
     matrix(fil,
            nrow = n_farm,
            dimnames = list(paste("Parc",1:n_farm), c("Impact", "IC (min)", "IC (max)"))
     )
-  } # end function print_impact_table
+  } # end function print_impact
 
-  print_out <- function(){
-    if(!is.null(out$run)) {
-      # Print the result
+  # Display title
+  output$title_indiv_impact_result <- renderText({
+    req(input$run > 0, out$analysis_choice == "cumulated")
+    "Résultat : Impact de chaque parc éolien, estimé au bout de 30 ans"
+  })
 
-      if(param$cumulated_impacts){
-        # cumulated impact ==> Table
-        print_impact_table(res = get_metrics(N = out$run$N, cumulated_impacts = TRUE))
-      }else{
-        # non cumulated impact ==> Text
-        print_impact_text(impact = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "avg",-1],
-                 lci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "lci",-1],
-                 uci = get_metrics(N = out$run$N)$scenario$impact[time_horzion, "uci",-1])
-      }
+  # Display impact result (table)
+  output$indiv_impact_table <- renderTable({
+    req(input$run & out$analysis_choice == "cumulated")
+    print_indiv_impact()
+  }, rownames = TRUE)
 
-    } else {
-      # When run is NULL
 
-      if(!is.null(out$msg)){
+  ##################################################
+  ## Impact : GLOBAL (for all types of analysis)
+  ##------------------------------------------------
+  print_impact <- function(){
+    req(out$run)
+    res <- get_metrics(N = out$run$N, cumulated_impacts = FALSE)
+    n_scen <- (dim(res$scenario$impact)[3]-1)
 
-        # Print the error msg, if there is one
-        if(out$msg == "error_not_ready"){
-          paste0("Erreur: Vous n'avez pas lancer l'analyse 'valeurs experts'")
-        }else{
-          paste0("Some other error occurred")
-        }
+    RowNam <- NULL
+    if(out$analysis_choice == "single_farm") RowNam <- c("Parc 1")
+    if(out$analysis_choice == "cumulated") RowNam <- c("Parc 1", paste("... + Parc", (2:n_scen)))
+    if(out$analysis_choice == "multi_scenario") RowNam <- paste("Scenario", (1:n_scen))
 
-      }else{
-        # When no error msg : nothing happens
-      } # if "msg"
-    } # if "run
-  } # end function print_out
+    fil <- paste0(round(t(res$scenario$impact[param$time_horizon, -2, -1]),2)*100, "%")
+    matrix(fil,
+           nrow = n_scen,
+           dimnames = list(RowNam, c("Impact", "IC (min)", "IC (max)"))
+    )
+  } # end function print_impact
 
   # Display title
   output$title_impact_result <- renderText({
-    if(input$run > 0){
-      "Résultat : Impact estimé au bout de 30 ans"
-    }
+    req(input$run)
+    "Résultat : Impact global estimé au bout de 30 ans"
   })
 
-  # Display result (text for non cumulated impacts)
-  output$impact_text <- renderText({
-    if(input$run == 0){
-      NULL
-    }else{
-      if(!param$cumulated_impacts){
-        print_out()
-      } else{
-        NULL
-      }
-    }
-  })
-
-  # Display result (table for cumulated impacts)
+  # Display impact result (table)
   output$impact_table <- renderTable({
-    if(input$run == 0){
-      NULL
-    }else{
-      if(param$cumulated_impacts){
-        print_out()
-      } else{
-        NULL
-      }
-    }
+    req(input$run)
+    print_impact()
   }, rownames = TRUE)
 
+
+  #############################################
+  ## Probability of extinction
   ##-------------------------------------------
+  print_PrExt <- function(){
+    req(out$run)
+    res <- get_metrics(N = out$run$N, cumulated_impacts = FALSE)
+    n_scen <- dim(res$scenario$impact)[3]
+
+    RowNam <- NULL
+    if(out$analysis_choice == "single_farm") RowNam <- c("Sans parc", "Avec parc")
+    if(out$analysis_choice == "cumulated") RowNam <- c("Sans parc", "+ Parc 1", paste("... + Parc", (3:n_scen)-1))
+    if(out$analysis_choice == "multi_scenario") RowNam <- paste("Scenario", (1:n_scen)-1)
+
+    fil <- paste0(round(t(res$scenario$Pext),2)*100, "%")
+    matrix(fil,
+           nrow = n_scen,
+           dimnames = list(RowNam, c("Probabilité d'extinction"))
+    )
+  } # end function print_PrExt
+
+  # Display title
+  output$title_PrExt_result <- renderText({
+    req(input$run)
+    "Résultat : Probabilité d'extinction à 30 ans"
+  })
+
+  # Display impact result (table)
+  output$PrExt_table <- renderTable({
+    req(input$run)
+    print_PrExt()
+  }, rownames = TRUE)
+
+
+  #############################################
   ## Plot Impacts
   ##-------------------------------------------
   ## Function to plot the impact
   plot_out_impact <- function(){
     if(is.null(out$run)) {} else {
+
+      n_scen <- dim(out$run$N)[3]
+      Legend <- NULL
+      if(out$analysis_choice == "single_farm") Legend <- c("Sans parc", "Avec parc")
+      if(out$analysis_choice == "cumulated") Legend <- c("Sans parc", "+ Parc 1", paste("... + Parc", (3:n_scen)-1))
+      if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", (1:n_scen)-1)
+
       plot_impact(N = out$run$N, onset_year = param$onset_year, percent = TRUE,
-                  xlab = "\nAnnée", ylab = "Impact relatif (%)\n")
+                  xlab = "\nAnnée", ylab = "Impact relatif (%)\n", Legend = Legend)
       }
   }
 
@@ -1359,14 +1402,22 @@ server <- function(input, output, session){
     plot_out_impact()
   })
 
-  ##-------------------------------------------
+  #############################################
   ## Plot Demographic Trajectories
   ##-------------------------------------------
   # Function to plot trajectories
   plot_out_traj <- function(){
     if(is.null(out$run)) {
     } else {
-      plot_traj(N = out$run$N, xlab = "Année", ylab = "Taille de population (toutes classes d'âges)")}
+
+      n_scen <- dim(out$run$N)[3]
+      Legend <- NULL
+      if(out$analysis_choice == "single_farm") Legend <- c("Sans parc", "Avec parc")
+      if(out$analysis_choice == "cumulated") Legend <- c("Sans parc", "+ Parc 1", paste("... + Parc", (3:n_scen)-1))
+      if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", (1:n_scen)-1)
+
+      plot_traj(N = out$run$N, onset_year = param$onset_year,
+                xlab = "\nAnnée", ylab = "Taille de population\n", Legend = Legend)}
   }
 
   output$title_traj_plot <- renderText({

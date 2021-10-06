@@ -13,7 +13,7 @@
 #' @param DD_params NULL or a list. Density-dependence parameters (rMAX, K, theta). Only used in DD models M3 and M4.
 #' @param model_demo an R object corresponding to the demographic model to be used. The 4 possible models currently are:
 #' M1_noDD_noDemoStoch, M2_noDD_WithDemoStoch, M3_WithDD_noDemoStoch, M4_WithDD_WithDemoStoch,
-#' @param time_horzion a number. The number of years (time horizon) over which to project the population dynamics.
+#' @param time_horizon a number. The number of years (time horizon) over which to project the population dynamics.
 #' @param coeff_var_environ a number. The coefficient of variation to model environment stochasticity.
 #' @param fatal_constant text (character). Either "h" or "M". Using "h" sets the fatality RATE as the constant value across years.
 #' Using "M" sets the NUMBER of fatalities as the constant value across years.
@@ -27,7 +27,7 @@
 #' f <- c(0, 0, 0.05, 0.55)
 #' N0 <- pop_vector(pop_size = 200, pop_size_type = "Npair", s, f)
 #' pop_project(fatalities = c(0, 5, 10), intial_pop_vector = N0, s = s, f = f,
-#' model_demo = M2_noDD_WithDemoStoch, time_horzion = 30,
+#' model_demo = M2_noDD_WithDemoStoch, time_horizon = 30,
 #' coeff_var_environ = 0.1, fatal_constant = "h")
 #'
 pop_project_cumulated_impacts <- function(fatalities,
@@ -36,7 +36,7 @@ pop_project_cumulated_impacts <- function(fatalities,
                                           s, f,
                                           DD_params,
                                           model_demo,
-                                          time_horzion,
+                                          time_horizon,
                                           coeff_var_environ,
                                           fatal_constant = "h"){
 
@@ -45,7 +45,7 @@ pop_project_cumulated_impacts <- function(fatalities,
   cv_env <- coeff_var_environ
 
   # Number of years
-  nyr <- time_horzion
+  nyr <- time_horizon
 
   # Number of age classes
   nac <- length(s)

@@ -21,9 +21,8 @@ rm(list = ls(all.names = TRUE))
   (data_sf)
 
   # Fixed parameters (for now)
-  nsim = 10
   coeff_var_environ = 0.03
-  time_horzion = 30
+  #time_horizon = 30
   theta = 1 # DD parameter theta
   CP = 0.99 # Coverage probability for lower - upper values
 }
@@ -93,7 +92,7 @@ rm(list = ls(all.names = TRUE))
                                                 options = list(container='body')
                                       )
                            ),
-                           choices = c("Impacts non cumulés" = "scenario", "Impacts cumulés" = "cumulated")
+                           choices = c("Impacts non cumulés" = "single_farm", "Impacts cumulés" = "cumulated", "Multiple scénarios" = "multi_scenario")
               )},
 
               # Choose species (selectInput)
@@ -324,9 +323,9 @@ rm(list = ls(all.names = TRUE))
                                                                                 options = list(container='body')
                                                                       )
                                                        ),
-                                                       value = matrix(c(5, 0.5, 2010,
+                                                       value = matrix(c(8, 0.5, 2010,
                                                                         3, 0.5, 2015,
-                                                                        4, 0.5, 2018),
+                                                                        15, 0.5, 2018),
                                                                       nrow = 3, ncol = 3, byrow = TRUE,
                                                                       dimnames = list(c(paste0("Parc num.", c(1:3))),
                                                                                       c("Moyenne",
@@ -335,6 +334,33 @@ rm(list = ls(all.names = TRUE))
                                                        class = "numeric",
                                                        rows = list(names = TRUE),
                                                        cols = list(names = TRUE)),
+
+
+                                           ### Part for "scenarios option"
+                                           selectizeInput(inputId = "fatalities_vec_scenario",
+                                             label = HTML(
+                                               "Saisir chaque valeur de mortalité<br>
+                                               (séparer par un espace)"
+                                               ),
+                                             choices = NULL,
+                                             multiple = TRUE,
+                                             options = list(
+                                               create = TRUE,
+                                               delimiter = ' ',
+                                               create = I("function(input, callback){
+                                                              return {
+                                                              value: input,
+                                                              text: input
+                                                            };
+                                                          }")
+                                             )
+                                           ),
+
+
+
+
+
+
                                 )}, # close wellPanel
 
               )}, # close conditional panel
@@ -674,21 +700,34 @@ rm(list = ls(all.names = TRUE))
         tabPanel(title = "Impact population",
 
                  br(),
+                 numericInput(inputId = "time_horizon",
+                              label = "Nombre d'années",
+                              value = 30, min = 5, max = Inf, step = 10),
+
+                 br(),
                  numericInput(inputId = "nsim",
                               label = "Nombre de simulations",
                               value = 10, min = 0, max = Inf, step = 10),
 
                  br(),
-
                  actionButton(inputId = "run", label = "Lancer l'analyse"),
                  hr(),
 
-                 span(textOutput("title_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
-                 br(),
-                 strong(span(textOutput("impact_text"), style="color:blue; font-size:18px", align = "left")),
-                 strong(span(tableOutput("impact_table"), style="color:blue; font-size:18px", align = "left")),
-                 br(),
+                 span(textOutput("title_indiv_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
+                 strong(span(tableOutput("indiv_impact_table"), style="color:green; font-size:18px", align = "left")),
 
+                 hr(),
+
+                 span(textOutput("title_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
+                 strong(span(tableOutput("impact_table"), style="color:blue; font-size:18px", align = "left")),
+
+                 hr(),
+
+                 br(),
+                 span(textOutput("title_PrExt_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
+                 strong(span(tableOutput("PrExt_table"), style="color:orange; font-size:18px", align = "left")),
+
+                 br(),
                  hr(),
 
                  tags$h4(textOutput("title_impact_plot"), align = "center"),

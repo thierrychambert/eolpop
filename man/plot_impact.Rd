@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_impact.R
 \name{plot_impact}
 \alias{plot_impact}
-\title{Plot demographic trajectories}
+\title{Plot the relative impact for each scenario}
 \usage{
 plot_impact(
   N,
@@ -10,6 +10,7 @@ plot_impact(
   percent = TRUE,
   xlab = "Year",
   ylab = "Relative impact (\%)",
+  Legend = NULL,
   ...
 )
 }
@@ -26,15 +27,13 @@ If FALSE, the impact value displayed is between 0 and -1 (negative impact).}
 
 \item{ylab}{a character string. Label for the y axis.}
 
+\item{Legend}{a vector of character strings. The legend to show on the side of the plot.}
+
 \item{...}{any other graphical input similar to the R plot function}
 }
 \value{
 a plot of the relative impact of each scenario.
 }
 \description{
-Plot demographic trajectories
-}
-\examples{
-# plot_impact(demo_proj, xlab = "year", ylab = "pop size")
-
+Plot the relative impact for each scenario
 }
