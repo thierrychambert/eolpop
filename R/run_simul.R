@@ -92,9 +92,6 @@ run_simul <- function(nsim, cumulated_impacts,
   # Create object to store DD parameters
   DD_params <- list()
 
-  # Define K
-  K <- sum(pop_vector(pop_size = carrying_capacity, pop_size_type = pop_size_type, s = survivals, f = fecundities))
-
   # Fill the list of DD parameters
   DD_params$K <- NULL
   DD_params$theta <- theta

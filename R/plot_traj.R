@@ -20,7 +20,7 @@
 #'
 #'
 #'
-plot_traj <- function(N, onset_year = NULL, xlab = "Year", ylab = "Relative impact (%)",
+plot_traj <- function(N, onset_year = NULL, xlab = "Year", ylab = "Population size",
                         Legend = NULL, ...){
 
   # Get metrics and dimensions

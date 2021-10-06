@@ -1422,7 +1422,7 @@ server <- function(input, output, session){
 
   output$title_traj_plot <- renderText({
     if(input$run > 0){
-      "Graphique : Trajectoire démographique"
+      "Graphique : Trajectoires démographiques"
     }
   })
 
