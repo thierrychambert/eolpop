@@ -690,7 +690,10 @@ rm(list = ls(all.names = TRUE))
       # Capacite de charge
       {wellPanel(style = "background:#DCDCDC",
                  p("Capacité de charge", style="font-size:20px; font-weight: bold"),
-                 span(textOutput(outputId = "carrying_capacity_info"), style="font-size:16px"),
+                 shiny::tags$u(textOutput(outputId = "carrying_capacity_unit_info"), style="font-size:16px"),
+                 p(""),
+                 span(textOutput(outputId = "carrying_capacity_mean_info"), style="font-size:16px"),
+                 span(textOutput(outputId = "carrying_capacity_se_info"), style="font-size:16px"),
       )},
 
 

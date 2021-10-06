@@ -851,25 +851,38 @@ server <- function(input, output, session){
   ## Carrying capacity
   ##-------------------------------
   # UNIT (like pop size)
-  output$carrying_capacity_info <- renderText({
-
-    # Source info "unit"
-    if(is.null(param$pop_size_unit)){
-      unit1 <- input$pop_size_unit
-    }else{
-      unit1 <- param$pop_size_unit
+  ## UNIT
+  output$carrying_capacity_unit_info <- renderText({
+    if(!is.null(param$pop_size_unit)){
+      if(input$carrying_cap_input_type == "unknown"){
+        "Inconnue"
+      }else{
+        if(param$pop_size_unit == "Npair"){
+          paste0("Nombre de couple")
+        } else {
+          paste0("Effectif total")
+        }
+      }
     }
-
-    # UNIT information
-    if(unit1 == "Npair"){
-      info1 <- paste0("Nombre de couple")
-    } else {
-      info1 <- paste0("Effectif total")
-    }
-
-    # paste for printing
-    paste0(info1, " : ", param$carrying_capacity_mean)
   })
+
+  ## VALUES
+  output$carrying_capacity_mean_info <- renderText({
+    if(input$carrying_cap_input_type == "unknown"){
+      NULL
+    }else{
+      paste0("Moyenne : ", param$carrying_capacity_mean)
+    }
+  })
+
+  output$carrying_capacity_se_info <- renderText({
+    if(input$carrying_cap_input_type == "unknown"){
+      NULL
+    }else{
+      paste0("Erreur-type : ", param$carrying_capacity_se)
+    }
+  })
+
 
 
   #################################
@@ -1189,7 +1202,7 @@ server <- function(input, output, session){
 
       }else{
         # values: mean and se
-        if(input$pop_size_input_type == "val"){
+        if(input$carrying_cap_input_type == "val"){
           ready$carrying_capacity <- TRUE
           param$carrying_capacity_mean <- input$carrying_capacity_mean
           param$carrying_capacity_se <- input$carrying_capacity_se
