@@ -4,48 +4,91 @@
 #' Plot demographic trajectories
 #'
 #' @param N a 4-D array containing demographic projection outputs
-#' @param len number of individual trajectories to show on the plot
+#' @param onset_year a vector containing the years of each wind farm start being active
+#' (thus, the year at whihc each fatality value starts kicking in)
+#' @param percent a logical value indicating whether the impact should be displayed in % (y axis).
+#' If FALSE, the impact value displayed is between 0 and -1 (negative impact).
+#' @param xlab a character string. Label for the x axis.
+#' @param ylab a character string. Label for the y axis.
+#' @param Legend a vector of character strings. The legend to show on the side of the plot.
 #' @param ... any other graphical input similar to the R plot function
 #'
-#' @return a plot of individual trajectories, from each simulation run,
-#' and the average trajectory of each scenario.
-#' Black = reference scenario (sc0). Red = fatality scenario (sc1)
+#' @return a plot of the relative impact of each scenario.
 #' @export
 #'
-#' @import dichromat
+#' @importFrom dplyr filter
+#' @importFrom scales pretty_breaks
+#' @import ggplot2
 #'
 #' @examples
-#' plot_traj(demo_proj, xlab = "year", ylab = "pop size")
-plot_traj <- function(N, len = 50, ...){
+#'
+#'
+plot_traj <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", ylab = "Relative impact (%)",
+                        Legend = NULL, ...){
+
+  # Get metrics and dimensions
   TH <- dim(N)[2]
   nsim <- dim(N)[4]
-  len <- min(len, nsim)
+  nsc <- dim(N)[3]
+  if(is.null(onset_year)) onset_year <- 1
+  years <- min(onset_year) + (1:TH) - 1
 
-  # Average trend
-  N_avg <- apply(N, c(1,2,3), mean)
+  # Average trajectory and CI limits (here we use CI = +/- 0.5*SE to avoid overloading the graph)
+  out <- colSums(N[-1,,,])
+  N_avg <- apply(out, c(1,2), mean)
+  N_lci <- apply(out, c(1,2), quantile, prob = pnorm(0.5))
+  N_uci <- apply(out, c(1,2), quantile, prob = pnorm(-0.5))
 
-  # Color palette
-  col_sc0 <- make_transparent(colorRampPalette(colors = c("black", "grey"))(nsim), percent = 85)
-  col_sc1 <- make_transparent(colorRampPalette(colors = c("red", "orange"))(nsim), percent = 85)
+  # Build dataframe
+  df <- as.data.frame(cbind(year = years, N_avg = N_avg[,1], N_lci = N_lci[,1], N_uci = N_uci[,1], scenario = 1))
+  for(j in 2:nsc) df <- rbind(df, cbind(year = years, N_avg = N_avg[,j], N_lci = N_lci[,j], N_uci = N_uci[,j], scenario = j))
 
-  # Initiate plot
-  plot(x = 1:TH, y = colSums(N_avg[,,"sc0"]), type = 'n', col=1, lwd=3, ylim = c(0,max(colSums(N))), ...)
+  ## Define Graphic Parameters
+  size = 1.5
 
-  ## Plot individual trajectories
-  sel <- sample(x = nsim, size = len)
+  # Plot lines and CIs
+  p <-
+    ggplot(data = df, aes(x = .data$year, y = .data$N_avg)) +
+    geom_line(size = size, aes(colour = factor(.data$scenario))) +
+    geom_ribbon(aes(ymin = .data$N_lci, ymax = .data$N_uci, fill = factor(.data$scenario)), linetype = 0, alpha = 0.100)
 
-  # Scenario 0
-  for(k in 1:length(sel)) points(x = 1:TH, y = colSums(N[,,"sc0",sel[k]]), type = 'l', col=col_sc0[k])
+  ## If want to not show CI for sc0, use :
+  #  geom_ribbon(data = dplyr::filter(df, .data$scenario > 1), aes(ymin = .data$N_lci, ymax = .data$N_uci, fill = factor(.data$scenario)), linetype = 0, alpha = 0.100)
 
-  # Scenario 1
-  for(k in 1:length(sel)) points(x = 1:TH, y = colSums(N[,,"sc1",sel[k]]), type = 'l', col=col_sc1[k])
+  # change color palette (we want sc0 in black)
+  p <- p +
+    scale_color_manual(breaks = 1:nsc,
+                       values = palette()[1:nsc],
+                       labels = Legend, aesthetics = c("colour", "fill"))
 
-  ## Plot average trend for each scenario
-  # Scenario 0
-  points(x = 1:TH, y = colSums(N_avg[,,"sc0"]), type = 'l', col=1, lwd=3)
 
-  # Scenario 1
-  points(x = 1:TH, y = colSums(N_avg[,,"sc1"]), type = 'l', col="red2", lwd=3)
+  # Add x/y labels and legend
+  p <- p +
+    labs(x = xlab, y = ylab,
+         col = "Scenario", fill = "Scenario") +
+    theme(
+      axis.title=element_text(size = 20, face = "bold"),
+      axis.text=element_text(size = 14)
+    )
+
+
+  # Improve th eoverall look
+  p <- p +
+    theme(legend.key.height = unit(2, 'line'),
+          legend.key.width = unit(3, 'line'),
+          legend.title = element_text(size = 18, face = "bold"),
+          legend.text = element_text(size = 14))
+
+
+  # Add y-axis on right side, and make pretty x/y axis and limits
+  p <- p +
+    scale_y_continuous(expand = expansion(mult = c(0.025, 0.005)),
+                       breaks = scales::pretty_breaks(n = 10)) +
+    scale_x_continuous(expand = expansion(mult = c(0.015, 0)),
+                       breaks = scales::pretty_breaks(n = 10))
+
+
+  return(p)
 
 } # End function
 ################################################################################

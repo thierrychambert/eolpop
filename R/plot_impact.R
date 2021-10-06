@@ -1,7 +1,7 @@
 ##==============================================================================
-##                           Plot trajectories                                ==
+##                        Plot of the relative impact                         ==
 ##==============================================================================
-#' Plot demographic trajectories
+#' Plot the relative impact for each scenario
 #'
 #' @param N a 4-D array containing demographic projection outputs
 #' @param onset_year a vector containing the years of each wind farm start being active
@@ -10,6 +10,7 @@
 #' If FALSE, the impact value displayed is between 0 and -1 (negative impact).
 #' @param xlab a character string. Label for the x axis.
 #' @param ylab a character string. Label for the y axis.
+#' @param Legend a vector of character strings. The legend to show on the side of the plot.
 #' @param ... any other graphical input similar to the R plot function
 #'
 #' @return a plot of the relative impact of each scenario.
@@ -20,9 +21,10 @@
 #' @import ggplot2
 #'
 #' @examples
-#' # plot_impact(demo_proj, xlab = "year", ylab = "pop size")
 #'
-plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", ylab = "Relative impact (%)", Legend, ...){
+#'
+plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", ylab = "Relative impact (%)",
+                        Legend = NULL, ...){
 
   # Get metrics and dimensions
   if(percent) out <- get_metrics(N)$scenario$impact*100 else out <- get_metrics(N)$scenario$impact

@@ -4,23 +4,40 @@
 \alias{plot_traj}
 \title{Plot demographic trajectories}
 \usage{
-plot_traj(N, len = 50, ...)
+plot_traj(
+  N,
+  onset_year = NULL,
+  percent = TRUE,
+  xlab = "Year",
+  ylab = "Relative impact (\%)",
+  Legend = NULL,
+  ...
+)
 }
 \arguments{
 \item{N}{a 4-D array containing demographic projection outputs}
 
-\item{len}{number of individual trajectories to show on the plot}
+\item{onset_year}{a vector containing the years of each wind farm start being active
+(thus, the year at whihc each fatality value starts kicking in)}
+
+\item{percent}{a logical value indicating whether the impact should be displayed in \% (y axis).
+If FALSE, the impact value displayed is between 0 and -1 (negative impact).}
+
+\item{xlab}{a character string. Label for the x axis.}
+
+\item{ylab}{a character string. Label for the y axis.}
+
+\item{Legend}{a vector of character strings. The legend to show on the side of the plot.}
 
 \item{...}{any other graphical input similar to the R plot function}
 }
 \value{
-a plot of individual trajectories, from each simulation run,
-and the average trajectory of each scenario.
-Black = reference scenario (sc0). Red = fatality scenario (sc1)
+a plot of the relative impact of each scenario.
 }
 \description{
 Plot demographic trajectories
 }
 \examples{
-plot_traj(demo_proj, xlab = "year", ylab = "pop size")
+
+
 }
