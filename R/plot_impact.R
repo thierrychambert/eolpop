@@ -47,7 +47,7 @@ plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", yla
 
   # Plot CIs
   p <- p +
-    geom_ribbon(data = filter(df, .data$scenario > 1),
+    geom_ribbon(data = dplyr::filter(df, .data$scenario > 1),
                 aes(ymin = .data$uci, ymax = .data$lci, fill = factor(.data$scenario)), linetype = 0, alpha = 0.100)
 
   # Add x/y labels and legend
