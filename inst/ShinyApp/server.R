@@ -1208,17 +1208,22 @@ server <- function(input, output, session){
   ############################################################
   ## Observe parameter values to be used in simulations run
   ##----------------------------------------------------------
-  observe({
-    param # required to ensure up-to-date values are run
-
-    # simple inputs
+  observeEvent({
+    input$run
+  }, {
     param$nsim <- input$nsim
-    param$fatal_constant <- "h" # input$fatalities_unit
+    param$fatal_constant <- input$fatalities_unit
+    param$time_horizon <- input$time_horizon
+
+  }) # Close observEvent
+
+
+  observe ({
+    param # to ensure up-to-date values are run
 
     # fixed in global environment (for now)
-    param$theta = theta
-    param$time_horizon = time_horizon
-    param$coeff_var_environ = coeff_var_environ
+    param$theta <- theta
+    param$coeff_var_environ <- coeff_var_environ
 
   }) # end observe
   #####
@@ -1281,9 +1286,9 @@ server <- function(input, output, session){
   ##---------------------------------------------------------------------
   print_indiv_impact <- function(){
     req(out$run)
-    res = get_metrics(N = out$run$N, cumulated_impacts = TRUE)
+    res <- get_metrics(N = out$run$N, cumulated_impacts = TRUE)
     n_farm <- (dim(res$indiv_farm$impact)[3]-1)
-    fil <- paste0(round(t(res$indiv_farm$impact[time_horizon, -2, -1]),2)*100, "%")
+    fil <- paste0(round(t(res$indiv_farm$impact[param$time_horizon, -2, -1]),2)*100, "%")
     matrix(fil,
            nrow = n_farm,
            dimnames = list(paste("Parc",1:n_farm), c("Impact", "IC (min)", "IC (max)"))
@@ -1308,7 +1313,7 @@ server <- function(input, output, session){
   ##------------------------------------------------
   print_impact <- function(){
     req(out$run)
-    res = get_metrics(N = out$run$N, cumulated_impacts = FALSE)
+    res <- get_metrics(N = out$run$N, cumulated_impacts = FALSE)
     n_scen <- (dim(res$scenario$impact)[3]-1)
 
     RowNam <- NULL
@@ -1316,7 +1321,7 @@ server <- function(input, output, session){
     if(out$analysis_choice == "cumulated") RowNam <- c("Parc 1", paste("... + Parc", (2:n_scen)))
     if(out$analysis_choice == "multi_scenario") RowNam <- paste("Scenario", (1:n_scen))
 
-    fil <- paste0(round(t(res$scenario$impact[time_horizon, -2, -1]),2)*100, "%")
+    fil <- paste0(round(t(res$scenario$impact[param$time_horizon, -2, -1]),2)*100, "%")
     matrix(fil,
            nrow = n_scen,
            dimnames = list(RowNam, c("Impact", "IC (min)", "IC (max)"))
@@ -1341,7 +1346,7 @@ server <- function(input, output, session){
   ##-------------------------------------------
   print_PrExt <- function(){
     req(out$run)
-    res = get_metrics(N = out$run$N, cumulated_impacts = FALSE)
+    res <- get_metrics(N = out$run$N, cumulated_impacts = FALSE)
     n_scen <- dim(res$scenario$impact)[3]
 
     RowNam <- NULL
