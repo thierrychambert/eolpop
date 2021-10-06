@@ -22,7 +22,7 @@
 #' @examples
 #' # plot_impact(demo_proj, xlab = "year", ylab = "pop size")
 #'
-plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", ylab = "Relative impact (%)", ...){
+plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", ylab = "Relative impact (%)", Legend, ...){
 
   # Get metrics and dimensions
   if(percent) out <- get_metrics(N)$scenario$impact*100 else out <- get_metrics(N)$scenario$impact
@@ -42,18 +42,18 @@ plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", yla
   # Plot lines
   p <-
     ggplot(data = df, aes(x = .data$year, y = .data$avg)) +
-    geom_line(data = dplyr::filter(df, .data$scenario > 1), size = size, aes(colour = factor(.data$scenario))) +
-    geom_line(data = dplyr::filter(df, .data$scenario == 1), size = size, colour = "black")
+    geom_line(size = size, aes(colour = factor(.data$scenario))) +
+    geom_ribbon(
+      aes(ymin = .data$uci, ymax = .data$lci, fill = factor(.data$scenario)), linetype = 0, alpha = 0.100)
 
-  # Plot CIs
+  # change color palette (we want sc0 in black)
   p <- p +
-    geom_ribbon(data = dplyr::filter(df, .data$scenario > 1),
-                aes(ymin = .data$uci, ymax = .data$lci, fill = factor(.data$scenario)), linetype = 0, alpha = 0.100)
+    scale_color_manual(breaks = 1:nsc,
+                       values = palette()[1:nsc],
+                       labels = Legend, aesthetics = c("colour", "fill"))
+
 
   # Add x/y labels and legend
-  Legend <- "... + Parc"
-  nsc <- max(df$scenario) - 1
-
   p <- p +
     labs(x = xlab, y = ylab,
          col = "Scenario", fill = "Scenario") +
@@ -62,7 +62,6 @@ plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", yla
       axis.text=element_text(size = 14)
     ) +
 
-    scale_color_hue(labels = c("Parc 1",paste(Legend, 2:nsc)), aesthetics = c("colour", "fill")) +
     theme(legend.key.height = unit(2, 'line'),
           legend.key.width = unit(3, 'line'),
           legend.title = element_text(size = 18, face = "bold"),

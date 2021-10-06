@@ -17,14 +17,14 @@ carrying_capacity = 5000
 
 #(4.8/100)*sum(N000[-1])
 #(0.7/100)*sum(N000[-1])
-fatalities_mean = c(0, 10, 3, 15)
-fatalities_se = c(0, 0.5, 0.5, 0.5)
+fatalities_mean = c(0, 5, 3, 4, 2, 1, 4)
+fatalities_se = c(0, rep(0.5,6))
 
 
 survivals <- c(0.47, 0.67, 0.67)
 fecundities <- c(0, 0.30, 1.16)
 
-pop_growth_mean = 0.95
+pop_growth_mean = 1.03
 # lambda( build_Leslie(s = survivals, f = fecundities) )
 pop_growth_se = 0.01
 
@@ -38,7 +38,7 @@ pop_size_type = "Npair"
 #if(length(fatalities_mean) > 2) cumulated_impacts = TRUE else cumulated_impacts = FALSE
 cumulated_impacts = TRUE
 
-onset_year = c(2010, 2013, 2016)
+onset_year = c(2010, 2013, 2016, 2016, 2017, 2019, 2020)
 onset_time = onset_year - min(onset_year) + 1
 onset_time = c(min(onset_time), onset_time)
 if(!cumulated_impacts) onset_time = NULL
