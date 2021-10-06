@@ -91,7 +91,10 @@ server <- function(input, output, session){
     shinyjs::hide("pop_trend")
     shinyjs::hide("pop_trend_strength")
 
-    shinyjs::hide("carrying_capacity")
+    shinyjs::hide("carrying_capacity_lower")
+    shinyjs::hide("carrying_capacity_upper")
+    shinyjs::hide("carrying_capacity_mean")
+    shinyjs::hide("carrying_capacity_se")
     shinyjs::hide("carrying_cap_number_expert")
     shinyjs::hide("carrying_cap_mat_expert")
     shinyjs::hide("carrying_cap_run_expert")
@@ -185,8 +188,13 @@ server <- function(input, output, session){
     # Show inputs for carrying capacity part
     if(input$button_carrying_cap%%2 == 1){
       shinyjs::show("carrying_cap_input_type")
+      if(input$carrying_cap_input_type == "itvl"){
+        shinyjs::show("carrying_capacity_lower")
+        shinyjs::show("carrying_capacity_upper")
+      }
       if(input$carrying_cap_input_type == "val"){
-        shinyjs::show("carrying_capacity")
+        shinyjs::show("carrying_capacity_mean")
+        shinyjs::show("carrying_capacity_se")
       }
       if(input$carrying_cap_input_type == "eli_exp"){
         shinyjs::show("carrying_cap_number_expert")
@@ -240,7 +248,10 @@ server <- function(input, output, session){
                           f_calibrated = NULL,
                           vr_calibrated = NULL,
 
-                          carrying_capacity = NULL,
+                          carrying_capacity_mean = NULL,
+                          carrying_capacity_se = NULL,
+
+
                           theta = NULL,
                           rMAX_species = NULL,
 
@@ -857,7 +868,7 @@ server <- function(input, output, session){
     }
 
     # paste for printing
-    paste0(info1, " : ", param$carrying_capacity)
+    paste0(info1, " : ", param$carrying_capacity_mean)
   })
 
 
@@ -1062,7 +1073,7 @@ server <- function(input, output, session){
     if(input$pop_size_input_type == "eli_exp"){
       if(!(is.null(param$pop_size_eli_result))){
         param$pop_size_mean <- round(param$pop_size_eli_result$mean)
-        param$pop_size_se <- round(param$pop_size_eli_result$SE)
+        param$pop_size_se <- round(param$pop_size_eli_result$SE, 1)
         ready$pop_size <- TRUE
       } else {
         ready$pop_size <- FALSE
@@ -1162,18 +1173,34 @@ server <- function(input, output, session){
   observe({
     if(input$carrying_cap_input_type == "eli_exp"){
       if(!(is.null(param$carrying_cap_eli_result))){
-        param$carrying_capacity <- round(param$carrying_cap_eli_result$mean)
+        param$carrying_capacity_mean <- round(param$carrying_cap_eli_result$mean)
+        param$carrying_capacity_se <- round(param$carrying_cap_eli_result$SE, 1)
         ready$carrying_capacity <- TRUE
       } else {
         ready$carrying_capacity <- FALSE
       }
+
     } else {
+
       if(input$carrying_cap_input_type == "unknown"){
         ready$carrying_capacity <- TRUE
-        param$carrying_capacity <- max(param$pop_size_mean*100, 1e8) # use a very large K
+        param$carrying_capacity_mean <- max(param$pop_size_mean*100, 1e8) # use a very large K
+        param$carrying_capacity_se <- 0
+
       }else{
-        ready$carrying_capacity <- TRUE
-        param$carrying_capacity <- input$carrying_capacity
+        # values: mean and se
+        if(input$pop_size_input_type == "val"){
+          ready$carrying_capacity <- TRUE
+          param$carrying_capacity_mean <- input$carrying_capacity_mean
+          param$carrying_capacity_se <- input$carrying_capacity_se
+
+        }else{
+          # lower/upper interval
+          ready$carrying_capacity <- TRUE
+          param$carrying_capacity_mean <- round(get_mu(lower = input$carrying_capacity_lower, upper = input$carrying_capacity_upper), 2)
+          param$carrying_capacity_se <- round(get_sd(lower = input$carrying_capacity_lower, upper = input$carrying_capacity_upper, coverage = CP), 3)
+        } # end (if3)
+
       }
     }
   })
@@ -1257,7 +1284,9 @@ server <- function(input, output, session){
                                    survivals = param$s_calibrated,
                                    fecundities = param$f_calibrated,
 
-                                   carrying_capacity = param$carrying_capacity,
+                                   carrying_capacity_mean = param$carrying_capacity_mean,
+                                   carrying_capacity_se = param$carrying_capacity_se,
+
                                    theta = param$theta,
                                    rMAX_species = param$rMAX_species,
 

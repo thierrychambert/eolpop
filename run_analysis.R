@@ -12,7 +12,8 @@ nsim = 10
 pop_size_mean = 500
 pop_size_se = 0
 
-carrying_capacity = 1000
+carrying_capacity_mean = 1000
+carrying_capacity_se = 100
 
 
 #(4.8/100)*sum(N000[-1])
@@ -95,7 +96,9 @@ run0 <- run_simul(nsim = nsim,
                             survivals = s_calibrated,
                             fecundities = f_calibrated,
 
-                            carrying_capacity = carrying_capacity,
+                            carrying_capacity_mean = carrying_capacity_mean,
+                            carrying_capacity_se = carrying_capacity_se,
+
                             theta = theta,
                             rMAX_species = rMAX_species,
 

@@ -587,15 +587,33 @@ rm(list = ls(all.names = TRUE))
 
                                            radioButtons(inputId = "carrying_cap_input_type",
                                                         label = "Type de saisie",
-                                                        choices = c("Valeur" = "val",
+                                                        choices = c("Intervalle" = "itvl",
+                                                                    "Valeur" = "val",
                                                                     "Elicitation d'expert" = "eli_exp",
                                                                     "Valeur Inconnue" = "unknown")),
 
-                                           # Value
-                                           numericInput(inputId = "carrying_capacity",
-                                                        label = "Capacité de charge",
+                                           # Interval
+                                           numericInput(inputId = "carrying_capacity_lower",
+                                                        label = "Borne inférieure (capacité de charge)",
+                                                        value = 850,
+                                                        min = 0, max = Inf, step = 100),
+
+                                           numericInput(inputId = "carrying_capacity_upper",
+                                                        label = "Borne supérieure (capacité de charge)",
+                                                        value = 1250,
+                                                        min = 0, max = Inf, step = 100),
+
+                                           # Values
+                                           numericInput(inputId = "carrying_capacity_mean",
+                                                        label = "Moyenne de la capacité de charge",
                                                         value = 1000,
                                                         min = 0, max = Inf, step = 100),
+
+                                           numericInput(inputId = "carrying_capacity_se",
+                                                        label = "Erreur-type de la capacité de charge",
+                                                        value = 100,
+                                                        min = 0, max = Inf, step = 50),
+
 
                                            # Expert Elicitation Matrix
                                            numericInput(inputId = "carrying_cap_number_expert",
