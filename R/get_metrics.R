@@ -164,7 +164,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
         DR_N <- DR_N[,-sel2]
       }
 
-      # Remove rare cases where sc0 = 0 and sc1 > 0 (making DR = +Inf)
+      # Mean and SE
       impact_indiv[,"avg",j] <- apply(DR_N, 1, mean, na.rm = TRUE)
       impact_indiv[,"se",j] <- apply(DR_N, 1, sd, na.rm = TRUE)
 

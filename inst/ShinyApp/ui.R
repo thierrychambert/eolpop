@@ -323,9 +323,9 @@ rm(list = ls(all.names = TRUE))
                                                                                 options = list(container='body')
                                                                       )
                                                        ),
-                                                       value = matrix(c(5, 0.5, 2010,
+                                                       value = matrix(c(8, 0.5, 2010,
                                                                         3, 0.5, 2015,
-                                                                        4, 0.5, 2018),
+                                                                        15, 0.5, 2018),
                                                                       nrow = 3, ncol = 3, byrow = TRUE,
                                                                       dimnames = list(c(paste0("Parc num.", c(1:3))),
                                                                                       c("Moyenne",
@@ -710,7 +710,7 @@ rm(list = ls(all.names = TRUE))
                  hr(),
 
                  span(textOutput("title_indiv_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
-                 strong(span(tableOutput("indiv_impact_table"), style="color:orange; font-size:18px", align = "left")),
+                 strong(span(tableOutput("indiv_impact_table"), style="color:green; font-size:18px", align = "left")),
 
                  hr(),
 
@@ -721,7 +721,7 @@ rm(list = ls(all.names = TRUE))
 
                  br(),
                  span(textOutput("title_PrExt_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
-                 strong(span(tableOutput("PrExt_table"), style="color:green; font-size:18px", align = "left")),
+                 strong(span(tableOutput("PrExt_table"), style="color:orange; font-size:18px", align = "left")),
 
                  br(),
                  hr(),
