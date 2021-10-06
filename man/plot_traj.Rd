@@ -8,7 +8,7 @@ plot_traj(
   N,
   onset_year = NULL,
   xlab = "Year",
-  ylab = "Relative impact (\%)",
+  ylab = "Population size",
   Legend = NULL,
   ...
 )

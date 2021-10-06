@@ -7,12 +7,12 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 100
+nsim = 10
 
-pop_size_mean = 50
+pop_size_mean = 500
 pop_size_se = 0
 
-carrying_capacity = 5000
+carrying_capacity = 1000
 
 
 #(4.8/100)*sum(N000[-1])
@@ -24,7 +24,7 @@ fatalities_se = c(0, rep(0.5,6))
 survivals <- c(0.47, 0.67, 0.67)
 fecundities <- c(0, 0.30, 1.16)
 
-pop_growth_mean = 1.03
+pop_growth_mean = 1.15
 # lambda( build_Leslie(s = survivals, f = fecundities) )
 pop_growth_se = 0.01
 
@@ -33,7 +33,7 @@ model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDe
 time_horizon = 30
 coeff_var_environ = 0
 fatal_constant = "h"
-pop_size_type = "Npair"
+pop_size_type = "Ntotal"
 
 #if(length(fatalities_mean) > 2) cumulated_impacts = TRUE else cumulated_impacts = FALSE
 cumulated_impacts = TRUE
@@ -127,23 +127,8 @@ res = get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)
 
 ###
 
-n_farm <- (dim(res$indiv_farm$impact)[3]-1)
-fil <- paste0(round(t(res$indiv_farm$impact[time_horizon, -2, -1]),2)*100, "%")
-matrix(fil,
-       nrow = n_farm,
-       dimnames = list(paste("Parc",1:n_farm), c("Impact", "IC (min)", "IC (max)"))
-)
-
-###
-
-x11()
 plot_impact(N)
 
+x11()
+plot_traj(N)
 ###
-
-n_scen <- (dim(res$scenario$impact)[3]-1)
-fil <- paste0(round(t(res$scenario$impact[time_horizon, -2, -1]),2)*100, "%")
-matrix(fil,
-       nrow = n_scen,
-       dimnames = list(NULL, c("Impact", "IC (min)", "IC (max)"))
-)

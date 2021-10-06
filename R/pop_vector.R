@@ -43,10 +43,10 @@ pop_vector <- function(pop_size, pop_size_type = "Npair", s, f){
     # If N0 is total pop size (all age classes)
     if(match.arg(arg = pop_size_type, choices = c("Npair","Ntotal")) == "Ntotal"){
 
-      N0 <- round(stable.stage(A) * N00)
+      N0 <- round(stable.stage(A) * N00 / sum(stable.stage(A)[-1]))
 
       # Correct small difference due to rounding (not always needed)
-      N0[1] <- N0[1] - (sum(N0) - N00)
+      N0[2] <- N0[2] - (sum(N0[-1]) - (N00))
 
     }  # end if 2
 
