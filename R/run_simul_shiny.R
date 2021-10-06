@@ -19,9 +19,11 @@
 #' @param survivals a vector. Average survival probabilities for each age class.
 #' @param fecundities a vector of fecundity values for each age class.
 #'
-#' @param carrying_capacity a strictly positive number.
-#' Carrying capacity (= maximum size that the population can reach). Here, the unit is the same as pop_size_type.
+#' @param carrying_capacity_mean a strictly positive number.
+#' Average carrying capacity (= maximum size that the population can reach). Here, the unit is the same as pop_size_type.
 #' It can thus be expressed as the total population or the number of pair.
+#' @param carrying_capacity_se Standard Error for the carrying capacity.
+#'
 #' @param theta a strictly positive number. Parameter defining the shape of the density-dependence relationship.
 #' The relationship is defined as : r <- rMAX*(1-(N/K)^theta)
 #' Note lambda = r + 1
@@ -56,7 +58,8 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
                       pop_size_mean, pop_size_se, pop_size_type,
                       pop_growth_mean, pop_growth_se,
                       survivals, fecundities,
-                      carrying_capacity, theta = 1, rMAX_species,
+                      carrying_capacity_mean, carrying_capacity_se,
+                      theta = 1, rMAX_species,
                       model_demo = NULL, time_horizon, coeff_var_environ, fatal_constant){
 
 
@@ -112,6 +115,10 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
       N0 <- sample_gamma(1, mu = pop_size_mean, sd =  pop_size_se) %>%
         round %>%
         pop_vector(pop_size_type = pop_size_type, s = survivals, f = fecundities)
+
+      # Draw carrying capacity
+      carrying_capacity <- sample_gamma(1, mu = carrying_capacity_mean, sd = carrying_capacity_se) %>%
+        round
 
       # Define K
       K <- sum(pop_vector(pop_size = carrying_capacity, pop_size_type = pop_size_type, s = survivals, f = fecundities))
