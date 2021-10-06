@@ -245,7 +245,7 @@ server <- function(input, output, session){
                           rMAX_species = NULL,
 
                           model_demo = NULL,
-                          time_horzion = NULL,
+                          time_horizon = NULL,
                           coeff_var_environ = NULL,
                           fatal_constant = NULL,
 
@@ -1217,7 +1217,7 @@ server <- function(input, output, session){
 
     # fixed in global environment (for now)
     param$theta = theta
-    param$time_horzion = time_horzion
+    param$time_horizon = time_horizon
     param$coeff_var_environ = coeff_var_environ
 
   }) # end observe
@@ -1257,7 +1257,7 @@ server <- function(input, output, session){
                                    rMAX_species = param$rMAX_species,
 
                                    model_demo = NULL,
-                                   time_horzion = param$time_horzion,
+                                   time_horizon = param$time_horizon,
                                    coeff_var_environ = param$coeff_var_environ,
                                    fatal_constant = param$fatal_constant)
       }) # Close withProgress
@@ -1283,7 +1283,7 @@ server <- function(input, output, session){
     req(out$run)
     res = get_metrics(N = out$run$N, cumulated_impacts = TRUE)
     n_farm <- (dim(res$indiv_farm$impact)[3]-1)
-    fil <- paste0(round(t(res$indiv_farm$impact[time_horzion, -2, -1]),2)*100, "%")
+    fil <- paste0(round(t(res$indiv_farm$impact[time_horizon, -2, -1]),2)*100, "%")
     matrix(fil,
            nrow = n_farm,
            dimnames = list(paste("Parc",1:n_farm), c("Impact", "IC (min)", "IC (max)"))
@@ -1316,7 +1316,7 @@ server <- function(input, output, session){
     if(out$analysis_choice == "cumulated") RowNam <- c("Parc 1", paste("... + Parc", (2:n_scen)))
     if(out$analysis_choice == "multi_scenario") RowNam <- paste("Scenario", (1:n_scen))
 
-    fil <- paste0(round(t(res$scenario$impact[time_horzion, -2, -1]),2)*100, "%")
+    fil <- paste0(round(t(res$scenario$impact[time_horizon, -2, -1]),2)*100, "%")
     matrix(fil,
            nrow = n_scen,
            dimnames = list(RowNam, c("Impact", "IC (min)", "IC (max)"))

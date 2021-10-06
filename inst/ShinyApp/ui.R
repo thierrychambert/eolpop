@@ -22,7 +22,7 @@ rm(list = ls(all.names = TRUE))
 
   # Fixed parameters (for now)
   coeff_var_environ = 0.03
-  time_horzion = 30
+  time_horizon = 30
   theta = 1 # DD parameter theta
   CP = 0.99 # Coverage probability for lower - upper values
 }
@@ -700,12 +700,16 @@ rm(list = ls(all.names = TRUE))
         tabPanel(title = "Impact population",
 
                  br(),
+                 numericInput(inputId = "TH",
+                              label = "Nombre d'années",
+                              value = 30, min = 5, max = Inf, step = 10),
+
+                 br(),
                  numericInput(inputId = "nsim",
                               label = "Nombre de simulations",
                               value = 10, min = 0, max = Inf, step = 10),
 
                  br(),
-
                  actionButton(inputId = "run", label = "Lancer l'analyse"),
                  hr(),
 

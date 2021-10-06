@@ -32,13 +32,13 @@
 #'
 #' References :
 #' Niel, C., and J. Lebreton. 2005. Using demographic invariants to detect overharvested bird
-#' populations from incomplete data. Conservation Biology 19:826–835.
+#' populations from incomplete data. Conservation Biology 19:826-835.
 #'
 #' @param model_demo is NULL, by default, because the model choice will be made inside each iteration (simulation),
 #' base on the values of N0 and lam0 that are drawn.
 #' But it can be forced by setting the value, which must then be an R object corresponding to the demographic model to be used.
 #' The 4 possible models currently are: M1_noDD_noDemoStoch, M2_noDD_WithDemoStoch, M3_WithDD_noDemoStoch, M4_WithDD_WithDemoStoch,
-#' @param time_horzion a number. The number of years (time horizon) over which to project the population dynamics.
+#' @param time_horizon a number. The number of years (time horizon) over which to project the population dynamics.
 #' @param coeff_var_environ a number. The coefficient of variation to model environment stochasticity.
 #' @param fatal_constant text (character). Either "h" or "M". Using "h" sets the fatality RATE as the constant value across years.
 #' Using "M" sets the NUMBER of fatalities as the constant value across years.
@@ -57,7 +57,7 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
                       pop_growth_mean, pop_growth_se,
                       survivals, fecundities,
                       carrying_capacity, theta = 1, rMAX_species,
-                      model_demo = NULL, time_horzion, coeff_var_environ, fatal_constant){
+                      model_demo = NULL, time_horizon, coeff_var_environ, fatal_constant){
 
 
   # Create object to store DD parameters
@@ -75,7 +75,7 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
   cv_env <- coeff_var_environ
 
   # Number of years
-  nyr <- time_horzion
+  nyr <- time_horizon
 
   # Number of age classes
   nac <- length(survivals)
@@ -191,7 +191,7 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
       # Project population trajectory
       N[,,,sim] <- fun_project(fatalities = M, onset_time = onset_time, intial_pop_vector = N0,
                                s = s, f = f, DD_params = DD_params,
-                               model_demo = model_demo, time_horzion = time_horzion,
+                               model_demo = model_demo, time_horizon = time_horizon,
                                coeff_var_environ = coeff_var_environ, fatal_constant = fatal_constant)
     } # sim ##-----------------------------------------------------------------------------------------
 

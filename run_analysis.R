@@ -7,7 +7,7 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 10
+nsim = 100
 
 pop_size_mean = 50
 pop_size_se = 0
@@ -30,7 +30,7 @@ pop_growth_se = 0.01
 
 
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
-time_horzion = 30
+time_horizon = 30
 coeff_var_environ = 0
 fatal_constant = "h"
 pop_size_type = "Npair"
@@ -100,7 +100,7 @@ run0 <- run_simul(nsim = nsim,
                             rMAX_species = rMAX_species,
 
                             model_demo = NULL,
-                            time_horzion = time_horzion,
+                            time_horizon = time_horizon,
                             coeff_var_environ = coeff_var_environ,
                             fatal_constant = fatal_constant)
 )
@@ -121,14 +121,14 @@ out$run = run0
 
 dim(out$run$N)
 
-get_metrics(N = out$run$N)$scenario$impact[time_horzion, ,-1] %>% round(.,2)
+get_metrics(N = out$run$N)$scenario$impact[time_horizon, ,-1] %>% round(.,2)
 
 res = get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)
 
 ###
 
 n_farm <- (dim(res$indiv_farm$impact)[3]-1)
-fil <- paste0(round(t(res$indiv_farm$impact[time_horzion, -2, -1]),2)*100, "%")
+fil <- paste0(round(t(res$indiv_farm$impact[time_horizon, -2, -1]),2)*100, "%")
 matrix(fil,
        nrow = n_farm,
        dimnames = list(paste("Parc",1:n_farm), c("Impact", "IC (min)", "IC (max)"))
@@ -142,7 +142,7 @@ plot_impact(N)
 ###
 
 n_scen <- (dim(res$scenario$impact)[3]-1)
-fil <- paste0(round(t(res$scenario$impact[time_horzion, -2, -1]),2)*100, "%")
+fil <- paste0(round(t(res$scenario$impact[time_horizon, -2, -1]),2)*100, "%")
 matrix(fil,
        nrow = n_scen,
        dimnames = list(NULL, c("Impact", "IC (min)", "IC (max)"))
