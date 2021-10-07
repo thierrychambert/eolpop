@@ -18,11 +18,16 @@ rm(list = ls(all.names = TRUE))
 
   ## Load survival and fecundities data
   data_sf <- read.csv("./inst/ShinyApp/survivals_fecundities_species.csv", sep = ",")#, encoding = "UTF-8")
-  (data_sf)
 
-  # Fixed parameters (for now)
-  coeff_var_environ = 0.03
-  CP = 0.99 # Coverage probability for lower - upper values
+  ##### Fixed parameters #####
+
+  # Coefficient of environmental variation -- set at 8%, based on values found for birds in the literature
+    ## (Saeher & Engen 2002) between 7% et 14%, so about 10%
+    ## (Sæther et al. 2005) : mostly between 2.5% et 10%, so about 6%
+  coeff_var_environ = 0.08
+
+  # Coverage probability used for lower/upper interval input values
+  CP = 0.99
 }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
