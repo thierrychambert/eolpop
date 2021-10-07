@@ -1236,7 +1236,10 @@ server <- function(input, output, session){
     # We also define rMAX and theta here
     rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
     param$rMAX_species <- rMAX_species
-    param$theta <- theta_spp(rMAX_species)
+
+    ## We define theta = 1 for simplicity - given large uncertainty of real shape of density-dependence in nature
+    #param$theta <- theta_spp(rMAX_species)
+    param$theta <- fixed_theta
 
     param$vr_calibrated <- calibrate_params(
       inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),

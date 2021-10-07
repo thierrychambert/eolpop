@@ -19,7 +19,11 @@ rm(list = ls(all.names = TRUE))
   ## Load survival and fecundities data
   data_sf <- read.csv("./inst/ShinyApp/survivals_fecundities_species.csv", sep = ",")#, encoding = "UTF-8")
 
+
   ##### Fixed parameters #####
+
+  # We define theta = 1 for simplicity - given large uncertainty of real shape of density-dependence in nature
+  fixed_theta = 1
 
   # Coefficient of environmental variation -- set at 8%, based on values found for birds in the literature
     ## (Saeher & Engen 2002) between 7% et 14%, so about 10%
