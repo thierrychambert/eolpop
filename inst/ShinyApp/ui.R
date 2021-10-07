@@ -22,8 +22,6 @@ rm(list = ls(all.names = TRUE))
 
   # Fixed parameters (for now)
   coeff_var_environ = 0.03
-  #time_horizon = 30
-  theta = 1 # DD parameter theta
   CP = 0.99 # Coverage probability for lower - upper values
 }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###

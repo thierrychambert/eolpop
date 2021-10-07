@@ -1233,8 +1233,10 @@ server <- function(input, output, session){
     input$run
   },{
 
-    # we also define rMAX here
-    param$rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
+    # We also define rMAX and theta here
+    rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
+    param$rMAX_species <- rMAX_species
+    param$theta <- theta_spp(rMAX_species)
 
     param$vr_calibrated <- calibrate_params(
       inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
@@ -1262,7 +1264,6 @@ server <- function(input, output, session){
     param # to ensure up-to-date values are run
 
     # fixed in global environment (for now)
-    param$theta <- theta
     param$coeff_var_environ <- coeff_var_environ
 
   }) # end observe
