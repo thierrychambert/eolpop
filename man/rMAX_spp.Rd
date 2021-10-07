@@ -2,7 +2,7 @@
 % Please edit documentation in R/rMAX_spp.R
 \name{rMAX_spp}
 \alias{rMAX_spp}
-\title{Rmax of a species}
+\title{Rmax value for a given species}
 \usage{
 rMAX_spp(surv, afr)
 }
@@ -20,7 +20,6 @@ There are two different equation depending on whether the species is longlived o
 Here, we consider a species to be "shortlived" if age at first reproduction <= 2 and adult survival <= 0.8.
 
 References.
-
 Niel, C., and J. Lebreton. 2005. Using demographic invariants to detect overharvested bird
 populations from incomplete data. Conservation Biology 19:826-835.
 }

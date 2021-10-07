@@ -50,13 +50,16 @@ N000 <- pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = 
 sum(N000)
 
 # Define K
-theta = 1
-K = pop_vector(pop_size = carrying_capacity, pop_size_type = pop_size_type, s = survivals, f = fecundities) %>% sum
+K = pop_vector(pop_size = carrying_capacity_mean, pop_size_type = pop_size_type, s = survivals, f = fecundities) %>% sum
 K
 
 # Define theoretical rMAX for the species
 rMAX_species <- rMAX_spp(surv = tail(survivals,1), afr = min(which(fecundities != 0)))
 rMAX_species
+
+# Define the (theoretical) theta parameter (shape of Density-dependence) for the species
+theta <- theta_spp(rMAX_species)
+theta = 1
 
 ##  Avoid unrealistic scenarios
 pop_growth_mean <- min(1 + rMAX_species, pop_growth_mean)
@@ -130,7 +133,7 @@ res = get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)
 
 ###
 
-plot_impact(N)
+# plot_impact(N)
 
 x11()
 plot_traj(N)
