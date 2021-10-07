@@ -15,12 +15,14 @@ rMAX_spp(surv, afr)
 the theoretical Rmax of the species
 }
 \description{
-Calculate the theoretical Rmax of a species using the equation of Niel and Lebreton 2005.
+Calculate the theoretical Rmax of a species using the equations of Niel and Lebreton 2005.
+There are two different equation depending on whether the species is longlived or "short-lived".
+Here, we consider a species to be "shortlived" if age at first reproduction <= 2 and adult survival <= 0.8.
 
 References.
 
 Niel, C., and J. Lebreton. 2005. Using demographic invariants to detect overharvested bird
-populations from incomplete data. Conservation Biology 19:826–835.
+populations from incomplete data. Conservation Biology 19:826-835.
 }
 \examples{
 rMAX_spp(surv = 0.6, afr = 2)
