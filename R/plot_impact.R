@@ -49,7 +49,7 @@ plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", yla
   # change color palette (we want sc0 in black)
   p <- p +
     scale_color_manual(breaks = 1:nsc,
-                       values = palette()[1:nsc],
+                       values = custom_palette_c25()[1:nsc],
                        labels = Legend, aesthetics = c("colour", "fill"))
 
 

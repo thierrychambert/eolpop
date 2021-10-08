@@ -55,7 +55,7 @@ plot_traj <- function(N, onset_year = NULL, xlab = "Year", ylab = "Population si
   # change color palette (we want sc0 in black)
   p <- p +
     scale_color_manual(breaks = 1:nsc,
-                       values = palette.colors(n = 9*10, recycle = TRUE)[1:nsc],
+                       values = custom_palette_c25()[1:nsc],
                        labels = Legend, aesthetics = c("colour", "fill"))
 
 

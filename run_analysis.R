@@ -18,9 +18,9 @@ carrying_capacity_se = 100
 
 #(4.8/100)*sum(N000[-1])
 #(0.7/100)*sum(N000[-1])
-fatalities_mean = c(0, 5, 3, 4, 2, 1, 4)
-fatalities_se = c(0, rep(0.5,6))
-
+fatalities_mean = c(0, 5, 3, 4, 2, 1, 4, 2, 2, 3)
+fatalities_se = c(0, rep(0.5,9))
+length(fatalities_mean)
 
 survivals <- c(0.47, 0.67, 0.67)
 fecundities <- c(0, 0.30, 1.16)
@@ -39,7 +39,8 @@ pop_size_type = "Ntotal"
 #if(length(fatalities_mean) > 2) cumulated_impacts = TRUE else cumulated_impacts = FALSE
 cumulated_impacts = TRUE
 
-onset_year = c(2010, 2013, 2016, 2016, 2017, 2019, 2020)
+onset_year = c(2010, 2013, 2016, 2016, 2017, 2019, 2020, 2020, 2020, 2021) #rep(2010, 10)#
+length(onset_year)
 onset_time = onset_year - min(onset_year) + 1
 onset_time = c(min(onset_time), onset_time)
 if(!cumulated_impacts) onset_time = NULL
