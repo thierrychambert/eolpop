@@ -134,8 +134,8 @@ res = get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)
 
 ###
 
-# plot_impact(N)
+plot_impact(N, Legend = paste("sc", 1:length(fatalities_mean)))
 
 x11()
-plot_traj(N)
+plot_traj(N, Legend = paste("sc", 1:length(fatalities_mean)))
 ###

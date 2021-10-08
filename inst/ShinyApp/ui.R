@@ -666,8 +666,9 @@ rm(list = ls(all.names = TRUE))
 
 
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
-  ##  Side Panel : Parameter information
   {sidebarLayout(
+
+    ##  Side Panel : Parameter information
     {sidebarPanel(
 
       p("Valeurs sélectionnées", style="font-size:28px",
@@ -720,24 +721,24 @@ rm(list = ls(all.names = TRUE))
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-    # Creation of outputs parts
+    ###  Main Panel
 
     {mainPanel(
       tabsetPanel(
-        tabPanel(title = "Distribution paramètres",
+
+        ## Parameter distribution
+        {tabPanel(title = "Distribution paramètres",
                  br(),
                  hr(),
 
                  span(textOutput(outputId = "title_distri_plot"), style="font-size:24px; font-weight:bold"),
                  plotOutput(outputId = "distri_plot"),
 
-        ), # End tabPanel
+        )}, # End tabPanel
 
 
-        tabPanel(title = "Impact population",
+        ## Population Impact : simulations
+        {tabPanel(title = "Impact population",
 
                  br(),
                  numericInput(inputId = "time_horizon",
@@ -776,10 +777,11 @@ rm(list = ls(all.names = TRUE))
 
                  tags$h4(textOutput("title_traj_plot"), align = "center"),
                  plotOutput("traj_plot", width = "100%", height = "550px")
-        ), # End tabPanel
+        )}, # End tabPanel
 
 
-        tabPanel(title = "Rapport",
+        ## Report
+        {tabPanel(title = "Rapport",
                  br(),
                  radioButtons(inputId = "lifestyle",
                               h4("Mode de vie de l'espèce"),
@@ -791,7 +793,7 @@ rm(list = ls(all.names = TRUE))
                               h4("Nombre d'éoliennes"),
                               value = 1, min = 0, max = Inf, step = 1)
 
-        ) # End tabPanel
+        )} # End tabPanel
 
       ) # End tabSetPanel
     )} # End mainPanel

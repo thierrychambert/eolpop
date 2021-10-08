@@ -738,19 +738,30 @@ server <- function(input, output, session){
     input$carrying_cap_input_type
     input$button_carrying_cap
   },{
-    # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
-    if(input$button_carrying_cap%%2 == 1 & input$carrying_cap_input_type == "eli_exp"){
-      if(!is.null(param$carrying_cap_eli_result)){
-        output$title_distri_plot <- renderText({ "Capacité de charge" })
-        output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out) })
-      } else {
+    # Show from input values: if button is ON and input_type is set on "value"
+    if(input$button_carrying_cap%%2 == 1 & input$carrying_cap_input_type != "eli_exp"){
+      output$title_distri_plot <- renderText({ "Capacité de charge" })
+
+      output$distri_plot <- renderPlot({
+        req(param$carrying_capacity_mean, param$carrying_capacity_se)
+        plot_gamma(mu = param$carrying_capacity_mean, se = param$carrying_capacity_se)
+      })
+
+    } else {
+      # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
+      if(input$button_carrying_cap%%2 == 1 & input$carrying_cap_input_type == "eli_exp"){
+        if(!is.null(param$carrying_cap_eli_result)){
+          output$title_distri_plot <- renderText({ "Capacité de charge" })
+          output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out) })
+        } else {
+          output$title_distri_plot <- NULL
+          output$distri_plot <- NULL
+        }
+        # Hide otherwise (when button is OFF)
+      }else{
         output$title_distri_plot <- NULL
         output$distri_plot <- NULL
       }
-      # Hide otherwise (when button is OFF)
-    }else{
-      output$title_distri_plot <- NULL
-      output$distri_plot <- NULL
     }
   }, ignoreInit = FALSE)
   #####
