@@ -53,8 +53,7 @@ rMAX_spp <- function(surv, afr){
 #' Johnson, F. A., M. A. H. Walters, and G. S. Boomer. 2012. Allowable levels of take for the trade in
 #' Nearctic songbirds. Ecological Applications 22:1114-1130.
 #'
-#' @param surv Adult survival. Single value between 0 and 1.
-#' @param afr Age at first reproduction. Single integer value.
+#' @param rMAX_species Species rMAX value (Between 0 and +Inf)
 #'
 #' @return the theoretical Rmax of the species
 #' @export

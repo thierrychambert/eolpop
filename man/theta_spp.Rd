@@ -7,9 +7,7 @@
 theta_spp(rMAX_species)
 }
 \arguments{
-\item{surv}{Adult survival. Single value between 0 and 1.}
-
-\item{afr}{Age at first reproduction. Single integer value.}
+\item{rMAX_species}{Species rMAX value (Between 0 and +Inf)}
 }
 \value{
 the theoretical Rmax of the species
