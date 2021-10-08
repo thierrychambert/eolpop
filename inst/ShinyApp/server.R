@@ -549,7 +549,7 @@ server <- function(input, output, session){
 
     if(show_mode) mtext(text = paste("Mode = ", round(MU, 2)), side = 3, line = 4, cex = 1.2, adj = 0)
     if(show_mean) mtext(text = paste("Moyenne = ", round(mu, 2)), side = 3, line = 2.5, cex = 1.2, adj = 0)
-    if(show_se) mtext(text = paste("Erreur-type = ", round(se, 2)), side = 3, line = 1, cex = 1.2, adj = 0)
+    if(show_se) mtext(text = paste("Erreur-type = ", round(se, 3)), side = 3, line = 1, cex = 1.2, adj = 0)
   } # end function plot_gamma
 
   plot_gamma_cumulated_impacts <- function(mu, se, nparc, ...){
@@ -1032,9 +1032,9 @@ server <- function(input, output, session){
 
         }else{
           # Case 1.3 : Values directly provided as lower/upper interval
-          param$fatalities_mean <- c(0, round(get_mu(lower = input$fatalities_lower, upper = input$fatalities_upper), 2))
+          param$fatalities_mean <- c(0, round(get_mu(lower = input$fatalities_lower, upper = input$fatalities_upper), 1))
           param$onset_time <- NULL
-          param$fatalities_se <- c(0, round(get_sd(lower = input$fatalities_lower, upper = input$fatalities_upper, coverage = CP), 3))
+          param$fatalities_se <- c(0, round(get_sd(lower = input$fatalities_lower, upper = input$fatalities_upper, coverage = CP), 2))
           ready$fatalities <- TRUE
         } # end (if3)
 
@@ -1114,8 +1114,8 @@ server <- function(input, output, session){
       }else{
         # Case 3 : Values directly provided as lower/upper interval
         ready$pop_size <- TRUE
-        param$pop_size_mean <- round(get_mu(lower = input$pop_size_lower, upper = input$pop_size_upper), 2)
-        param$pop_size_se <- round(get_sd(lower = input$pop_size_lower, upper = input$pop_size_upper, coverage = CP), 3)
+        param$pop_size_mean <- round(get_mu(lower = input$pop_size_lower, upper = input$pop_size_upper), 1)
+        param$pop_size_se <- round(get_sd(lower = input$pop_size_lower, upper = input$pop_size_upper, coverage = CP), 1)
       } # end (if3)
 
     }
@@ -1171,7 +1171,7 @@ server <- function(input, output, session){
         if(input$pop_growth_input_type == "val"){
           # Case 2 : Values directly provided as mean & SE
           ready$pop_growth <- TRUE
-          param$pop_growth_mean <- round(min(1 + param$rMAX_species, make_lambda(input$pop_growth_mean)), 3)
+          param$pop_growth_mean <- round(min(1 + param$rMAX_species, make_lambda(input$pop_growth_mean)), 2)
           param$pop_growth_se <- input$pop_growth_se/100
 
         }else{
@@ -1221,8 +1221,8 @@ server <- function(input, output, session){
         }else{
           # lower/upper interval
           ready$carrying_capacity <- TRUE
-          param$carrying_capacity_mean <- round(get_mu(lower = input$carrying_capacity_lower, upper = input$carrying_capacity_upper), 2)
-          param$carrying_capacity_se <- round(get_sd(lower = input$carrying_capacity_lower, upper = input$carrying_capacity_upper, coverage = CP), 3)
+          param$carrying_capacity_mean <- round(get_mu(lower = input$carrying_capacity_lower, upper = input$carrying_capacity_upper), 0)
+          param$carrying_capacity_se <- round(get_sd(lower = input$carrying_capacity_lower, upper = input$carrying_capacity_upper, coverage = CP), 1)
         } # end (if3)
 
       }
