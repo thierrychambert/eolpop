@@ -14,7 +14,7 @@ rm(list = ls(all.names = TRUE))
 
   ## Load species list
   species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")
-  species_list <- unique(as.character(species_data$NomEspece))
+  species_list <- unique(as.character(species_data$NomEspece)) %>% sort
 
   ## Load survival and fecundities data
   data_sf <- read.csv("./inst/ShinyApp/survivals_fecundities_species.csv", sep = ",")#, encoding = "UTF-8")
