@@ -71,9 +71,6 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
   DD_params$theta <- theta
   DD_params$rMAX <- rMAX_species
 
-  # Coefficient of variation for environment stochasticity
-  cv_env <- coeff_var_environ
-
   # Number of years
   nyr <- time_horizon
 
