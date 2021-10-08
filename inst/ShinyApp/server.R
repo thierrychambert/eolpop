@@ -1134,24 +1134,24 @@ server <- function(input, output, session){
 
         if(input$pop_trend == "growth") {
           if(input$pop_trend_strength == "weak") {
-            param$pop_growth_mean <- 1.01
+            param$pop_growth_mean <- growth_weak
           } else if(input$pop_trend_strength == "average"){
-            param$pop_growth_mean <- 1.03
+            param$pop_growth_mean <- growth_average
           } else {
-            param$pop_growth_mean <- 1.06
+            param$pop_growth_mean <- growth_strong
           }
         } else if(input$pop_trend == "decline"){
           if(input$pop_trend_strength == "weak") {
-            param$pop_growth_mean <- 0.99
+            param$pop_growth_mean <- decline_weak
           } else if(input$pop_trend_strength == "average"){
-            param$pop_growth_mean <- 0.97
+            param$pop_growth_mean <- decline_average
           } else {
-            param$pop_growth_mean <- 0.94
+            param$pop_growth_mean <- decline_strong
           }
         } else {
-          param$pop_growth_mean <- 1
+          param$pop_growth_mean <- pop_stable
         }
-        param$pop_growth_se <- 0
+        param$pop_growth_se <- trend_se
 
 
         # Case 3 : Values directly provided (i.e., not from expert elicitation)
@@ -1237,9 +1237,8 @@ server <- function(input, output, session){
     rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
     param$rMAX_species <- rMAX_species
 
-    ## We define theta = 1 for simplicity - given large uncertainty of real shape of density-dependence in nature
-    #param$theta <- theta_spp(rMAX_species)
     param$theta <- fixed_theta
+    #param$theta <- theta_spp(rMAX_species)
 
     param$vr_calibrated <- calibrate_params(
       inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
