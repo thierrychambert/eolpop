@@ -100,6 +100,7 @@ server <- function(input, output, session){
     shinyjs::hide("carrying_cap_run_expert")
 
     shinyjs::hide("mat_fill_vr")
+    shinyjs::hide("vr_mat_number_age_classes")
 
     #------------
     # Show some
@@ -206,6 +207,7 @@ server <- function(input, output, session){
     # Show inputs vital rates part
     if(input$button_vital_rates%%2 == 1){
       shinyjs::show("mat_fill_vr")
+      shinyjs::show("vr_mat_number_age_classes")
     }
 
   }) # en observe show/hide
@@ -907,21 +909,45 @@ server <- function(input, output, session){
     return(out_mat)
   }
 
+  # Update the vital rate matrix (mat_fill_vr) when changing the number of age classes
+  observeEvent({
+    input$vr_mat_number_age_classes
+  }, {
+    req(input$vr_mat_number_age_classes)
+    number_age_class <- input$vr_mat_number_age_classes
+    updateMatrixInput(session, inputId = "mat_fill_vr",
+                        value = matrix(data = NA,
+                                       nrow = number_age_class,
+                                       ncol = 2,
+                                       dimnames = list(c(paste("Age", (1:number_age_class))), c("Survie", "Fécondité"))))
+  }) # end observeEvent
+
+
+
   # Update the vital rate matrix (mat_fill_vr) when changing species in the list
   observeEvent({
     input$species_choice
   }, {
 
-    if(input$species_choice == "Espèce générique") {} else {
+    if(input$species_choice == "Espèce générique") {
+
+      number_age_class <- input$vr_mat_number_age_classes
+      updateMatrixInput(session, inputId = "mat_fill_vr",
+                        value = matrix(data = NA,
+                                       nrow = number_age_class,
+                                       ncol = 2,
+                                       dimnames = list(c(paste("Age", (1:number_age_class))), c("Survie", "Fécondité"))))
+    } else {
 
       tab_species <- make_mat_vr(data_sf = data_sf, species = input$species_choice)
 
       if(all(is.na(tab_species))) {
+        number_age_class <- input$vr_mat_number_age_classes
         updateMatrixInput(session, inputId = "mat_fill_vr",
                           value = matrix(data = NA,
-                                         nrow = 4,
+                                         nrow = number_age_class,
                                          ncol = 2,
-                                         dimnames = list(c("Juv 0", "Sub 1", "Sub 2", "Adulte"), c("Survie", "Fécondité"))))
+                                         dimnames = list(c(paste("Age", (1:number_age_class))), c("Survie", "Fécondité"))))
 
       } else {
         number_age_class <- nrow(tab_species)
@@ -938,6 +964,9 @@ server <- function(input, output, session){
     } # end if 1
 
   }) # end observeEvent species_list
+
+
+
 
   # Display vital rates output table
   output$vital_rates_info <- renderTable({

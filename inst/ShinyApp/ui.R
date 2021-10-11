@@ -208,11 +208,16 @@ rm(list = ls(all.names = TRUE))
                                              style = "font-weight: bold; font-size: 18px;")
               ),
 
-              br(),
+              br(" "),
+              numericInput(inputId = "vr_mat_number_age_classes",
+                           label = "Nombre de classes d'age",
+                           value = 3, min = 1, max = Inf, step = 1),
+
+              #br(),
               matrixInput(inputId = "mat_fill_vr",
                           label = "",
                           value = matrix(data = NA, 3, 2,
-                                         dimnames = list(c("Juv 1", "Juv 2", "Adulte"), c("Survie", "Fécondité"))),
+                                         dimnames = list(c("Juv 0", "Sub 1", "Adulte"), c("Survie", "Fécondité"))),
                           class = "numeric",
                           rows = list(names = TRUE),
                           cols = list(names = TRUE)
