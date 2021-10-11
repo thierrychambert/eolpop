@@ -483,10 +483,10 @@ rm(list = ls(all.names = TRUE))
 
               tags$style(HTML('#button_pop_growth{background-color:#C2C8D3}')),
               actionButton(inputId = "button_pop_growth", width = '100%',
-                           label = tags$span("Tendance de la population", style = "font-weight: bold; font-size: 18px;")
+                           label = tags$span("Taux de croissance", style = "font-weight: bold; font-size: 18px;")
               ),
               bsPopover(id = "button_pop_growth",
-                        title = "Tendance de la population",
+                        title = "Taux de croissance",
                         content = HTML(
                           "Taux d\\'accroissement annuel de la population <b>en %</b> : valeur positive pour une population en croissance; valeur <b>négative</b> pour une population en <b>déclin</b> (ex : « -4 » pour un déclin de 4% par an) ; 0 pour une population stable. <br>A défaut, on pourra juste cocher la <b>tendance globale</b> (déclin, stabilité ou croissance) et l\\'intensité de cette tendance (faible, moyenne, forte).<br><br><b>NOTE</b> : les valeurs fournies seront traduites en <b>taux de croissance annuel (&lambda;)</b> (avec &lambda; = 1 pour une population stable, &lambda; < 1 pour une population en déclin, et &lambda; > 1 pour une population croissante)."
                           ),
@@ -505,7 +505,7 @@ rm(list = ls(all.names = TRUE))
                                                         choices = c("Intervalle" = "itvl",
                                                                     "Valeurs" = "val",
                                                                     "Elicitation d'expert" = "eli_exp",
-                                                                    "Tendance locale ou régionale" = "trend")),
+                                                                    "Tendance population" = "trend")),
                                            # Interval
                                            numericInput(inputId = "pop_growth_lower",
                                                         label = HTML("Borne inférieure<br>(taux d'accroissement en %)"),
