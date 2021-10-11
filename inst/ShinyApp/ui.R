@@ -94,6 +94,8 @@ rm(list = ls(all.names = TRUE))
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
   # Head Panel 1 : type of analysis and species
   {wellPanel(
+    p("Choix d'analyse et espèce", style="font-size:28px"),
+
     {fluidRow(
 
       # Select type of analysis : cumulated impacted or not
