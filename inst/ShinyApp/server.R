@@ -1064,9 +1064,9 @@ server <- function(input, output, session){
 
         }else{
           # Case 1.3 : Values directly provided as lower/upper interval
-          param$fatalities_mean <- c(0, round(get_mu(lower = input$fatalities_lower, upper = input$fatalities_upper), 1))
+          param$fatalities_mean <- c(0, round(get_mu(lower = input$fatalities_lower, upper = input$fatalities_upper), 2))
           param$onset_time <- NULL
-          param$fatalities_se <- c(0, round(get_sd(lower = input$fatalities_lower, upper = input$fatalities_upper, coverage = CP), 2))
+          param$fatalities_se <- c(0, round(get_sd(lower = input$fatalities_lower, upper = input$fatalities_upper, coverage = CP), 3))
           ready$fatalities <- TRUE
         } # end (if3)
 
@@ -1128,7 +1128,7 @@ server <- function(input, output, session){
     # Case 1 : Values from expert elicitation
     if(input$pop_size_input_type == "eli_exp"){
       if(!(is.null(param$pop_size_eli_result))){
-        param$pop_size_mean <- round(param$pop_size_eli_result$mean)
+        param$pop_size_mean <- round(param$pop_size_eli_result$mean, 1)
         param$pop_size_se <- round(param$pop_size_eli_result$SE, 1)
         ready$pop_size <- TRUE
       } else {
@@ -1140,8 +1140,8 @@ server <- function(input, output, session){
       if(input$pop_size_input_type == "val"){
         # Case 2 : Values directly provided as mean & SE
         ready$pop_size <- TRUE
-        param$pop_size_mean <- input$pop_size_mean
-        param$pop_size_se <- input$pop_size_se
+        param$pop_size_mean <- round(input$pop_size_mean, 1)
+        param$pop_size_se <- round(input$pop_size_se, 1)
 
       }else{
         # Case 3 : Values directly provided as lower/upper interval
@@ -1162,8 +1162,8 @@ server <- function(input, output, session){
     # Case 1 : Values from expert elicitation
     if(input$pop_growth_input_type == "eli_exp"){
       if(!(is.null(param$pop_growth_eli_result))){
-        param$pop_growth_mean <- round(min(1 + param$rMAX_species, round(param$pop_growth_eli_result$mean, 2)), 2)
-        param$pop_growth_se <- round(param$pop_growth_eli_result$SE, 2)
+        param$pop_growth_mean <- round(min(1 + param$rMAX_species, round(param$pop_growth_eli_result$mean, 2)), 4)
+        param$pop_growth_se <- round(param$pop_growth_eli_result$SE, 5)
         ready$pop_growth <- TRUE
       } else {
         ready$pop_growth <- FALSE
@@ -1203,18 +1203,18 @@ server <- function(input, output, session){
         if(input$pop_growth_input_type == "val"){
           # Case 2 : Values directly provided as mean & SE
           ready$pop_growth <- TRUE
-          param$pop_growth_mean <- round(min(1 + param$rMAX_species, make_lambda(input$pop_growth_mean)), 2)
-          param$pop_growth_se <- input$pop_growth_se/100
+          param$pop_growth_mean <- round(min(1 + param$rMAX_species, make_lambda(input$pop_growth_mean)), 4)
+          param$pop_growth_se <- round(input$pop_growth_se/100, 5)
 
         }else{
           # Case 3 : Values directly provided as lower/upper interval
           ready$pop_growth <- TRUE
           param$pop_growth_mean <- round(min(1 + param$rMAX_species,
-                                             round(get_mu(lower = make_lambda(input$pop_growth_lower),
-                                                          upper = make_lambda(input$pop_growth_upper)), 2)
-                                             ), 3)
+                                             get_mu(lower = make_lambda(input$pop_growth_lower),
+                                                          upper = make_lambda(input$pop_growth_upper)))
+                                             , 4)
           param$pop_growth_se <- round(get_sd(lower = make_lambda(input$pop_growth_lower),
-                                              upper = make_lambda(input$pop_growth_upper), coverage = CP), 3)
+                                              upper = make_lambda(input$pop_growth_upper), coverage = CP), 5)
         } # end (if3)
 
       }
