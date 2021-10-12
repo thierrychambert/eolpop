@@ -32,7 +32,7 @@ plot_traj <- function(N, onset_year = NULL, xlab = "Year", ylab = "Population si
 
   # Average trajectory and CI limits (here we use CI = +/- 0.5*SE to avoid overloading the graph)
   out <- colSums(N[-1,,,])
-  N_avg <- apply(out, c(1,2), mean)
+  N_avg <- apply(out, c(1,2), median)
   N_lci <- apply(out, c(1,2), quantile, prob = pnorm(0.5))
   N_uci <- apply(out, c(1,2), quantile, prob = pnorm(-0.5))
 
