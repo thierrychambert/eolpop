@@ -533,7 +533,7 @@ server <- function(input, output, session){
 
     ## Plot the curve
     par(mar = c(5, 4, 6, 2))
-    curve(dgamma(x, shape=shape, scale=scale), from = max(0,mu-3*se), to = mu+4*se, lwd = 3, col = "darkblue", yaxt = "n",
+    curve(dgamma(x, shape=shape, scale=scale), from = max(0,mu-3*se), to = mu+3*se, lwd = 3, col = "darkblue", yaxt = "n",
           ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2)
     mtext(text = "Densité de probabilité", side = 2, line = 2, cex = 1.2)
 
