@@ -558,18 +558,18 @@ rm(list = ls(all.names = TRUE))
                                              column(6,
                                                     radioButtons(inputId = "pop_trend",
                                                                  label = "Tendance",
-                                                                 choices = c("Croissance" = "growth",
+                                                                 choices = c("En croissance" = "growth",
                                                                              "Stable" = "stable",
-                                                                             "Déclin" = "decline")),
+                                                                             "En déclin" = "decline")),
                                              ),
 
                                              # Strength of trend
                                              column(6,
                                                     radioButtons(inputId = "pop_trend_strength",
-                                                                 label = "Force",
+                                                                 label = "intensité",
                                                                  choices = c("Faible" = "weak",
-                                                                             "Moyen" = "average",
-                                                                             "Fort" = "strong")),
+                                                                             "Moyenne" = "average",
+                                                                             "Forte" = "strong")),
                                              ),
                                            )}, # close fluidRow
 
