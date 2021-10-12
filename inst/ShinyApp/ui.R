@@ -566,7 +566,7 @@ rm(list = ls(all.names = TRUE))
                                              # Strength of trend
                                              column(6,
                                                     radioButtons(inputId = "pop_trend_strength",
-                                                                 label = "intensité",
+                                                                 label = "Intensité",
                                                                  choices = c("Faible" = "weak",
                                                                              "Moyenne" = "average",
                                                                              "Forte" = "strong")),
