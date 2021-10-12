@@ -14,17 +14,37 @@ rm(list = ls(all.names = TRUE))
 
   ## Load species list
   species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")
-  species_list <- unique(as.character(species_data$NomEspece))
+  species_list <- unique(as.character(species_data$NomEspece)) %>% sort
+  species_list <- c(species_list, "Espèce générique")
 
   ## Load survival and fecundities data
   data_sf <- read.csv("./inst/ShinyApp/survivals_fecundities_species.csv", sep = ",")#, encoding = "UTF-8")
-  (data_sf)
 
-  # Fixed parameters (for now)
-  coeff_var_environ = 0.03
-  #time_horizon = 30
-  theta = 1 # DD parameter theta
-  CP = 0.99 # Coverage probability for lower - upper values
+
+  ##### Fixed parameters #####
+  # We define theta = 1 (same as in PBR) - for simplicity, given large uncertainty of real shape of density-dependence in nature
+  fixed_theta = 1
+
+  # Coefficient of environmental variation (SD)
+    ## Environnmental variance set at 8%, based on values found for birds in the literature:
+    ## (Saeher & Engen 2002) : between 7% et 14 ==> average : 10%
+    ## (Sæther et al. 2005) : between 2.5% et 10% ==> average : 6%
+  coeff_var_environ = sqrt(0.08) # SD ~28%
+
+  # Coverage probability used for lower/upper interval input values
+  CP = 0.99
+
+  # Values of pop_growth (assumed), when the "trend" option is chosen
+  growth_weak <- 1.05
+  growth_average <- 1.10
+  growth_strong <- 1.15
+
+  decline_weak <- 0.97
+  decline_average <- 0.94
+  decline_strong <- 0.91
+
+  pop_stable <- 1
+  trend_se <- 0.03 # SE to use for pop_growth, when the "trend" option is chosen
 }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
@@ -74,6 +94,8 @@ rm(list = ls(all.names = TRUE))
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
   # Head Panel 1 : type of analysis and species
   {wellPanel(
+    p("Choix d'analyse et espèce", style="font-size:28px"),
+
     {fluidRow(
 
       # Select type of analysis : cumulated impacted or not
@@ -188,11 +210,16 @@ rm(list = ls(all.names = TRUE))
                                              style = "font-weight: bold; font-size: 18px;")
               ),
 
-              br(),
+              br(" "),
+              numericInput(inputId = "vr_mat_number_age_classes",
+                           label = "Nombre de classes d'age",
+                           value = 3, min = 1, max = Inf, step = 1),
+
+              #br(),
               matrixInput(inputId = "mat_fill_vr",
                           label = "",
                           value = matrix(data = NA, 3, 2,
-                                         dimnames = list(c("Juv 1", "Juv 2", "Adulte"), c("Survie", "Fécondité"))),
+                                         dimnames = list(c("Juv 0", "Sub 1", "Adulte"), c("Survie", "Fécondité"))),
                           class = "numeric",
                           rows = list(names = TRUE),
                           cols = list(names = TRUE)
@@ -464,10 +491,10 @@ rm(list = ls(all.names = TRUE))
 
               tags$style(HTML('#button_pop_growth{background-color:#C2C8D3}')),
               actionButton(inputId = "button_pop_growth", width = '100%',
-                           label = tags$span("Tendance de la population", style = "font-weight: bold; font-size: 18px;")
+                           label = tags$span("Taux de croissance", style = "font-weight: bold; font-size: 18px;")
               ),
               bsPopover(id = "button_pop_growth",
-                        title = "Tendance de la population",
+                        title = "Taux de croissance",
                         content = HTML(
                           "Taux d\\'accroissement annuel de la population <b>en %</b> : valeur positive pour une population en croissance; valeur <b>négative</b> pour une population en <b>déclin</b> (ex : « -4 » pour un déclin de 4% par an) ; 0 pour une population stable. <br>A défaut, on pourra juste cocher la <b>tendance globale</b> (déclin, stabilité ou croissance) et l\\'intensité de cette tendance (faible, moyenne, forte).<br><br><b>NOTE</b> : les valeurs fournies seront traduites en <b>taux de croissance annuel (&lambda;)</b> (avec &lambda; = 1 pour une population stable, &lambda; < 1 pour une population en déclin, et &lambda; > 1 pour une population croissante)."
                           ),
@@ -486,7 +513,7 @@ rm(list = ls(all.names = TRUE))
                                                         choices = c("Intervalle" = "itvl",
                                                                     "Valeurs" = "val",
                                                                     "Elicitation d'expert" = "eli_exp",
-                                                                    "Tendance locale ou régionale" = "trend")),
+                                                                    "Tendance population" = "trend")),
                                            # Interval
                                            numericInput(inputId = "pop_growth_lower",
                                                         label = HTML("Borne inférieure<br>(taux d'accroissement en %)"),
@@ -531,18 +558,18 @@ rm(list = ls(all.names = TRUE))
                                              column(6,
                                                     radioButtons(inputId = "pop_trend",
                                                                  label = "Tendance",
-                                                                 choices = c("Croissance" = "growth",
+                                                                 choices = c("En croissance" = "growth",
                                                                              "Stable" = "stable",
-                                                                             "Déclin" = "decline")),
+                                                                             "En déclin" = "decline")),
                                              ),
 
                                              # Strength of trend
                                              column(6,
                                                     radioButtons(inputId = "pop_trend_strength",
-                                                                 label = "Force",
+                                                                 label = "Intensité",
                                                                  choices = c("Faible" = "weak",
-                                                                             "Moyen" = "average",
-                                                                             "Fort" = "strong")),
+                                                                             "Moyenne" = "average",
+                                                                             "Forte" = "strong")),
                                              ),
                                            )}, # close fluidRow
 
@@ -587,15 +614,33 @@ rm(list = ls(all.names = TRUE))
 
                                            radioButtons(inputId = "carrying_cap_input_type",
                                                         label = "Type de saisie",
-                                                        choices = c("Valeur" = "val",
+                                                        choices = c("Intervalle" = "itvl",
+                                                                    "Valeur" = "val",
                                                                     "Elicitation d'expert" = "eli_exp",
                                                                     "Valeur Inconnue" = "unknown")),
 
-                                           # Value
-                                           numericInput(inputId = "carrying_capacity",
-                                                        label = "Capacité de charge",
+                                           # Interval
+                                           numericInput(inputId = "carrying_capacity_lower",
+                                                        label = "Borne inférieure (capacité de charge)",
+                                                        value = 850,
+                                                        min = 0, max = Inf, step = 100),
+
+                                           numericInput(inputId = "carrying_capacity_upper",
+                                                        label = "Borne supérieure (capacité de charge)",
+                                                        value = 1250,
+                                                        min = 0, max = Inf, step = 100),
+
+                                           # Values
+                                           numericInput(inputId = "carrying_capacity_mean",
+                                                        label = "Moyenne de la capacité de charge",
                                                         value = 1000,
                                                         min = 0, max = Inf, step = 100),
+
+                                           numericInput(inputId = "carrying_capacity_se",
+                                                        label = "Erreur-type de la capacité de charge",
+                                                        value = 100,
+                                                        min = 0, max = Inf, step = 50),
+
 
                                            # Expert Elicitation Matrix
                                            numericInput(inputId = "carrying_cap_number_expert",
@@ -629,8 +674,9 @@ rm(list = ls(all.names = TRUE))
 
 
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
-  ##  Side Panel : Parameter information
   {sidebarLayout(
+
+    ##  Side Panel : Parameter information
     {sidebarPanel(
 
       p("Valeurs sélectionnées", style="font-size:28px",
@@ -672,7 +718,10 @@ rm(list = ls(all.names = TRUE))
       # Capacite de charge
       {wellPanel(style = "background:#DCDCDC",
                  p("Capacité de charge", style="font-size:20px; font-weight: bold"),
-                 span(textOutput(outputId = "carrying_capacity_info"), style="font-size:16px"),
+                 shiny::tags$u(textOutput(outputId = "carrying_capacity_unit_info"), style="font-size:16px"),
+                 p(""),
+                 span(textOutput(outputId = "carrying_capacity_mean_info"), style="font-size:16px"),
+                 span(textOutput(outputId = "carrying_capacity_se_info"), style="font-size:16px"),
       )},
 
 
@@ -680,24 +729,24 @@ rm(list = ls(all.names = TRUE))
 
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-    # Creation of outputs parts
+    ###  Main Panel
 
     {mainPanel(
       tabsetPanel(
-        tabPanel(title = "Distribution paramètres",
+
+        ## Parameter distribution
+        {tabPanel(title = "Distribution paramètres",
                  br(),
                  hr(),
 
                  span(textOutput(outputId = "title_distri_plot"), style="font-size:24px; font-weight:bold"),
                  plotOutput(outputId = "distri_plot"),
 
-        ), # End tabPanel
+        )}, # End tabPanel
 
 
-        tabPanel(title = "Impact population",
+        ## Population Impact : simulations
+        {tabPanel(title = "Impact population",
 
                  br(),
                  numericInput(inputId = "time_horizon",
@@ -736,10 +785,11 @@ rm(list = ls(all.names = TRUE))
 
                  tags$h4(textOutput("title_traj_plot"), align = "center"),
                  plotOutput("traj_plot", width = "100%", height = "550px")
-        ), # End tabPanel
+        )}, # End tabPanel
 
 
-        tabPanel(title = "Rapport",
+        ## Report
+        {tabPanel(title = "Rapport",
                  br(),
                  radioButtons(inputId = "lifestyle",
                               h4("Mode de vie de l'espèce"),
@@ -751,7 +801,7 @@ rm(list = ls(all.names = TRUE))
                               h4("Nombre d'éoliennes"),
                               value = 1, min = 0, max = Inf, step = 1)
 
-        ) # End tabPanel
+        )} # End tabPanel
 
       ) # End tabSetPanel
     )} # End mainPanel

@@ -91,12 +91,16 @@ server <- function(input, output, session){
     shinyjs::hide("pop_trend")
     shinyjs::hide("pop_trend_strength")
 
-    shinyjs::hide("carrying_capacity")
+    shinyjs::hide("carrying_capacity_lower")
+    shinyjs::hide("carrying_capacity_upper")
+    shinyjs::hide("carrying_capacity_mean")
+    shinyjs::hide("carrying_capacity_se")
     shinyjs::hide("carrying_cap_number_expert")
     shinyjs::hide("carrying_cap_mat_expert")
     shinyjs::hide("carrying_cap_run_expert")
 
     shinyjs::hide("mat_fill_vr")
+    shinyjs::hide("vr_mat_number_age_classes")
 
     #------------
     # Show some
@@ -185,8 +189,13 @@ server <- function(input, output, session){
     # Show inputs for carrying capacity part
     if(input$button_carrying_cap%%2 == 1){
       shinyjs::show("carrying_cap_input_type")
+      if(input$carrying_cap_input_type == "itvl"){
+        shinyjs::show("carrying_capacity_lower")
+        shinyjs::show("carrying_capacity_upper")
+      }
       if(input$carrying_cap_input_type == "val"){
-        shinyjs::show("carrying_capacity")
+        shinyjs::show("carrying_capacity_mean")
+        shinyjs::show("carrying_capacity_se")
       }
       if(input$carrying_cap_input_type == "eli_exp"){
         shinyjs::show("carrying_cap_number_expert")
@@ -198,6 +207,7 @@ server <- function(input, output, session){
     # Show inputs vital rates part
     if(input$button_vital_rates%%2 == 1){
       shinyjs::show("mat_fill_vr")
+      shinyjs::show("vr_mat_number_age_classes")
     }
 
   }) # en observe show/hide
@@ -240,7 +250,10 @@ server <- function(input, output, session){
                           f_calibrated = NULL,
                           vr_calibrated = NULL,
 
-                          carrying_capacity = NULL,
+                          carrying_capacity_mean = NULL,
+                          carrying_capacity_se = NULL,
+
+
                           theta = NULL,
                           rMAX_species = NULL,
 
@@ -538,7 +551,7 @@ server <- function(input, output, session){
 
     if(show_mode) mtext(text = paste("Mode = ", round(MU, 2)), side = 3, line = 4, cex = 1.2, adj = 0)
     if(show_mean) mtext(text = paste("Moyenne = ", round(mu, 2)), side = 3, line = 2.5, cex = 1.2, adj = 0)
-    if(show_se) mtext(text = paste("Erreur-type = ", round(se, 2)), side = 3, line = 1, cex = 1.2, adj = 0)
+    if(show_se) mtext(text = paste("Erreur-type = ", round(se, 3)), side = 3, line = 1, cex = 1.2, adj = 0)
   } # end function plot_gamma
 
   plot_gamma_cumulated_impacts <- function(mu, se, nparc, ...){
@@ -727,19 +740,30 @@ server <- function(input, output, session){
     input$carrying_cap_input_type
     input$button_carrying_cap
   },{
-    # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
-    if(input$button_carrying_cap%%2 == 1 & input$carrying_cap_input_type == "eli_exp"){
-      if(!is.null(param$carrying_cap_eli_result)){
-        output$title_distri_plot <- renderText({ "Capacité de charge" })
-        output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out) })
-      } else {
+    # Show from input values: if button is ON and input_type is set on "value"
+    if(input$button_carrying_cap%%2 == 1 & input$carrying_cap_input_type != "eli_exp"){
+      output$title_distri_plot <- renderText({ "Capacité de charge" })
+
+      output$distri_plot <- renderPlot({
+        req(param$carrying_capacity_mean, param$carrying_capacity_se)
+        plot_gamma(mu = param$carrying_capacity_mean, se = param$carrying_capacity_se)
+      })
+
+    } else {
+      # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
+      if(input$button_carrying_cap%%2 == 1 & input$carrying_cap_input_type == "eli_exp"){
+        if(!is.null(param$carrying_cap_eli_result)){
+          output$title_distri_plot <- renderText({ "Capacité de charge" })
+          output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out) })
+        } else {
+          output$title_distri_plot <- NULL
+          output$distri_plot <- NULL
+        }
+        # Hide otherwise (when button is OFF)
+      }else{
         output$title_distri_plot <- NULL
         output$distri_plot <- NULL
       }
-      # Hide otherwise (when button is OFF)
-    }else{
-      output$title_distri_plot <- NULL
-      output$distri_plot <- NULL
     }
   }, ignoreInit = FALSE)
   #####
@@ -840,25 +864,38 @@ server <- function(input, output, session){
   ## Carrying capacity
   ##-------------------------------
   # UNIT (like pop size)
-  output$carrying_capacity_info <- renderText({
-
-    # Source info "unit"
-    if(is.null(param$pop_size_unit)){
-      unit1 <- input$pop_size_unit
-    }else{
-      unit1 <- param$pop_size_unit
+  ## UNIT
+  output$carrying_capacity_unit_info <- renderText({
+    if(!is.null(param$pop_size_unit)){
+      if(input$carrying_cap_input_type == "unknown"){
+        "Inconnue"
+      }else{
+        if(param$pop_size_unit == "Npair"){
+          paste0("Nombre de couple")
+        } else {
+          paste0("Effectif total")
+        }
+      }
     }
-
-    # UNIT information
-    if(unit1 == "Npair"){
-      info1 <- paste0("Nombre de couple")
-    } else {
-      info1 <- paste0("Effectif total")
-    }
-
-    # paste for printing
-    paste0(info1, " : ", param$carrying_capacity)
   })
+
+  ## VALUES
+  output$carrying_capacity_mean_info <- renderText({
+    if(input$carrying_cap_input_type == "unknown"){
+      NULL
+    }else{
+      paste0("Moyenne : ", param$carrying_capacity_mean)
+    }
+  })
+
+  output$carrying_capacity_se_info <- renderText({
+    if(input$carrying_cap_input_type == "unknown"){
+      NULL
+    }else{
+      paste0("Erreur-type : ", param$carrying_capacity_se)
+    }
+  })
+
 
 
   #################################
@@ -872,21 +909,45 @@ server <- function(input, output, session){
     return(out_mat)
   }
 
+  # Update the vital rate matrix (mat_fill_vr) when changing the number of age classes
+  observeEvent({
+    input$vr_mat_number_age_classes
+  }, {
+    req(input$vr_mat_number_age_classes)
+    number_age_class <- input$vr_mat_number_age_classes
+    updateMatrixInput(session, inputId = "mat_fill_vr",
+                        value = matrix(data = NA,
+                                       nrow = number_age_class,
+                                       ncol = 2,
+                                       dimnames = list(c(paste("Age", (1:number_age_class))), c("Survie", "Fécondité"))))
+  }) # end observeEvent
+
+
+
   # Update the vital rate matrix (mat_fill_vr) when changing species in the list
   observeEvent({
     input$species_choice
   }, {
 
-    if(input$species_choice == "Espèce générique") {} else {
+    if(input$species_choice == "Espèce générique") {
+
+      number_age_class <- input$vr_mat_number_age_classes
+      updateMatrixInput(session, inputId = "mat_fill_vr",
+                        value = matrix(data = NA,
+                                       nrow = number_age_class,
+                                       ncol = 2,
+                                       dimnames = list(c(paste("Age", (1:number_age_class))), c("Survie", "Fécondité"))))
+    } else {
 
       tab_species <- make_mat_vr(data_sf = data_sf, species = input$species_choice)
 
       if(all(is.na(tab_species))) {
+        number_age_class <- input$vr_mat_number_age_classes
         updateMatrixInput(session, inputId = "mat_fill_vr",
                           value = matrix(data = NA,
-                                         nrow = 4,
+                                         nrow = number_age_class,
                                          ncol = 2,
-                                         dimnames = list(c("Juv 0", "Sub 1", "Sub 2", "Adulte"), c("Survie", "Fécondité"))))
+                                         dimnames = list(c(paste("Age", (1:number_age_class))), c("Survie", "Fécondité"))))
 
       } else {
         number_age_class <- nrow(tab_species)
@@ -903,6 +964,9 @@ server <- function(input, output, session){
     } # end if 1
 
   }) # end observeEvent species_list
+
+
+
 
   # Display vital rates output table
   output$vital_rates_info <- renderTable({
@@ -997,9 +1061,9 @@ server <- function(input, output, session){
 
         }else{
           # Case 1.3 : Values directly provided as lower/upper interval
-          param$fatalities_mean <- c(0, round(get_mu(lower = input$fatalities_lower, upper = input$fatalities_upper), 2))
+          param$fatalities_mean <- c(0, round(get_mu(lower = input$fatalities_lower, upper = input$fatalities_upper), 1))
           param$onset_time <- NULL
-          param$fatalities_se <- c(0, round(get_sd(lower = input$fatalities_lower, upper = input$fatalities_upper, coverage = CP), 3))
+          param$fatalities_se <- c(0, round(get_sd(lower = input$fatalities_lower, upper = input$fatalities_upper, coverage = CP), 2))
           ready$fatalities <- TRUE
         } # end (if3)
 
@@ -1062,7 +1126,7 @@ server <- function(input, output, session){
     if(input$pop_size_input_type == "eli_exp"){
       if(!(is.null(param$pop_size_eli_result))){
         param$pop_size_mean <- round(param$pop_size_eli_result$mean)
-        param$pop_size_se <- round(param$pop_size_eli_result$SE)
+        param$pop_size_se <- round(param$pop_size_eli_result$SE, 1)
         ready$pop_size <- TRUE
       } else {
         ready$pop_size <- FALSE
@@ -1079,8 +1143,8 @@ server <- function(input, output, session){
       }else{
         # Case 3 : Values directly provided as lower/upper interval
         ready$pop_size <- TRUE
-        param$pop_size_mean <- round(get_mu(lower = input$pop_size_lower, upper = input$pop_size_upper), 2)
-        param$pop_size_se <- round(get_sd(lower = input$pop_size_lower, upper = input$pop_size_upper, coverage = CP), 3)
+        param$pop_size_mean <- round(get_mu(lower = input$pop_size_lower, upper = input$pop_size_upper), 1)
+        param$pop_size_se <- round(get_sd(lower = input$pop_size_lower, upper = input$pop_size_upper, coverage = CP), 1)
       } # end (if3)
 
     }
@@ -1110,24 +1174,24 @@ server <- function(input, output, session){
 
         if(input$pop_trend == "growth") {
           if(input$pop_trend_strength == "weak") {
-            param$pop_growth_mean <- 1.01
+            param$pop_growth_mean <- growth_weak
           } else if(input$pop_trend_strength == "average"){
-            param$pop_growth_mean <- 1.03
+            param$pop_growth_mean <- growth_average
           } else {
-            param$pop_growth_mean <- 1.06
+            param$pop_growth_mean <- growth_strong
           }
         } else if(input$pop_trend == "decline"){
           if(input$pop_trend_strength == "weak") {
-            param$pop_growth_mean <- 0.99
+            param$pop_growth_mean <- decline_weak
           } else if(input$pop_trend_strength == "average"){
-            param$pop_growth_mean <- 0.97
+            param$pop_growth_mean <- decline_average
           } else {
-            param$pop_growth_mean <- 0.94
+            param$pop_growth_mean <- decline_strong
           }
         } else {
-          param$pop_growth_mean <- 1
+          param$pop_growth_mean <- pop_stable
         }
-        param$pop_growth_se <- 0
+        param$pop_growth_se <- trend_se
 
 
         # Case 3 : Values directly provided (i.e., not from expert elicitation)
@@ -1136,7 +1200,7 @@ server <- function(input, output, session){
         if(input$pop_growth_input_type == "val"){
           # Case 2 : Values directly provided as mean & SE
           ready$pop_growth <- TRUE
-          param$pop_growth_mean <- round(min(1 + param$rMAX_species, make_lambda(input$pop_growth_mean)), 3)
+          param$pop_growth_mean <- round(min(1 + param$rMAX_species, make_lambda(input$pop_growth_mean)), 2)
           param$pop_growth_se <- input$pop_growth_se/100
 
         }else{
@@ -1162,18 +1226,34 @@ server <- function(input, output, session){
   observe({
     if(input$carrying_cap_input_type == "eli_exp"){
       if(!(is.null(param$carrying_cap_eli_result))){
-        param$carrying_capacity <- round(param$carrying_cap_eli_result$mean)
+        param$carrying_capacity_mean <- round(param$carrying_cap_eli_result$mean)
+        param$carrying_capacity_se <- round(param$carrying_cap_eli_result$SE, 1)
         ready$carrying_capacity <- TRUE
       } else {
         ready$carrying_capacity <- FALSE
       }
+
     } else {
+
       if(input$carrying_cap_input_type == "unknown"){
         ready$carrying_capacity <- TRUE
-        param$carrying_capacity <- max(param$pop_size_mean*100, 1e8) # use a very large K
+        param$carrying_capacity_mean <- max(param$pop_size_mean*100, 1e8) # use a very large K
+        param$carrying_capacity_se <- 0
+
       }else{
-        ready$carrying_capacity <- TRUE
-        param$carrying_capacity <- input$carrying_capacity
+        # values: mean and se
+        if(input$carrying_cap_input_type == "val"){
+          ready$carrying_capacity <- TRUE
+          param$carrying_capacity_mean <- input$carrying_capacity_mean
+          param$carrying_capacity_se <- input$carrying_capacity_se
+
+        }else{
+          # lower/upper interval
+          ready$carrying_capacity <- TRUE
+          param$carrying_capacity_mean <- round(get_mu(lower = input$carrying_capacity_lower, upper = input$carrying_capacity_upper), 0)
+          param$carrying_capacity_se <- round(get_sd(lower = input$carrying_capacity_lower, upper = input$carrying_capacity_upper, coverage = CP), 1)
+        } # end (if3)
+
       }
     }
   })
@@ -1193,8 +1273,12 @@ server <- function(input, output, session){
     input$run
   },{
 
-    # we also define rMAX here
-    param$rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
+    # We also define rMAX and theta here
+    rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
+    param$rMAX_species <- rMAX_species
+
+    param$theta <- fixed_theta
+    #param$theta <- theta_spp(rMAX_species)
 
     param$vr_calibrated <- calibrate_params(
       inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
@@ -1222,7 +1306,6 @@ server <- function(input, output, session){
     param # to ensure up-to-date values are run
 
     # fixed in global environment (for now)
-    param$theta <- theta
     param$coeff_var_environ <- coeff_var_environ
 
   }) # end observe
@@ -1257,7 +1340,9 @@ server <- function(input, output, session){
                                    survivals = param$s_calibrated,
                                    fecundities = param$f_calibrated,
 
-                                   carrying_capacity = param$carrying_capacity,
+                                   carrying_capacity_mean = param$carrying_capacity_mean,
+                                   carrying_capacity_se = param$carrying_capacity_se,
+
                                    theta = param$theta,
                                    rMAX_species = param$rMAX_species,
 
@@ -1422,7 +1507,7 @@ server <- function(input, output, session){
 
   output$title_traj_plot <- renderText({
     if(input$run > 0){
-      "Graphique : Trajectoire démographique"
+      "Graphique : Trajectoires démographiques"
     }
   })
 

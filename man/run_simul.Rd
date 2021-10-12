@@ -17,7 +17,8 @@ run_simul(
   pop_growth_se,
   survivals,
   fecundities,
-  carrying_capacity,
+  carrying_capacity_mean,
+  carrying_capacity_se,
   theta = 1,
   rMAX_species,
   model_demo = NULL,
@@ -52,9 +53,11 @@ or the Number of Pairs ("Npair"). A stable age distribution is used to infer the
 
 \item{fecundities}{a vector of fecundity values for each age class.}
 
-\item{carrying_capacity}{a strictly positive number.
-Carrying capacity (= maximum size that the population can reach). Here, the unit is the same as pop_size_type.
+\item{carrying_capacity_mean}{a strictly positive number.
+Average carrying capacity (= maximum size that the population can reach). Here, the unit is the same as pop_size_type.
 It can thus be expressed as the total population or the number of pair.}
+
+\item{carrying_capacity_se}{Standard Error for the carrying capacity.}
 
 \item{theta}{a strictly positive number. Parameter defining the shape of the density-dependence relationship.
 The relationship is defined as : r <- rMAX*(1-(N/K)^theta)
@@ -107,7 +110,8 @@ time_horizon = 30
 coeff_var_environ = 0.10
 fatal_constant = "h"
 
-carrying_capacity = 1200
+carrying_capacity_mean = 1200
+carrying_capacity_se = 100
 theta = 1
 rMAX_species <- 0.15
 
@@ -116,7 +120,8 @@ run_simul(nsim = 10, cumulated_impacts = FALSE,
            pop_size_mean, pop_size_se, pop_size_type,
            pop_growth_mean, pop_growth_se,
            survivals, fecundities,
-           carrying_capacity, theta,
+           carrying_capacity_mean, carrying_capacity_se,
+           theta,
            rMAX_species,
            model_demo = NULL, time_horizon, coeff_var_environ, fatal_constant)
 

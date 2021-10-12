@@ -20,7 +20,7 @@
 #'
 #'
 #'
-plot_traj <- function(N, onset_year = NULL, xlab = "Year", ylab = "Relative impact (%)",
+plot_traj <- function(N, onset_year = NULL, xlab = "Year", ylab = "Population size",
                         Legend = NULL, ...){
 
   # Get metrics and dimensions
@@ -55,7 +55,7 @@ plot_traj <- function(N, onset_year = NULL, xlab = "Year", ylab = "Relative impa
   # change color palette (we want sc0 in black)
   p <- p +
     scale_color_manual(breaks = 1:nsc,
-                       values = palette()[1:nsc],
+                       values = custom_palette_c25()[1:nsc],
                        labels = Legend, aesthetics = c("colour", "fill"))
 
 
@@ -92,33 +92,3 @@ plot_traj <- function(N, onset_year = NULL, xlab = "Year", ylab = "Relative impa
 } # End function
 ################################################################################
 
-
-
-
-##==============================================================================
-##                Function to control color transparency                      ==
-##==============================================================================
-#' Function to control color transparency on a plot
-#'
-#' @param someColor some color name, such as "green", "red", etc.
-#' @param percent the desired % of transparency, between 0 (no transparency) and 100 (full transparency) .
-#'
-#' @return a Hex Code including the desired transparency level, such as #RRGGBB7F
-#' @export
-#'
-#' @import RColorBrewer
-#' @import grDevices
-#'
-#' @examples
-#' make_transparent("green", percent=50)
-make_transparent <- function(someColor, percent=100)
-{
-  newColor <- col2rgb(someColor)
-  apply(newColor, 2,
-        function(curcoldata){
-          rgb(red = curcoldata[1], green = curcoldata[2], blue = curcoldata[3],
-              alpha = (100 - percent) * 255 / 100, maxColorValue = 255)
-        }
-  )
-} # End function
-################################################################################
