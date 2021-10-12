@@ -175,29 +175,20 @@ rm(list = ls(all.names = TRUE))
 
 
               # Display the intrinsic lambda(i.e., based solely on the Leslie matrix)
-              # NOTE : the first piece(tags$head...) ensures that output is left aligned
-              tags$head(
-                tags$style(HTML("
-                    div.MathJax_Display{
-                    text-align: left !important;
-                    }
-                "))
-              ),
-
               # Output display (intrinsic lambda)
               h5(strong("Taux de croissance intrinsèque"),
                  bsButton("Q_lambda0_info", label = "", icon = icon("question"), size = "extra-small"),
                  bsPopover(id = "Q_lambda0_info",
                            title = "Taux de croissance intrinsèque",
                            content = HTML(
-                             "Taux de croissance basé seulement sur la matrice de Leslie (survies et fécondités de l\\'espèce), <b> avant considération de la tendance de population locale</b>. <br><br>Ce taux de croissance est fourni simplement à titre informatif. La valeur qui sera utilisée dans les simulations correspond au taux de croissance fourni dans la partie \\'Tendance de population\\'. <br><br>NOTE : &lambda; = 1.05 correspond à 5% de croissance annuelle. &lambda; = 0.93 correspond à 7% de déclin par an. "
+                             "Taux de croissance basé seulement sur la matrice de Leslie (survies et fécondités de l\\'espèce), <b> avant considération de la tendance de population locale</b>. <br><br>Ce taux de croissance est fourni simplement à titre informatif. La valeur qui sera utilisée dans les simulations correspond au taux de croissance fourni dans la partie \\'Taux de croissance\\'."
                            ),
                            placement = "right",
                            trigger = "click",
                            options = list(container='body')
                  )
               ),
-              span(uiOutput(outputId = "lambda0_info", inline = TRUE), style = "color:black; font-size:16px"),
+              span(textOutput(outputId = "lambda0_info", inline = TRUE), style = "color:black; font-size:16px"),
 
       )}, # close column
 
@@ -496,7 +487,7 @@ rm(list = ls(all.names = TRUE))
               bsPopover(id = "button_pop_growth",
                         title = "Taux de croissance",
                         content = HTML(
-                          "Taux d\\'accroissement annuel de la population <b>en %</b> : valeur positive pour une population en croissance; valeur <b>négative</b> pour une population en <b>déclin</b> (ex : « -4 » pour un déclin de 4% par an) ; 0 pour une population stable. <br>A défaut, on pourra juste cocher la <b>tendance globale</b> (déclin, stabilité ou croissance) et l\\'intensité de cette tendance (faible, moyenne, forte).<br><br><b>NOTE</b> : les valeurs fournies seront traduites en <b>taux de croissance annuel (&lambda;)</b> (avec &lambda; = 1 pour une population stable, &lambda; < 1 pour une population en déclin, et &lambda; > 1 pour une population croissante)."
+                          "Taux d\\'accroissement annuel de la population <b>en %</b> : valeur positive pour une population en croissance; valeur <b>négative</b> pour une population en <b>déclin</b> (ex : « -4 » pour un déclin de 4% par an) ; 0 pour une population stable.<br><br>A défaut, on pourra juste cocher la <b>tendance globale</b> (déclin, stabilité ou croissance) et l\\'intensité de cette tendance (faible, moyenne, forte)."
                           ),
                         placement = "top",
                         trigger = "hover",

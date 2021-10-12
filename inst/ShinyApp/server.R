@@ -975,9 +975,12 @@ server <- function(input, output, session){
 
   # Display intrinsic lambda (based solely on Leslie matrix)
   delay(ms = 300,
-        output$lambda0_info <- renderUI({
+        output$lambda0_info <- renderText({
           lam <- lambda(build_Leslie(s = input$mat_fill_vr[,1], f = input$mat_fill_vr[,2]))
-          withMathJax(sprintf("$$\\lambda = %.02f$$", lam))
+          taux <- round(lam-1,2)*100
+          if(taux < 0) Text <- "Déclin : " else Text <- "Croissance : "
+          if(taux == 0) Text <- "Population stable : "
+          paste0(Text, taux, "% par an")
         })
   )
 
@@ -1383,7 +1386,7 @@ server <- function(input, output, session){
   # Display title
   output$title_indiv_impact_result <- renderText({
     req(input$run > 0, out$analysis_choice == "cumulated")
-    "Résultat : Impact de chaque parc éolien, estimé au bout de 30 ans"
+    paste("Résultat : Impact de chaque parc éolien, estimé au bout de" , param$time_horizon, "ans")
   })
 
   # Display impact result (table)
@@ -1416,7 +1419,7 @@ server <- function(input, output, session){
   # Display title
   output$title_impact_result <- renderText({
     req(input$run)
-    "Résultat : Impact global estimé au bout de 30 ans"
+    paste("Résultat : Impact global estimé au bout de" , param$time_horizon, "ans")
   })
 
   # Display impact result (table)
@@ -1449,7 +1452,7 @@ server <- function(input, output, session){
   # Display title
   output$title_PrExt_result <- renderText({
     req(input$run)
-    "Résultat : Probabilité d'extinction à 30 ans"
+    paste("Résultat : Probabilité d'extinction à", param$time_horizon, "ans")
   })
 
   # Display impact result (table)
