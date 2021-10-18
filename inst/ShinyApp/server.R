@@ -409,12 +409,21 @@ server <- function(input, output, session){
   # Function to run the elication analysis
   func_eli <- function(mat_expert){
     t_mat_expert <- t(mat_expert)
-    vals <- t_mat_expert[2:4,]
-    Cp <- t_mat_expert[5,]
+    vals <- t_mat_expert[2:4,] %>% apply(., 2, sort)
+    Cp <- t_mat_expert[5,] %>% sapply(., min, 0.99) %>% sapply(., max, 0.2)
     weights <- t_mat_expert[1,]
 
-    out <- elicitation(vals, Cp, weights)
-    return(list(out = out, mean = out$mean_smooth, SE = sqrt(out$var_smooth)))
+    out <- tryCatch(
+      elicitation(vals, Cp, weights), error = function(e)
+        message("Erreur : certaines valeurs dans la matrice d'experts n'ont pas de sens")
+      )
+
+    if(!is.null(out)){
+      OUT <- list(out = out, mean = out$mean_smooth, SE = sqrt(out$var_smooth))
+    }else{
+      OUT <- NULL
+    }
+    return(OUT)
   }
 
   # Function to plot the elication analysis output
@@ -506,12 +515,15 @@ server <- function(input, output, session){
       param$carrying_cap_eli_result <- func_eli(input$carrying_cap_mat_expert)
 
       ## show output
-      output$title_distri_plot <- renderText({ "Capacité de charge" })
-      output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out, show_se = FALSE) })
+      if(!is.null(param$carrying_cap_eli_result)){
+        output$title_distri_plot <- renderText({ "Capacité de charge" })
+        output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out, show_se = FALSE) })
+      }
 
     } else {
       param$carrying_cap_eli_result <- NULL
       print("missing value")
+      #output$title_distri_plot <- renderText({ "Des valeurs sont manquantes dans la table 'experts'" })
     } # end if
   }) # end observeEvent
 
