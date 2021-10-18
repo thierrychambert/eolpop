@@ -523,7 +523,7 @@ server <- function(input, output, session){
     } else {
       param$carrying_cap_eli_result <- NULL
       print("missing value")
-      #output$title_distri_plot <- renderText({ "Des valeurs sont manquantes dans la table 'experts'" })
+      output$title_distri_plot <- renderText({ "Des valeurs sont manquantes dans la table 'experts'" })
     } # end if
   }) # end observeEvent
 
