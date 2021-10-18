@@ -150,8 +150,10 @@ rm(list = ls(all.names = TRUE))
               ),
               #br(),
               span(textOutput(outputId = "dispersal_mean_info"), style="font-size:16px"),
-              #br(),
+              br(),
+              span(textOutput(outputId = "dispersal_d03p_info"), style="font-size:16px"),
               span(textOutput(outputId = "dispersal_d05p_info"), style="font-size:16px"),
+              span(textOutput(outputId = "dispersal_d10p_info"), style="font-size:16px"),
 
       )}, # close column
 

@@ -221,7 +221,7 @@ server <- function(input, output, session){
   ##--------------------------------------------
   out <- reactiveValues(run = NULL, msg = NULL, analysis_choice = NULL)
 
-  rv <- reactiveValues(distAVG = NULL, dist05p = NULL)
+  rv <- reactiveValues(distAVG = NULL, dist = NULL)
 
   ready <- reactiveValues(fatalities = TRUE, pop_size = TRUE, pop_growth = TRUE, carrying_capacity = TRUE)
 
@@ -999,15 +999,25 @@ server <- function(input, output, session){
 
     rv$distAVG <- round(distAVG, 1)
 
-    rv$dist05p <- round(-log(0.05)*rv$distAVG, 1)
+    rv$dist <- c(round(-log(0.03)*distAVG, 1),
+                 round(-log(0.05)*distAVG, 1),
+                 round(-log(0.10)*distAVG, 1))
   })
 
   output$dispersal_mean_info <- renderText({
     paste0("Distance moyenne de dispersion : ", rv$distAVG, " km")
     })
 
+  output$dispersal_d03p_info <- renderText({
+    paste0("Seuil de distance équiv. 3% de dispersion : ", rv$dist[1], " km")
+  })
+
   output$dispersal_d05p_info <- renderText({
-    paste0("Distance équiv. 5% de dispersion : ", rv$dist05p, " km")
+    paste0("Seuil de distance équiv. 5% de dispersion : ", rv$dist[2], " km")
+  })
+
+  output$dispersal_d10p_info <- renderText({
+    paste0("Seuil de distance équiv. 10% de dispersion : ", rv$dist[3], " km")
   })
 
   #####
