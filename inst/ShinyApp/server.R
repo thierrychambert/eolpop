@@ -505,12 +505,12 @@ server <- function(input, output, session){
       ## run elicitation analysis
       param$carrying_cap_eli_result <- func_eli(input$carrying_cap_mat_expert)
 
-      ## run elicitation analysis
+      ## show output
       output$title_distri_plot <- renderText({ "Capacité de charge" })
       output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out, show_se = FALSE) })
 
     } else {
-      #param$carrying_cap_eli_result <- "missing value"
+      param$carrying_cap_eli_result <- NULL
       print("missing value")
     } # end if
   }) # end observeEvent
@@ -763,13 +763,8 @@ server <- function(input, output, session){
       # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
       if(input$button_carrying_cap%%2 == 1 & input$carrying_cap_input_type == "eli_exp"){
         if(!is.null(param$carrying_cap_eli_result)){
-          #if(param$carrying_cap_eli_result == "missing value"){
-           # output$title_distri_plot <- renderText({"Elicitation d'expert : valeur manquante"})
-            #output$distri_plot <- NULL
-          #}else{
             output$title_distri_plot <- renderText({ "Capacité de charge" })
             output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out) })
-          #}
         } else {
           output$title_distri_plot <- NULL
           output$distri_plot <- NULL
@@ -1255,11 +1250,9 @@ server <- function(input, output, session){
   observe({
     if(input$carrying_cap_input_type == "eli_exp"){
       if(!is.null(param$carrying_cap_eli_result)){
-        #if(param$carrying_cap_eli_result != "missing value"){
-          param$carrying_capacity_mean <- round(param$carrying_cap_eli_result$mean)
-          param$carrying_capacity_se <- round(param$carrying_cap_eli_result$SE, 1)
-          ready$carrying_capacity <- TRUE
-        #}
+        param$carrying_capacity_mean <- round(param$carrying_cap_eli_result$mean)
+        param$carrying_capacity_se <- round(param$carrying_cap_eli_result$SE, 1)
+        ready$carrying_capacity <- TRUE
       } else {
         ready$carrying_capacity <- FALSE
       }
