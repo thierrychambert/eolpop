@@ -510,6 +510,7 @@ server <- function(input, output, session){
       output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out, show_se = FALSE) })
 
     } else {
+      #param$carrying_cap_eli_result <- "missing value"
       print("missing value")
     } # end if
   }) # end observeEvent
@@ -613,13 +614,15 @@ server <- function(input, output, session){
     input$fatalities_mat_cumulated
   },{
 
-    if(input$analysis_choice != "cumulated"){
+    ## 1. When analysis = single farm
+    if(input$analysis_choice == "single_farm"){
 
       # Show from input values: if button is ON and input_type is set on "value" or "itvl" (thus not "eli_exp")
       if(input$button_fatalities%%2 == 1 & input$fatalities_input_type != "eli_exp"){
         output$title_distri_plot <- renderText({ "Mortalités annuelles" })
 
         output$distri_plot <- renderPlot({
+          req(param$fatalities_mean, param$fatalities_se > 0)
           if(input$fatalities_input_type == "itvl"){
             req(input$fatalities_lower, input$fatalities_upper)
             plot_gamma(mu = tail(param$fatalities_mean, -1), se = tail(param$fatalities_se, -1))
@@ -646,18 +649,25 @@ server <- function(input, output, session){
         }
       }
 
-    # When analysis = cumulated impacts
+    ## 2. When analysis = cumulated impacts
     }else{
-      output$title_distri_plot <- renderText({ "Mortalités annuelles par parc (impacts cumulés)" })
-      # Plot: note we use the "NULL + delay" sequence only to avoid error message in R console
-      output$distri_plot <- NULL
-      delay(5,
-        output$distri_plot <- renderPlot({
-          plot_gamma_cumulated_impacts(mu = input$fatalities_mat_cumulated[,1],
-                                     se = input$fatalities_mat_cumulated[,2],
-                                     nparc = input$farm_number_cumulated)
-        })
-      )
+      if(input$analysis_choice == "cumulated"){
+        output$title_distri_plot <- renderText({ "Mortalités annuelles par parc (impacts cumulés)" })
+        # Plot: note we use the "NULL + delay" sequence only to avoid error message in R console
+        output$distri_plot <- NULL
+        delay(5,
+              output$distri_plot <- renderPlot({
+                req(all(!is.na(input$fatalities_mat_cumulated[,1])), all(input$fatalities_mat_cumulated[,2] > 0))
+                plot_gamma_cumulated_impacts(mu = input$fatalities_mat_cumulated[,1],
+                                             se = input$fatalities_mat_cumulated[,2],
+                                             nparc = input$farm_number_cumulated)
+              })
+        )
+      }else{
+        ## 3. When analysis = multi_scenarios
+        output$title_distri_plot <- renderText({ "Pas de graphe (pas d'incertitude dans le cas 'mulitple scénarios')" })
+        output$distri_plot <- NULL
+      } # end "else"
 
     } # end "if"
   }, ignoreInit = FALSE)
@@ -675,7 +685,7 @@ server <- function(input, output, session){
       output$title_distri_plot <- renderText({ "Taille initiale de la population" })
 
       output$distri_plot <- renderPlot({
-        req(param$pop_size_mean, param$pop_size_se)
+        req(param$pop_size_mean, param$pop_size_se > 0)
         plot_gamma(mu = param$pop_size_mean, se = param$pop_size_se)
       })
 
@@ -745,7 +755,7 @@ server <- function(input, output, session){
       output$title_distri_plot <- renderText({ "Capacité de charge" })
 
       output$distri_plot <- renderPlot({
-        req(param$carrying_capacity_mean, param$carrying_capacity_se)
+        req(param$carrying_capacity_mean, param$carrying_capacity_se > 0)
         plot_gamma(mu = param$carrying_capacity_mean, se = param$carrying_capacity_se)
       })
 
@@ -753,12 +763,18 @@ server <- function(input, output, session){
       # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
       if(input$button_carrying_cap%%2 == 1 & input$carrying_cap_input_type == "eli_exp"){
         if(!is.null(param$carrying_cap_eli_result)){
-          output$title_distri_plot <- renderText({ "Capacité de charge" })
-          output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out) })
+          #if(param$carrying_cap_eli_result == "missing value"){
+           # output$title_distri_plot <- renderText({"Elicitation d'expert : valeur manquante"})
+            #output$distri_plot <- NULL
+          #}else{
+            output$title_distri_plot <- renderText({ "Capacité de charge" })
+            output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out) })
+          #}
         } else {
           output$title_distri_plot <- NULL
           output$distri_plot <- NULL
         }
+
         # Hide otherwise (when button is OFF)
       }else{
         output$title_distri_plot <- NULL
@@ -1238,10 +1254,12 @@ server <- function(input, output, session){
   ##------------------------------
   observe({
     if(input$carrying_cap_input_type == "eli_exp"){
-      if(!(is.null(param$carrying_cap_eli_result))){
-        param$carrying_capacity_mean <- round(param$carrying_cap_eli_result$mean)
-        param$carrying_capacity_se <- round(param$carrying_cap_eli_result$SE, 1)
-        ready$carrying_capacity <- TRUE
+      if(!is.null(param$carrying_cap_eli_result)){
+        #if(param$carrying_cap_eli_result != "missing value"){
+          param$carrying_capacity_mean <- round(param$carrying_cap_eli_result$mean)
+          param$carrying_capacity_se <- round(param$carrying_cap_eli_result$SE, 1)
+          ready$carrying_capacity <- TRUE
+        #}
       } else {
         ready$carrying_capacity <- FALSE
       }
