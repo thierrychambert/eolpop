@@ -415,13 +415,14 @@ server <- function(input, output, session){
 
     out <- tryCatch(
       elicitation(vals, Cp, weights), error = function(e)
-        message("Erreur : certaines valeurs dans la matrice d'experts n'ont pas de sens")
+        return(NULL)
+        #message("Erreur : certaines valeurs dans la matrice d'experts n'ont pas de sens")
       )
 
     if(!is.null(out)){
       OUT <- list(out = out, mean = out$mean_smooth, SE = sqrt(out$var_smooth))
     }else{
-      OUT <- NULL
+      OUT <- list(out = NA, mean = NA, SE = NA)
     }
     return(OUT)
   }
@@ -515,9 +516,11 @@ server <- function(input, output, session){
       param$carrying_cap_eli_result <- func_eli(input$carrying_cap_mat_expert)
 
       ## show output
-      if(!is.null(param$carrying_cap_eli_result)){
+      if(!is.na(param$carrying_cap_eli_result$out)){
         output$title_distri_plot <- renderText({ "Capacité de charge" })
         output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out, show_se = FALSE) })
+      }else {
+        output$title_distri_plot <- renderText({ "Erreur : certaines valeurs dans la matrice d'experts n'ont pas de sens" })
       }
 
     } else {
@@ -775,8 +778,13 @@ server <- function(input, output, session){
       # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
       if(input$button_carrying_cap%%2 == 1 & input$carrying_cap_input_type == "eli_exp"){
         if(!is.null(param$carrying_cap_eli_result)){
+          if(!is.na(param$carrying_cap_eli_result$out)){
             output$title_distri_plot <- renderText({ "Capacité de charge" })
             output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out) })
+          }else{
+            output$title_distri_plot <- renderText({ "Erreur" })
+            output$distri_plot <- NULL
+          }
         } else {
           output$title_distri_plot <- NULL
           output$distri_plot <- NULL
