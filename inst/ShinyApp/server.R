@@ -221,7 +221,7 @@ server <- function(input, output, session){
   ##--------------------------------------------
   out <- reactiveValues(run = NULL, msg = NULL, analysis_choice = NULL)
 
-  rv <- reactiveValues(distAVG = NULL, dist05p = NULL)
+  rv <- reactiveValues(distAVG = NULL, dist = NULL)
 
   ready <- reactiveValues(fatalities = TRUE, pop_size = TRUE, pop_growth = TRUE, carrying_capacity = TRUE)
 
@@ -409,12 +409,22 @@ server <- function(input, output, session){
   # Function to run the elication analysis
   func_eli <- function(mat_expert){
     t_mat_expert <- t(mat_expert)
-    vals <- t_mat_expert[2:4,]
-    Cp <- t_mat_expert[5,]
+    vals <- t_mat_expert[2:4,] %>% apply(., 2, sort)
+    Cp <- t_mat_expert[5,] %>% sapply(., min, 0.99) %>% sapply(., max, 0.2)
     weights <- t_mat_expert[1,]
 
-    out <- elicitation(vals, Cp, weights)
-    return(list(out = out, mean = out$mean_smooth, SE = sqrt(out$var_smooth)))
+    out <- tryCatch(
+      elicitation(vals, Cp, weights), error = function(e)
+        return(NULL)
+        #message("Erreur : certaines valeurs dans la matrice d'experts n'ont pas de sens")
+      )
+
+    if(!is.null(out)){
+      OUT <- list(out = out, mean = out$mean_smooth, SE = sqrt(out$var_smooth))
+    }else{
+      OUT <- list(out = NA, mean = NA, SE = NA)
+    }
+    return(OUT)
   }
 
   # Function to plot the elication analysis output
@@ -505,12 +515,18 @@ server <- function(input, output, session){
       ## run elicitation analysis
       param$carrying_cap_eli_result <- func_eli(input$carrying_cap_mat_expert)
 
-      ## run elicitation analysis
-      output$title_distri_plot <- renderText({ "Capacité de charge" })
-      output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out, show_se = FALSE) })
+      ## show output
+      if(!is.na(param$carrying_cap_eli_result$out)){
+        output$title_distri_plot <- renderText({ "Capacité de charge" })
+        output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out, show_se = FALSE) })
+      }else {
+        output$title_distri_plot <- renderText({ "Erreur : certaines valeurs dans la matrice d'experts n'ont pas de sens" })
+      }
 
     } else {
+      param$carrying_cap_eli_result <- NULL
       print("missing value")
+      output$title_distri_plot <- renderText({ "Des valeurs sont manquantes dans la table 'experts'" })
     } # end if
   }) # end observeEvent
 
@@ -533,7 +549,7 @@ server <- function(input, output, session){
 
     ## Plot the curve
     par(mar = c(5, 4, 6, 2))
-    curve(dgamma(x, shape=shape, scale=scale), from = max(0,mu-3*se), to = mu+4*se, lwd = 3, col = "darkblue", yaxt = "n",
+    curve(dgamma(x, shape=shape, scale=scale), from = max(0,mu-3*se), to = mu+3*se, lwd = 3, col = "darkblue", yaxt = "n",
           ylab = "", xlab = "Valeur du paramètre", cex.lab = 1.2)
     mtext(text = "Densité de probabilité", side = 2, line = 2, cex = 1.2)
 
@@ -613,13 +629,15 @@ server <- function(input, output, session){
     input$fatalities_mat_cumulated
   },{
 
-    if(input$analysis_choice != "cumulated"){
+    ## 1. When analysis = single farm
+    if(input$analysis_choice == "single_farm"){
 
       # Show from input values: if button is ON and input_type is set on "value" or "itvl" (thus not "eli_exp")
       if(input$button_fatalities%%2 == 1 & input$fatalities_input_type != "eli_exp"){
         output$title_distri_plot <- renderText({ "Mortalités annuelles" })
 
         output$distri_plot <- renderPlot({
+          req(param$fatalities_mean, param$fatalities_se > 0)
           if(input$fatalities_input_type == "itvl"){
             req(input$fatalities_lower, input$fatalities_upper)
             plot_gamma(mu = tail(param$fatalities_mean, -1), se = tail(param$fatalities_se, -1))
@@ -646,18 +664,25 @@ server <- function(input, output, session){
         }
       }
 
-    # When analysis = cumulated impacts
+    ## 2. When analysis = cumulated impacts
     }else{
-      output$title_distri_plot <- renderText({ "Mortalités annuelles par parc (impacts cumulés)" })
-      # Plot: note we use the "NULL + delay" sequence only to avoid error message in R console
-      output$distri_plot <- NULL
-      delay(5,
-        output$distri_plot <- renderPlot({
-          plot_gamma_cumulated_impacts(mu = input$fatalities_mat_cumulated[,1],
-                                     se = input$fatalities_mat_cumulated[,2],
-                                     nparc = input$farm_number_cumulated)
-        })
-      )
+      if(input$analysis_choice == "cumulated"){
+        output$title_distri_plot <- renderText({ "Mortalités annuelles par parc (impacts cumulés)" })
+        # Plot: note we use the "NULL + delay" sequence only to avoid error message in R console
+        output$distri_plot <- NULL
+        delay(5,
+              output$distri_plot <- renderPlot({
+                req(all(!is.na(input$fatalities_mat_cumulated[,1])), all(input$fatalities_mat_cumulated[,2] > 0))
+                plot_gamma_cumulated_impacts(mu = input$fatalities_mat_cumulated[,1],
+                                             se = input$fatalities_mat_cumulated[,2],
+                                             nparc = input$farm_number_cumulated)
+              })
+        )
+      }else{
+        ## 3. When analysis = multi_scenarios
+        output$title_distri_plot <- renderText({ "Pas de graphe (pas d'incertitude dans le cas 'mulitple scénarios')" })
+        output$distri_plot <- NULL
+      } # end "else"
 
     } # end "if"
   }, ignoreInit = FALSE)
@@ -675,7 +700,7 @@ server <- function(input, output, session){
       output$title_distri_plot <- renderText({ "Taille initiale de la population" })
 
       output$distri_plot <- renderPlot({
-        req(param$pop_size_mean, param$pop_size_se)
+        req(param$pop_size_mean, param$pop_size_se > 0)
         plot_gamma(mu = param$pop_size_mean, se = param$pop_size_se)
       })
 
@@ -745,7 +770,7 @@ server <- function(input, output, session){
       output$title_distri_plot <- renderText({ "Capacité de charge" })
 
       output$distri_plot <- renderPlot({
-        req(param$carrying_capacity_mean, param$carrying_capacity_se)
+        req(param$carrying_capacity_mean, param$carrying_capacity_se > 0)
         plot_gamma(mu = param$carrying_capacity_mean, se = param$carrying_capacity_se)
       })
 
@@ -753,12 +778,18 @@ server <- function(input, output, session){
       # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
       if(input$button_carrying_cap%%2 == 1 & input$carrying_cap_input_type == "eli_exp"){
         if(!is.null(param$carrying_cap_eli_result)){
-          output$title_distri_plot <- renderText({ "Capacité de charge" })
-          output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out) })
+          if(!is.na(param$carrying_cap_eli_result$out)){
+            output$title_distri_plot <- renderText({ "Capacité de charge" })
+            output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out) })
+          }else{
+            output$title_distri_plot <- renderText({ "Erreur" })
+            output$distri_plot <- NULL
+          }
         } else {
           output$title_distri_plot <- NULL
           output$distri_plot <- NULL
         }
+
         # Hide otherwise (when button is OFF)
       }else{
         output$title_distri_plot <- NULL
@@ -975,9 +1006,12 @@ server <- function(input, output, session){
 
   # Display intrinsic lambda (based solely on Leslie matrix)
   delay(ms = 300,
-        output$lambda0_info <- renderUI({
+        output$lambda0_info <- renderText({
           lam <- lambda(build_Leslie(s = input$mat_fill_vr[,1], f = input$mat_fill_vr[,2]))
-          withMathJax(sprintf("$$\\lambda = %.02f$$", lam))
+          taux <- round(lam-1,2)*100
+          if(taux < 0) Text <- "Déclin : " else Text <- "Croissance : "
+          if(taux == 0) Text <- "Population stable : "
+          paste0(Text, taux, "% par an")
         })
   )
 
@@ -996,15 +1030,25 @@ server <- function(input, output, session){
 
     rv$distAVG <- round(distAVG, 1)
 
-    rv$dist05p <- round(-log(0.05)*rv$distAVG, 1)
+    rv$dist <- c(round(-log(0.03)*distAVG, 1),
+                 round(-log(0.05)*distAVG, 1),
+                 round(-log(0.10)*distAVG, 1))
   })
 
   output$dispersal_mean_info <- renderText({
     paste0("Distance moyenne de dispersion : ", rv$distAVG, " km")
     })
 
+  output$dispersal_d03p_info <- renderText({
+    paste0("Seuil de distance équiv. 3% de dispersion : ", rv$dist[1], " km")
+  })
+
   output$dispersal_d05p_info <- renderText({
-    paste0("Distance équiv. 5% de dispersion : ", rv$dist05p, " km")
+    paste0("Seuil de distance équiv. 5% de dispersion : ", rv$dist[2], " km")
+  })
+
+  output$dispersal_d10p_info <- renderText({
+    paste0("Seuil de distance équiv. 10% de dispersion : ", rv$dist[3], " km")
   })
 
   #####
@@ -1061,9 +1105,9 @@ server <- function(input, output, session){
 
         }else{
           # Case 1.3 : Values directly provided as lower/upper interval
-          param$fatalities_mean <- c(0, round(get_mu(lower = input$fatalities_lower, upper = input$fatalities_upper), 1))
+          param$fatalities_mean <- c(0, round(get_mu(lower = input$fatalities_lower, upper = input$fatalities_upper), 2))
           param$onset_time <- NULL
-          param$fatalities_se <- c(0, round(get_sd(lower = input$fatalities_lower, upper = input$fatalities_upper, coverage = CP), 2))
+          param$fatalities_se <- c(0, round(get_sd(lower = input$fatalities_lower, upper = input$fatalities_upper, coverage = CP), 3))
           ready$fatalities <- TRUE
         } # end (if3)
 
@@ -1125,7 +1169,7 @@ server <- function(input, output, session){
     # Case 1 : Values from expert elicitation
     if(input$pop_size_input_type == "eli_exp"){
       if(!(is.null(param$pop_size_eli_result))){
-        param$pop_size_mean <- round(param$pop_size_eli_result$mean)
+        param$pop_size_mean <- round(param$pop_size_eli_result$mean, 1)
         param$pop_size_se <- round(param$pop_size_eli_result$SE, 1)
         ready$pop_size <- TRUE
       } else {
@@ -1137,8 +1181,8 @@ server <- function(input, output, session){
       if(input$pop_size_input_type == "val"){
         # Case 2 : Values directly provided as mean & SE
         ready$pop_size <- TRUE
-        param$pop_size_mean <- input$pop_size_mean
-        param$pop_size_se <- input$pop_size_se
+        param$pop_size_mean <- round(input$pop_size_mean, 1)
+        param$pop_size_se <- round(input$pop_size_se, 1)
 
       }else{
         # Case 3 : Values directly provided as lower/upper interval
@@ -1159,8 +1203,8 @@ server <- function(input, output, session){
     # Case 1 : Values from expert elicitation
     if(input$pop_growth_input_type == "eli_exp"){
       if(!(is.null(param$pop_growth_eli_result))){
-        param$pop_growth_mean <- round(min(1 + param$rMAX_species, round(param$pop_growth_eli_result$mean, 2)), 2)
-        param$pop_growth_se <- round(param$pop_growth_eli_result$SE, 2)
+        param$pop_growth_mean <- round(min(1 + param$rMAX_species, round(param$pop_growth_eli_result$mean, 2)), 4)
+        param$pop_growth_se <- round(param$pop_growth_eli_result$SE, 5)
         ready$pop_growth <- TRUE
       } else {
         ready$pop_growth <- FALSE
@@ -1200,18 +1244,18 @@ server <- function(input, output, session){
         if(input$pop_growth_input_type == "val"){
           # Case 2 : Values directly provided as mean & SE
           ready$pop_growth <- TRUE
-          param$pop_growth_mean <- round(min(1 + param$rMAX_species, make_lambda(input$pop_growth_mean)), 2)
-          param$pop_growth_se <- input$pop_growth_se/100
+          param$pop_growth_mean <- round(min(1 + param$rMAX_species, make_lambda(input$pop_growth_mean)), 4)
+          param$pop_growth_se <- round(input$pop_growth_se/100, 5)
 
         }else{
           # Case 3 : Values directly provided as lower/upper interval
           ready$pop_growth <- TRUE
           param$pop_growth_mean <- round(min(1 + param$rMAX_species,
-                                             round(get_mu(lower = make_lambda(input$pop_growth_lower),
-                                                          upper = make_lambda(input$pop_growth_upper)), 2)
-                                             ), 3)
+                                             get_mu(lower = make_lambda(input$pop_growth_lower),
+                                                          upper = make_lambda(input$pop_growth_upper)))
+                                             , 4)
           param$pop_growth_se <- round(get_sd(lower = make_lambda(input$pop_growth_lower),
-                                              upper = make_lambda(input$pop_growth_upper), coverage = CP), 3)
+                                              upper = make_lambda(input$pop_growth_upper), coverage = CP), 5)
         } # end (if3)
 
       }
@@ -1225,7 +1269,7 @@ server <- function(input, output, session){
   ##------------------------------
   observe({
     if(input$carrying_cap_input_type == "eli_exp"){
-      if(!(is.null(param$carrying_cap_eli_result))){
+      if(!is.null(param$carrying_cap_eli_result)){
         param$carrying_capacity_mean <- round(param$carrying_cap_eli_result$mean)
         param$carrying_capacity_se <- round(param$carrying_cap_eli_result$SE, 1)
         ready$carrying_capacity <- TRUE
@@ -1383,7 +1427,7 @@ server <- function(input, output, session){
   # Display title
   output$title_indiv_impact_result <- renderText({
     req(input$run > 0, out$analysis_choice == "cumulated")
-    "Résultat : Impact de chaque parc éolien, estimé au bout de 30 ans"
+    paste("Résultat : Impact de chaque parc éolien, estimé au bout de" , param$time_horizon, "ans")
   })
 
   # Display impact result (table)
@@ -1416,7 +1460,7 @@ server <- function(input, output, session){
   # Display title
   output$title_impact_result <- renderText({
     req(input$run)
-    "Résultat : Impact global estimé au bout de 30 ans"
+    paste("Résultat : Impact global estimé au bout de" , param$time_horizon, "ans")
   })
 
   # Display impact result (table)
@@ -1449,7 +1493,7 @@ server <- function(input, output, session){
   # Display title
   output$title_PrExt_result <- renderText({
     req(input$run)
-    "Résultat : Probabilité d'extinction à 30 ans"
+    paste("Résultat : Probabilité d'extinction à", param$time_horizon, "ans")
   })
 
   # Display impact result (table)
