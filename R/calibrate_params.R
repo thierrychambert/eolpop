@@ -39,7 +39,8 @@ calibrate_params <- function(inits = NULL, s, f, lam0){
 
   # Set parameter boundaries for the optimization
   if(lam0 - lam00 < 0){
-    lower = c(rep(0, length(fu)), apply(cbind((s*0.5), 0.05), 1, max))
+    #lower = c(rep(0, length(fu)), apply(cbind((s*0.5), 0.05), 1, max))
+    lower = c(rep(0, length(fu)), s*0.10)
     upper = c(fu, s)
   }else{
     lower = c(fu, s)
@@ -88,12 +89,25 @@ init_calib  <- function(s, f, lam0){
   A00 <- build_Leslie(s=s, f=f)
   diff_rel_lam <- (lam0 - lambda(A00))/lambda(A00)
   d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
+  A01 <- A00 * (1+d)
 
   nac = length(s)
 
-  inits_vr <- c(s,f) + d
-  inits_vr <- c(tail(inits_vr, nac), head(inits_vr, nac) %>% sapply(min, 0.999))
+  # Calibrate survivals
+  keep <- which(A00[-1,] != 0)
+  s_init <- ((A01[-1,][keep]) %>% sapply(., max, 0.001)) %>% sapply(., min, 0.999)
+
+  # Calibrate fecundities
+  f00 <- (A01[1,]/s_init) %>% sapply(., max, 0.001)
+  f_init <- c(0, head(f00,-1))
+  f_init[f == 0] <- 0
+
+  # Combine vital rates
+  inits_vr <- c(s_init,f_init)
+  inits_vr <- c(tail(inits_vr, nac), head(inits_vr, nac))
   inits <- inits_vr[inits_vr != 0]
+  inits
+
   return(inits)
 } # End function
 ################################################################################
@@ -128,9 +142,13 @@ match_lam_delta <- function(diff_rel_lam, s, f){
   vr = c(s, f)
   A00 <- build_Leslie(s=s, f=f)
 
-  # Infer the DELTA for each vital rate
-  d <- diff_rel_lam*vr/(lambda(A00))
-  names(d) <- c(paste0("s", 1:nac), paste0("f", 1:nac))
+  # Scale the DELTA for each vital rate based on sensitivities
+  S <- A00 %>% sensitivity(zero = TRUE)
+  scaling <- (1/S)
+  scaling[A00 == 0] <- 0
+
+  # Infer the DELTA for each LESLIE MATRIX element
+  d <- scaling * (diff_rel_lam*sqrt(abs(diff_rel_lam))) ; d
 
   return(d)
 } # End function
