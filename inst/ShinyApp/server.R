@@ -1007,6 +1007,7 @@ server <- function(input, output, session){
   # Display intrinsic lambda (based solely on Leslie matrix)
   delay(ms = 300,
         output$lambda0_info <- renderText({
+          req(all(!is.na(input$mat_fill_vr)))
           lam <- lambda(build_Leslie(s = input$mat_fill_vr[,1], f = input$mat_fill_vr[,2]))
           taux <- round(lam-1,2)*100
           if(taux < 0) Text <- "Déclin : " else Text <- "Croissance : "
