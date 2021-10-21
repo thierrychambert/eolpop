@@ -585,9 +585,9 @@ rm(list = ls(all.names = TRUE))
               ),
 
               bsPopover(id = "button_carrying_cap",
-                        title = "Capacité de charge",
+                        title = "Capacité de charge (K)",
                         content = HTML(
-                          "La capacité de charge correspond à la <b>taille maximale que peut atteindre la population</b> dans son environnement et les limites spatiales considérées. <br><br><u>Note:</u> Ce chiffre sera exprimé dans la <b>même unité</b> que la taille de population (cad. nombre de couples ou effectif total). <br>Il n\\'a pas besoin d\\'être très précis&nbsp;; il doit simplement fournir un ordre de grandeur de la taille limite au-delà de laquelle la population ne peut plus croître (environnement local «saturé»)."
+                          "La capacité de charge (K) correspond à la <b>taille maximale que peut atteindre la population</b> dans son environnement et les limites spatiales considérées. <br><br><u>Note:</u> Ce chiffre sera exprimé dans la <b>même unité</b> que la taille de population (cad. nombre de couples ou effectif total). <br>Il n\\'a pas besoin d\\'être très précis&nbsp;; il doit simplement fournir un ordre de grandeur de la taille limite au-delà de laquelle la population ne peut plus croître (environnement local «saturé»)."
                           ),
                         placement = "top",
                         trigger = "hover",
@@ -610,7 +610,7 @@ rm(list = ls(all.names = TRUE))
                                                         choices = c("Intervalle" = "itvl",
                                                                     "Valeur" = "val",
                                                                     "Elicitation d'expert" = "eli_exp",
-                                                                    "Valeur Inconnue" = "unknown")),
+                                                                    "Absence de K" = "no_K")),
 
                                            # Interval
                                            numericInput(inputId = "carrying_capacity_lower",

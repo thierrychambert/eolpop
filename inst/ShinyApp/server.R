@@ -898,8 +898,8 @@ server <- function(input, output, session){
   ## UNIT
   output$carrying_capacity_unit_info <- renderText({
     if(!is.null(param$pop_size_unit)){
-      if(input$carrying_cap_input_type == "unknown"){
-        "Inconnue"
+      if(input$carrying_cap_input_type == "no_K"){
+        "Pas de capacité de charge (K = infini)"
       }else{
         if(param$pop_size_unit == "Npair"){
           paste0("Nombre de couple")
@@ -912,7 +912,7 @@ server <- function(input, output, session){
 
   ## VALUES
   output$carrying_capacity_mean_info <- renderText({
-    if(input$carrying_cap_input_type == "unknown"){
+    if(input$carrying_cap_input_type == "no_K"){
       NULL
     }else{
       paste0("Moyenne : ", param$carrying_capacity_mean)
@@ -920,7 +920,7 @@ server <- function(input, output, session){
   })
 
   output$carrying_capacity_se_info <- renderText({
-    if(input$carrying_cap_input_type == "unknown"){
+    if(input$carrying_cap_input_type == "no_K"){
       NULL
     }else{
       paste0("Erreur-type : ", param$carrying_capacity_se)
@@ -1280,9 +1280,9 @@ server <- function(input, output, session){
 
     } else {
 
-      if(input$carrying_cap_input_type == "unknown"){
+      if(input$carrying_cap_input_type == "no_K"){
         ready$carrying_capacity <- TRUE
-        param$carrying_capacity_mean <- max(param$pop_size_mean*100, 1e8) # use a very large K
+        param$carrying_capacity_mean <- max(param$pop_size_mean*100, 1e30) # use a very large K
         param$carrying_capacity_se <- 0
 
       }else{
