@@ -25,7 +25,7 @@ length(fatalities_mean)
 survivals <- c(0.47, 0.67, 0.67)
 fecundities <- c(0, 0.30, 1.16)
 
-pop_growth_mean = 1.15
+pop_growth_mean = 1.20
 # lambda( build_Leslie(s = survivals, f = fecundities) )
 pop_growth_se = 0.01
 
@@ -59,8 +59,17 @@ rMAX_species <- rMAX_spp(surv = tail(survivals,1), afr = min(which(fecundities !
 rMAX_species
 
 # Define the (theoretical) theta parameter (shape of Density-dependence) for the species
-theta <- theta_spp(rMAX_species)
+# theta_spp(rMAX_species)
 theta = 1
+
+##
+rMAX_use <- infer_rMAX(K = K, theta = theta,
+                             pop_size_current = sum(N000), pop_growth_current = pop_growth_mean,
+                             rMAX_theoretical = rMAX_species)
+rMAX_use
+rMAX_species
+
+
 
 ##  Avoid unrealistic scenarios
 pop_growth_mean <- min(1 + rMAX_species, pop_growth_mean)
