@@ -27,7 +27,7 @@ rMAX_spp <- function(surv, afr){
   lambdaMax <- uniroot(lambdaMax, c(1,4))
   rMAX_sl <- lambdaMax[[1]] - 1
 
-  if(afr <= 2 & surv <= 0.8){
+  if(afr < 2 & surv <= 0.7){
     # "short-lived"
     rMAX <- rMAX_sl
   }else{
