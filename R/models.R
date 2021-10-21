@@ -190,17 +190,22 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params,
   A <- build_Leslie(s = s, f = f)
   diff_rel_lam <- (lam_Nt - lambda(A))/lambda(A)
   d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
-  vr_Nt <- c(s,f) + d
+  A01 <- A * (1+d)
 
-  s_Nt <- head(vr_Nt, length(s)) %>% sapply(min, 0.999)
-  f_Nt <- tail(vr_Nt, length(f))
+  # Calibrate survivals
+  keep <- which(A[-1,] != 0)
+  s_Nt <- ((A01[-1,][keep]) %>% sapply(., max, 0.001)) %>% sapply(., min, 0.999)
 
+  # Calibrate fecundities
+  f00 <- (A01[1,]/s_Nt) %>% sapply(., max, 0.001)
+  f_Nt <- c(0, head(f00,-1))
+  f_Nt[f == 0] <- 0
 
   ## Check if approximation is close enough to desired lambda
  if( abs((lambda(build_Leslie(s = s_Nt, f = f_Nt)) - lam_Nt) / lam_Nt) > 0.05 ){
 
     #If difference is too large : Use optimisation function for better calibration
-    inits <- c(tail(vr_Nt, length(f)), head(vr_Nt, length(s)) %>% sapply(min, 0.999))
+    inits <- c(f_Nt, s_Nt)
     inits <- inits[inits != 0]
     vr_calib <- calibrate_params(inits = inits, f = f_Nt, s = s_Nt, lam0 = lam_Nt)
     s_Nt <- head(vr_calib, length(s_Nt))
@@ -273,17 +278,22 @@ M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params,
   A <- build_Leslie(s = s, f = f)
   diff_rel_lam <- (lam_Nt - lambda(A))/lambda(A)
   d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
-  vr_Nt <- c(s,f) + d
+  A01 <- A * (1+d)
 
-  s_Nt <- head(vr_Nt, length(s)) %>% sapply(min, 0.999)
-  f_Nt <- tail(vr_Nt, length(f))
+  # Calibrate survivals
+  keep <- which(A[-1,] != 0)
+  s_Nt <- ((A01[-1,][keep]) %>% sapply(., max, 0.001)) %>% sapply(., min, 0.999)
 
+  # Calibrate fecundities
+  f00 <- (A01[1,]/s_Nt) %>% sapply(., max, 0.001)
+  f_Nt <- c(0, head(f00,-1))
+  f_Nt[f == 0] <- 0
 
   ## Check if approximation is close enough to desired lambda
   if( abs((lambda(build_Leslie(s = s_Nt, f = f_Nt)) - lam_Nt) / lam_Nt) > 0.05 ){
 
     # If difference is too large : Use optimisation function for better calibration
-    inits <- c(tail(vr_Nt, length(f)), head(vr_Nt, length(s)) %>% sapply(min, 0.999))
+    inits <- c(f_Nt, s_Nt)
     inits <- inits[inits != 0]
     vr_calib <- calibrate_params(inits = inits, f = f_Nt, s = s_Nt, lam0 = lam_Nt)
     s_Nt <- head(vr_calib, length(s_Nt))
