@@ -950,7 +950,7 @@ server <- function(input, output, session){
                         value = matrix(data = NA,
                                        nrow = number_age_class,
                                        ncol = 2,
-                                       dimnames = list(c(paste("Age", (1:number_age_class))), c("Survie", "Fécondité"))))
+                                       dimnames = list(c(paste("Age", (1:number_age_class)-1)), c("Survie", "Fécondité"))))
   }) # end observeEvent
 
 
@@ -967,7 +967,7 @@ server <- function(input, output, session){
                         value = matrix(data = NA,
                                        nrow = number_age_class,
                                        ncol = 2,
-                                       dimnames = list(c(paste("Age", (1:number_age_class))), c("Survie", "Fécondité"))))
+                                       dimnames = list(c(paste("Age", (1:number_age_class)-1)), c("Survie", "Fécondité"))))
     } else {
 
       tab_species <- make_mat_vr(data_sf = data_sf, species = input$species_choice)
@@ -978,7 +978,7 @@ server <- function(input, output, session){
                           value = matrix(data = NA,
                                          nrow = number_age_class,
                                          ncol = 2,
-                                         dimnames = list(c(paste("Age", (1:number_age_class))), c("Survie", "Fécondité"))))
+                                         dimnames = list(c(paste("Age", (1:number_age_class)-1)), c("Survie", "Fécondité"))))
 
       } else {
         number_age_class <- nrow(tab_species)
