@@ -72,9 +72,17 @@ pop_project <- function(fatalities,
 
     # Fatalities : constant number (M) or constant rate (h)
     if(fatal_constant == "M"){
-      h <- sapply(M/apply(N[-1,t-1,], 2, sum), min, 1)
+      if(nac > 2){
+        h <- sapply(M/apply(N[-1,t-1,], 2, sum), min, 1)
+      }else{
+        h <- sapply(M/N[-1,t-1,], min, 1)
+      }
     } else {
-      h <- sapply(M/apply(N[-1,1,], 2, sum), min, 1)
+      if(nac > 2){
+        h <- sapply(M/apply(N[-1,1,], 2, sum), min, 1)
+      }else{
+        h <- sapply(M/N[-1,1,], min, 1)
+      }
     }
 
     ## Projection : apply the LESLIE matrix calculation forward

@@ -81,11 +81,18 @@ pop_project_cumulated_impacts <- function(fatalities,
     ss = 1 - rnorm(nac, mean = qlogis(1-s), sd = cv_env/(s)) %>% plogis        ## sample thru the mortality rate : 1 - s
     ff = rnorm(nac, mean = log(f), sd = cv_env) %>% exp
 
-    # Fatalities : constant number (M) or constant rate (h)
     if(fatal_constant == "M"){
-      h <- sapply(Mc[,t-1]/apply(N[-1,t-1,], 2, sum), min, 1)
+      if(nac > 2){
+        h <- sapply(Mc[,t-1]/apply(N[-1,t-1,], 2, sum), min, 1)
+      }else{
+        h <- sapply(Mc[,t-1]/N[-1,t-1,], min, 1)
+      }
     } else {
-      h <- sapply(Mc[,t-1]/apply(N[-1,1,], 2, sum), min, 1)
+      if(nac > 2){
+        h <- sapply(Mc[,t-1]/apply(N[-1,1,], 2, sum), min, 1)
+      }else{
+        h <- sapply(Mc[,t-1]/N[-1,1,], min, 1)
+      }
     }
 
     # Sample a seed for RNG

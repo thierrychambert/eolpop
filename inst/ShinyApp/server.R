@@ -1344,15 +1344,18 @@ server <- function(input, output, session){
     param$fatal_constant <- input$fatalities_unit
     param$time_horizon <- input$time_horizon
 
+    # This condition is used to avoid wild population swings in fast-paced species
+    if(max(param$fecundities) < 1.5){
+      param$coeff_var_environ <- coeff_var_environ
+    }else{
+      param$coeff_var_environ <- 0
+    }
+
   }) # Close observEvent
 
 
   observe ({
     param # to ensure up-to-date values are run
-
-    # fixed in global environment (for now)
-    param$coeff_var_environ <- coeff_var_environ
-
   }) # end observe
   #####
 

@@ -7,7 +7,7 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 10
+nsim = 100
 
 pop_size_mean = 500
 pop_size_se = 0
@@ -22,12 +22,15 @@ fatalities_mean = c(0, 5, 3, 4, 2, 1, 4, 2, 2, 3)
 fatalities_se = c(0, rep(0.5,9))
 length(fatalities_mean)
 
-survivals <- c(0.47, 0.67, 0.67)
-fecundities <- c(0, 0.30, 1.16)
+#survivals <- c(0.47, 0.67, 0.67)
+#fecundities <- c(0, 0.30, 1.16)
 
-pop_growth_mean = 1.20
+survivals <- c(0.25, 0.30)
+fecundities <- c(0, 19.8)
+
+pop_growth_mean = 0.97
 # lambda( build_Leslie(s = survivals, f = fecundities) )
-pop_growth_se = 0.01
+pop_growth_se = 0
 
 
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
@@ -77,6 +80,7 @@ pop_growth_mean
 
 lambda( build_Leslie(s = survivals, f = fecundities) )
 
+
 ##--------------------------------------------
 ##  Calibration                             --
 ##--------------------------------------------
@@ -88,6 +92,9 @@ f_calibrated <- tail(vr_calibrated, length(fecundities))
 
 lambda( build_Leslie(s = s_calibrated, f = f_calibrated) )
 
+
+
+length(survivals)
 ##==============================================================================
 ##                         Analyses (simulations)                             ==
 ##==============================================================================
@@ -146,5 +153,5 @@ res = get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)
 plot_impact(N, Legend = paste("sc", 1:length(fatalities_mean)))
 
 x11()
-plot_traj(N, Legend = paste("sc", 1:length(fatalities_mean)))
+plot_traj(N, Legend = paste("sc", 1:length(fatalities_mean)), xlim = c(0,10000))
 ###
