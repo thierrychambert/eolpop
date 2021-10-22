@@ -89,7 +89,10 @@ init_calib  <- function(s, f, lam0){
   A00 <- build_Leslie(s=s, f=f)
   diff_rel_lam <- (lam0 - lambda(A00))/lambda(A00)
   d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
-  A01 <- A00 * (1+d)
+
+  #A01 <- A00 * (1+d)
+
+  A01 <- A00 + d
 
   nac = length(s)
 
@@ -146,9 +149,14 @@ match_lam_delta <- function(diff_rel_lam, s, f){
   S <- A00 %>% sensitivity(zero = TRUE)
   scaling <- (1/S)
   scaling[A00 == 0] <- 0
+  scaling <- (scaling/sum(scaling))
 
   # Infer the DELTA for each LESLIE MATRIX element
-  d <- scaling * (diff_rel_lam*sqrt(abs(diff_rel_lam))) ; d
+  #d <- scaling * (diff_rel_lam*sqrt(abs(diff_rel_lam))) ; d
+  E <- A00 %>% elasticity
+  d <- scaling * (diff_rel_lam*A00/E)
+  d[is.nan(d)] <- 0
+  d
 
   return(d)
 } # End function

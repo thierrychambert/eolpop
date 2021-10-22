@@ -190,7 +190,8 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params,
   A <- build_Leslie(s = s, f = f)
   diff_rel_lam <- (lam_Nt - lambda(A))/lambda(A)
   d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
-  A01 <- A * (1+d)
+  #A01 <- A * (1+d)
+  A01 <- A + d
 
   # Calibrate survivals
   keep <- which(A[-1,] != 0)
@@ -278,7 +279,8 @@ M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params,
   A <- build_Leslie(s = s, f = f)
   diff_rel_lam <- (lam_Nt - lambda(A))/lambda(A)
   d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
-  A01 <- A * (1+d)
+  #A01 <- A * (1+d)
+  A01 <- A + d
 
   # Calibrate survivals
   keep <- which(A[-1,] != 0)
