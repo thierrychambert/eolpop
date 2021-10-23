@@ -24,14 +24,21 @@ plot_traj <- function(N, onset_year = NULL, xlab = "Year", ylab = "Population si
                         Legend = NULL, ...){
 
   # Get metrics and dimensions
+  nac <- dim(N)[1]
   TH <- dim(N)[2]
-  nsim <- dim(N)[4]
   nsc <- dim(N)[3]
+  nsim <- dim(N)[4]
+
   if(is.null(onset_year)) onset_year <- 1
   years <- min(onset_year) + (1:TH) - 1
 
   # Average trajectory and CI limits (here we use CI = +/- 0.5*SE to avoid overloading the graph)
-  out <- colSums(N[-1,,,])
+  ## Here : it's total pop size WITHOUT Juv0
+  if(nac == 2){
+    out <- N[-1,,,]
+  }else{
+    out <- colSums(N[-1,,,])
+  }
   N_avg <- apply(out, c(1,2), median)
   N_lci <- apply(out, c(1,2), quantile, prob = pnorm(0.5))
   N_uci <- apply(out, c(1,2), quantile, prob = pnorm(-0.5))
