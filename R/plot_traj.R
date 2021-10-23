@@ -4,6 +4,10 @@
 #' Plot demographic trajectories
 #'
 #' @param N a 4-D array containing demographic projection outputs
+#' @param age_class_use Either : "NotJuv0", "all" or "pairs". Which age class should be included
+#' in the population size count to be plotted. "NotJuv0"
+#' @param fecundities values of fecundities for each age class. This information is only required
+#' if age_class_use = "pairs", to determine which age classes are mature (thus contribute to the number of pairs).
 #' @param onset_year a vector containing the years of each wind farm start being active
 #' (thus, the year at whihc each fatality value starts kicking in)
 #' @param xlab a character string. Label for the x axis.
@@ -21,25 +25,35 @@
 #'
 #'
 #'
-plot_traj <- function(N, onset_year = NULL, xlab = "Year", ylab = "Population size",
-                        Legend = NULL, ylim = NULL, ...){
+plot_traj <- function(N, age_class_use = "NotJuv0", fecundities = NULL, onset_year = NULL,
+                      xlab = "Year", ylab = "Population size", Legend = NULL, ylim = NULL, ...){
 
   # Get metrics and dimensions
-  nac <- dim(N)[1]
   TH <- dim(N)[2]
   nsc <- dim(N)[3]
   nsim <- dim(N)[4]
+
+  # Select which age classes to use for the plot
+  if(base::missing(age_class_use)) N <- N[-1,,,]
+  if(match.arg(arg = age_class_use, choices = c("all","NotJuv0", "pairs")) == "NotJuv0")  N <- N[-1,,,]
+  if(match.arg(arg = age_class_use, choices = c("all","NotJuv0", "pairs")) == "all")      N <- N
+  if(match.arg(arg = age_class_use, choices = c("all","NotJuv0", "pairs")) == "pairs"){
+    mature <- which(fecundities != 0)
+    N <- N[mature,,,]/2
+  }
+  dim(N)
 
   if(is.null(onset_year)) onset_year <- 1
   years <- min(onset_year) + (1:TH) - 1
 
   # Average trajectory and CI limits (here we use CI = +/- 0.5*SE to avoid overloading the graph)
   ## Here : it's total pop size WITHOUT Juv0
-  if(nac == 2){
-    out <- N[-1,,,]
+  if(length(dim(N)) == 3){
+    out <- N
   }else{
-    out <- colSums(N[-1,,,])
+    out <- colSums(N)
   }
+  dim(out)
   N_avg <- apply(out, c(1,2), median)
   N_lci <- apply(out, c(1,2), quantile, prob = pnorm(0.5))
   N_uci <- apply(out, c(1,2), quantile, prob = pnorm(-0.5))
