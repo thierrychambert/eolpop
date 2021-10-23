@@ -34,12 +34,16 @@ plot_traj <- function(N, age_class_use = "NotJuv0", fecundities = NULL, onset_ye
   nsim <- dim(N)[4]
 
   # Select which age classes to use for the plot
-  if(base::missing(age_class_use)) N <- N[-1,,,]
-  if(match.arg(arg = age_class_use, choices = c("all","NotJuv0", "pairs")) == "NotJuv0")  N <- N[-1,,,]
-  if(match.arg(arg = age_class_use, choices = c("all","NotJuv0", "pairs")) == "all")      N <- N
-  if(match.arg(arg = age_class_use, choices = c("all","NotJuv0", "pairs")) == "pairs"){
-    mature <- which(fecundities != 0)
-    N <- N[mature,,,]/2
+  # if(base::missing(age_class_use)) N <- N[-1,,,]
+  if(match.arg(arg = age_class_use, choices = c("all", "NotJuv0", "pairs")) == "NotJuv0")  N <- N[-1,,,]
+  if(match.arg(arg = age_class_use, choices = c("all", "NotJuv0", "pairs")) == "all")      N <- N
+  if(match.arg(arg = age_class_use, choices = c("all", "NotJuv0", "pairs")) == "pairs"){
+    if(is.null(fecundities)){
+      stop("Argument 'fecundities' is required when age_class_use = 'pairs'")
+    }else{
+      mature <- which(fecundities != 0)
+      N <- N[mature,,,]/2
+    }
   }
   dim(N)
 
