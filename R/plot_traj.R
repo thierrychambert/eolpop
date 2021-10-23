@@ -9,6 +9,7 @@
 #' @param xlab a character string. Label for the x axis.
 #' @param ylab a character string. Label for the y axis.
 #' @param Legend a vector of character strings. The legend to show on the side of the plot.
+#' @param ylim a vector of 2 numbers. Limits of  the y axis.
 #' @param ... any other graphical input similar to the R plot function
 #'
 #' @return a plot of the relative impact of each scenario.
@@ -21,7 +22,7 @@
 #'
 #'
 plot_traj <- function(N, onset_year = NULL, xlab = "Year", ylab = "Population size",
-                        Legend = NULL, ...){
+                        Legend = NULL, ylim = NULL, ...){
 
   # Get metrics and dimensions
   nac <- dim(N)[1]
@@ -88,11 +89,11 @@ plot_traj <- function(N, onset_year = NULL, xlab = "Year", ylab = "Population si
   p <- p +
     scale_y_continuous(expand = expansion(mult = c(0.025, 0.005)),
                        breaks = scales::pretty_breaks(n = 10),
+                       limits = ylim,
                        sec.axis = sec_axis(trans = ~.*1, name = "",
                                            breaks = scales::pretty_breaks(n = 10))) +
     scale_x_continuous(expand = expansion(mult = c(0.015, 0)),
                        breaks = scales::pretty_breaks(n = 10))
-
 
   return(p)
 

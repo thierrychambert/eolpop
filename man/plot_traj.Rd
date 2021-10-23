@@ -10,6 +10,7 @@ plot_traj(
   xlab = "Year",
   ylab = "Population size",
   Legend = NULL,
+  ylim = NULL,
   ...
 )
 }
@@ -24,6 +25,8 @@ plot_traj(
 \item{ylab}{a character string. Label for the y axis.}
 
 \item{Legend}{a vector of character strings. The legend to show on the side of the plot.}
+
+\item{ylim}{a vector of 2 numbers. Limits of  the y axis.}
 
 \item{...}{any other graphical input similar to the R plot function}
 }
