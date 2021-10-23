@@ -1550,7 +1550,7 @@ server <- function(input, output, session){
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", (1:n_scen)-1)
 
       plot_traj(N = out$run$N, onset_year = param$onset_year,
-                xlab = "\nAnnée", ylab = "Taille de population\n", Legend = Legend)}
+                xlab = "\nAnnée", ylab = "Taille de population\n", Legend = Legend, ylim = c(0, NA))}
   }
 
   output$title_traj_plot <- renderText({
