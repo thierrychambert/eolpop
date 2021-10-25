@@ -102,6 +102,8 @@ server <- function(input, output, session){
     shinyjs::hide("mat_fill_vr")
     shinyjs::hide("vr_mat_number_age_classes")
 
+    shinyjs::hide("age_class_show")
+
     #------------
     # Show some
     #------------
@@ -208,6 +210,12 @@ server <- function(input, output, session){
     if(input$button_vital_rates%%2 == 1){
       shinyjs::show("mat_fill_vr")
       shinyjs::show("vr_mat_number_age_classes")
+    }
+
+
+    # Show radiobutton (output) for plot_traj graph
+    if(input$run > 0){
+      shinyjs::show("age_class_show")
     }
 
   }) # en observe show/hide
@@ -1576,14 +1584,17 @@ server <- function(input, output, session){
     } else {
 
       n_scen <- dim(out$run$N)[3]
+
+      # Define Legend
       Legend <- NULL
       if(out$analysis_choice == "single_farm") Legend <- c("Sans parc", "Avec parc")
       if(out$analysis_choice == "cumulated") Legend <- c("Sans parc", "+ Parc 1", paste("... + Parc", (3:n_scen)-1))
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", (1:n_scen)-1)
 
-      plot_traj(N = out$run$N, age_class_use = "all", fecundities = param$f_calibrated, onset_year = param$onset_year,
+      # Plot population trajectories
+      plot_traj(N = out$run$N, age_class_use = input$age_class_show, fecundities = param$f_calibrated, onset_year = param$onset_year,
                 xlab = "\nAnnée", ylab = "Taille de population\n", Legend = Legend, ylim = c(0, NA))}
-  }
+  } # End function
 
   output$title_traj_plot <- renderText({
     if(input$run > 0){

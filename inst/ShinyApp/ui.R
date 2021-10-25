@@ -781,6 +781,13 @@ rm(list = ls(all.names = TRUE))
                  hr(),
 
                  tags$h4(textOutput("title_traj_plot"), align = "center"),
+                 radioButtons(inputId = "age_class_show",
+                              label = "Classes d'âge à inclure sur le graphe",
+                              choices = c("Tous âges sauf juvéniles" = "NotJuv0",
+                                          "Tous âges, y compris juvéniles" = "all",
+                                          "Nombre de couples" = "pairs"),
+                              inline = TRUE
+                              ),
                  plotOutput("traj_plot", width = "100%", height = "550px")
         )}, # End tabPanel
 
