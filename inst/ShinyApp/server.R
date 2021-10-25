@@ -246,6 +246,8 @@ server <- function(input, output, session){
 
                           fecundities = NULL,
                           survivals = NULL,
+                          s_calib0 = NULL,
+                          f_calib0 = NULL,
                           s_calibrated = NULL,
                           f_calibrated = NULL,
                           vr_calibrated = NULL,
@@ -876,7 +878,7 @@ server <- function(input, output, session){
                    nrow = 1, dimnames = list(NULL, "Erreur"))
           }else{
             make_mat_popsizes(data_sf = data_sf, species = input$species_choice, pop_size = param$pop_size_mean,
-                              pop_size_unit = input$pop_size_unit, s = param$s_calibrated, f = param$f_calibrated)
+                              pop_size_unit = input$pop_size_unit, s = param$s_calib0, f = param$f_calib0)
           } # end if
         },
         width = "500px",
@@ -1004,8 +1006,8 @@ server <- function(input, output, session){
 
           tab_species <- make_mat_vr(data_sf = data_sf, species = input$species_choice)
           ages <- tab_species$classes_age
-          matrix(data = c(param$s_calibrated, param$f_calibrated),
-                  nrow = length(param$s_calibrated),
+          matrix(data = c(param$s_calib0, param$f_calib0),
+                  nrow = length(param$s_calib0),
                   ncol = 2,
                   dimnames = list(ages, c("Survie", "Fécondité"))
                  )
@@ -1019,7 +1021,7 @@ server <- function(input, output, session){
   delay(ms = 300,
         output$lambda0_info <- renderText({
           req(all(!is.na(input$mat_fill_vr)))
-          lam <- lambda(build_Leslie(s = param$s_calibrated, f = param$f_calibrated))
+          lam <- lambda(build_Leslie(s = param$s_calib0, f = param$f_calib0))
           taux <- round(lam-1,2)*100
           if(taux < 0) Text <- "Déclin : " else Text <- "Croissance : "
           if(taux == 0) Text <- "Population stable : "
@@ -1321,8 +1323,8 @@ server <- function(input, output, session){
     param$fecundities <- input$mat_fill_vr[,2]
 
     # for now, until calibration is really done
-    param$s_calibrated <- param$survivals
-    param$f_calibrated <- param$fecundities
+    param$s_calib0 <- param$survivals
+    param$f_calib0 <- param$fecundities
 
   }) # end observeEvent
   #####
@@ -1330,9 +1332,22 @@ server <- function(input, output, session){
   #############################################
   ## Calibration of survivals & fecundities
   ##-------------------------------------------
+  ## Calibration 1 : just for information display
+  observeEvent({
+    input$button_calibrate_vr
+  },{
+
+    vr_calib0 <- calibrate_params(
+      inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
+      f = param$fecundities, s = param$survivals, lam0 = param$pop_growth_mean
+    )
+    param$s_calib0 <- head(vr_calib0, length(param$survivals))
+    param$f_calib0 <- tail(vr_calib0, length(param$fecundities))
+  })
+
+  ## Calibration 2 : for simulation run
   observeEvent({
     input$run
-    input$button_calibrate_vr
   },{
 
     # We also define rMAX and theta here

@@ -566,6 +566,7 @@ rm(list = ls(all.names = TRUE))
                                              ),
                                            )}, # close fluidRow
 
+                                           br(),
                                            actionButton(inputId = "button_calibrate_vr", label = "Calibrer survies et fécondités"),
 
 
