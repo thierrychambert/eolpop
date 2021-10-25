@@ -44,7 +44,7 @@ rm(list = ls(all.names = TRUE))
   decline_strong <- 0.91
 
   pop_stable <- 1
-  trend_se <- 0.03 # SE to use for pop_growth, when the "trend" option is chosen
+  trend_se <- 0.05 # SE to use for pop_growth, when the "trend" option is chosen
 }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
