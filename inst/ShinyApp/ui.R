@@ -430,12 +430,12 @@ rm(list = ls(all.names = TRUE))
                                          # Interval
                                          numericInput(inputId = "pop_size_lower",
                                                       label = "Borne inférieure (taille population)",
-                                                      value = 150,
+                                                      value = 350,
                                                       min = 0, max = Inf, step = 10),
 
                                          numericInput(inputId = "pop_size_upper",
                                                       label = "Borne supérieure (taille population)",
-                                                      value = 250,
+                                                      value = 350,
                                                       min = 0, max = Inf, step = 10),
 
                                          # Values
@@ -515,7 +515,7 @@ rm(list = ls(all.names = TRUE))
 
                                            numericInput(inputId = "pop_growth_upper",
                                                         label = HTML("Borne supérieure<br>(taux d'accroissement en %)"),
-                                                        value = -3,
+                                                        value = -6,
                                                         min = -100, max = 100, step = 1),
 
                                            ## Input values: mean and se
@@ -565,6 +565,9 @@ rm(list = ls(all.names = TRUE))
                                                                              "Forte" = "strong")),
                                              ),
                                            )}, # close fluidRow
+
+                                           actionButton(inputId = "button_calibrate_vr", label = "Calibrer survies et fécondités"),
+
 
                                 )}, # close wellPanel
 

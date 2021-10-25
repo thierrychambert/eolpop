@@ -7,10 +7,11 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 100
+nsim = 10
 
-pop_size_mean = 500
+pop_size_mean = 350
 pop_size_se = 0
+pop_size_type = "Npair"
 
 carrying_capacity_mean = 1000
 carrying_capacity_se = 100
@@ -18,17 +19,19 @@ carrying_capacity_se = 100
 
 #(4.8/100)*sum(N000[-1])
 #(0.7/100)*sum(N000[-1])
-fatalities_mean = c(0, 5, 3, 4, 2, 1, 4, 2, 2, 3)
-fatalities_se = c(0, rep(0.5,9))
+fatalities_mean = c(0, 3) #c(0, 5, 3, 4, 2, 1, 4, 2, 2, 3)
+fatalities_se = c(0, 0.582) # c(0, rep(0.5,9))
 length(fatalities_mean)
+
+survivals <- c(0.65, 0.75, 0.85, 0.94)
+fecundities <- c(0, 0, 0.05, 0.40)
 
 #survivals <- c(0.47, 0.67, 0.67)
 #fecundities <- c(0, 0.30, 1.16)
+#survivals <- c(0.25, 0.30)
+#fecundities <- c(0, 19.8)
 
-survivals <- c(0.25, 0.30)
-fecundities <- c(0, 19.8)
-
-pop_growth_mean = 0.97
+pop_growth_mean = 0.94
 # lambda( build_Leslie(s = survivals, f = fecundities) )
 pop_growth_se = 0
 
@@ -37,10 +40,10 @@ model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDe
 time_horizon = 30
 coeff_var_environ = 0
 fatal_constant = "h"
-pop_size_type = "Ntotal"
+
 
 #if(length(fatalities_mean) > 2) cumulated_impacts = TRUE else cumulated_impacts = FALSE
-cumulated_impacts = TRUE
+cumulated_impacts = FALSE
 
 onset_year = c(2010, 2013, 2016, 2016, 2017, 2019, 2020, 2020, 2020, 2021) #rep(2010, 10)#
 length(onset_year)
@@ -91,7 +94,8 @@ s_calibrated <- head(vr_calibrated, length(survivals))
 f_calibrated <- tail(vr_calibrated, length(fecundities))
 
 lambda( build_Leslie(s = s_calibrated, f = f_calibrated) )
-
+s_calibrated
+f_calibrated
 
 
 length(survivals)
@@ -152,9 +156,37 @@ res = get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)
 
 plot_impact(N, Legend = paste("sc", 1:length(fatalities_mean)))
 
+
+
+
+##
+# Pop size total
+N00 <- pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = s_calibrated, f = f_calibrated)
+sum(N00)
+
+pop_size_mean
+pop_size_type
+sum(N00)
+N00
+sum(N000)
+
+NN <- apply(N, c(1:3), mean)
+colSums(NN[,1,1:2])
+sum(NN[-c(1:2),1,1])/2
+sum(NN[-1,1,1])
+sum(NN[,1,1])
+
+
 x11()
 plot_traj(N, age_class_use = "pairs", fecundities = fecundities,
          Legend = paste("sc", 1:length(fatalities_mean)), ylim = c(0, NA))
-###
-plot_traj(N,
+
+plot_traj(N, age_class_use = "NotJuv0", fecundities = fecundities,
           Legend = paste("sc", 1:length(fatalities_mean)), ylim = c(0, NA))
+
+plot_traj(N, age_class_use = "all", fecundities = fecundities,
+          Legend = paste("sc", 1:length(fatalities_mean)), ylim = c(0, NA))
+
+
+###
+# plot_traj(N, Legend = paste("sc", 1:length(fatalities_mean)), ylim = c(0, NA))

@@ -868,7 +868,7 @@ server <- function(input, output, session){
     )
   }
 
-  # Display the table       (Note the delay : piece is just there to avoid an error message - time for parameters to be "loaded in")
+  # Display the table       (Note : the "delay" piece is just there to avoid an error message - time for parameters to be "loaded in")
   delay(ms = 200,
         output$pop_size_by_age <- renderTable({
           if(any(is.na(param$survivals)) | any(is.na(param$fecundities))){
@@ -876,7 +876,7 @@ server <- function(input, output, session){
                    nrow = 1, dimnames = list(NULL, "Erreur"))
           }else{
             make_mat_popsizes(data_sf = data_sf, species = input$species_choice, pop_size = param$pop_size_mean,
-                              pop_size_unit = input$pop_size_unit, s = param$survivals, f = param$fecundities)
+                              pop_size_unit = input$pop_size_unit, s = param$s_calibrated, f = param$f_calibrated)
           } # end if
         },
         width = "500px",
@@ -993,22 +993,33 @@ server <- function(input, output, session){
                                          dimnames = list(ages, c("Survie", "Fécondité"))))
       } # end if 2
     } # end if 1
-
-  }) # end observeEvent species_list
-
-
+  }) # end observeEvent species_choice
 
 
   # Display vital rates output table
-  output$vital_rates_info <- renderTable({
-    input$mat_fill_vr
-  }, rownames = TRUE)
+  delay(ms = 300,
+        output$vital_rates_info <- renderTable({
+
+          #input$mat_fill_vr
+
+          tab_species <- make_mat_vr(data_sf = data_sf, species = input$species_choice)
+          ages <- tab_species$classes_age
+          matrix(data = c(param$s_calibrated, param$f_calibrated),
+                  nrow = length(param$s_calibrated),
+                  ncol = 2,
+                  dimnames = list(ages, c("Survie", "Fécondité"))
+                 )
+        }, rownames = TRUE)
+  )
+
+
+
 
   # Display intrinsic lambda (based solely on Leslie matrix)
   delay(ms = 300,
         output$lambda0_info <- renderText({
           req(all(!is.na(input$mat_fill_vr)))
-          lam <- lambda(build_Leslie(s = input$mat_fill_vr[,1], f = input$mat_fill_vr[,2]))
+          lam <- lambda(build_Leslie(s = param$s_calibrated, f = param$f_calibrated))
           taux <- round(lam-1,2)*100
           if(taux < 0) Text <- "Déclin : " else Text <- "Croissance : "
           if(taux == 0) Text <- "Population stable : "
@@ -1150,7 +1161,7 @@ server <- function(input, output, session){
     input$run
   },{
     if(input$fatalities_unit == "h"){
-      pop_size_tot <- sum(pop_vector(pop_size = param$pop_size_mean, pop_size_type = param$pop_size_type, s = param$survivals, f = param$fecundities)[-1])
+      pop_size_tot <- sum(pop_vector(pop_size = param$pop_size_mean, pop_size_type = param$pop_size_type, s = param$s_calibrated, f = param$f_calibrated)[-1])
       param$fatalities_mean_nb <- (param$fatalities_mean/100) * pop_size_tot
       param$fatalities_se_nb <- se_prod2(mu1 = param$fatalities_mean/100,
                                          se1 = param$fatalities_se/100,
@@ -1308,6 +1319,11 @@ server <- function(input, output, session){
   observe({
     param$survivals <- input$mat_fill_vr[,1]
     param$fecundities <- input$mat_fill_vr[,2]
+
+    # for now, until calibration is really done
+    param$s_calibrated <- param$survivals
+    param$f_calibrated <- param$fecundities
+
   }) # end observeEvent
   #####
 
@@ -1316,6 +1332,7 @@ server <- function(input, output, session){
   ##-------------------------------------------
   observeEvent({
     input$run
+    input$button_calibrate_vr
   },{
 
     # We also define rMAX and theta here
@@ -1549,7 +1566,7 @@ server <- function(input, output, session){
       if(out$analysis_choice == "cumulated") Legend <- c("Sans parc", "+ Parc 1", paste("... + Parc", (3:n_scen)-1))
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", (1:n_scen)-1)
 
-      plot_traj(N = out$run$N, onset_year = param$onset_year,
+      plot_traj(N = out$run$N, age_class_use = "all", fecundities = param$f_calibrated, onset_year = param$onset_year,
                 xlab = "\nAnnée", ylab = "Taille de population\n", Legend = Legend, ylim = c(0, NA))}
   }
 
