@@ -1602,6 +1602,20 @@ server <- function(input, output, session){
     }
   })
 
+
+  output$warning_traj_plot <- renderText({
+    if(input$run > 0){
+      "Attention : Il s'agit de prédictions en l'état actuel des connaissances.
+      Personne ne peut prédire comment les facteurs d'influence démographique (environnement, etc.)
+      vont évoluer dans le futur. Donc personne ne peut prédire de façon exacte ce que sera la taille
+      de population dans plusieurs années.\n
+      Ce graphe est simplementfourni à titre informatif. Attention à ne pas le sur-interpréter.\n
+      L'impact des collisions doit être évalué à partir des valeurs et du graphe ci-dessus, qui fournissent
+      une estimation plus robuste (c-à-d. moins sensibles aux postulats et incertitudes) de cet impact."
+    }
+  })
+
+
   output$traj_plot <- renderPlot({
     plot_out_traj()
   })

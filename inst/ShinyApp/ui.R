@@ -141,7 +141,7 @@ rm(list = ls(all.names = TRUE))
                  bsPopover(id = "Q_dispersal_info",
                            title = "Distances de dispersion",
                            content = HTML(
-                             "(1) <b>Distance moyenne de dispersion</b> de l\\'espèce, estimée à partir des relations allométriques publiées dans l\\'article de Claramunt (2021).<br><br> (2) Distance équivalente à un <b>taux de dispersion relatif de 5%</b>, sous l\\'hypothèse que la distance de dispersion suit une loi exponentielle.<br><br><u>Reference citée</u> : Claramunt, S. (2021). Flight efficiency explains differences in natal dispersal distances in birds. <i>Ecology</i>, e03442."
+                             "(1) <b>Distance moyenne de dispersion</b> de l\\'espèce, estimée à partir des relations allométriques publiées dans l\\'article de Claramunt (2021).<br><br> (2) Distance équivalente à un <b>taux de dispersion relatif de 3%, 5% et 10%</b>, sous l\\'hypothèse que la distance de dispersion suit une loi exponentielle.<br><br><u>Reference citée</u> : Claramunt, S. (2021). Flight efficiency explains differences in natal dispersal distances in birds. <i>Ecology</i>, e03442."
                              ),
                            placement = "right",
                            trigger = "click",
@@ -165,7 +165,8 @@ rm(list = ls(all.names = TRUE))
                    bsPopover(id = "Q_vital_rates_info",
                              title = "Paramètres démographiques",
                              content = HTML(
-                               "Valeurs de <b>survie et fécondités par classe d\\'âge</b>, pour l\\'espèce sélectionnée. <br><br><b>Juv 0</b> correspond à un individu né dans l\\'année, n\\'ayant <u>pas encore</u> 1 an révolu.<br><b>Juv 1</b> correspond à un individu ayant 1 an révolu, donc dans sa 2<sup>e</sup> année de vie.<br>Etc."
+                               "Valeurs de <b>survie et fécondités par classe d\\'âge</b>, pour l\\'espèce sélectionnée. <br><br><b>L\\'âge 0</b> (ex : Juv 0) correspond à un individu né dans l\\'année, n\\'ayant <u>pas encore</u> 1 an révolu.<br><b>L\\'âge 1</b> correspond à un individu ayant 1 an révolu, donc dans sa 2<sup>e</sup> année de vie.<br>Etc."
+                               #"Valeurs de <b>survie et fécondités par classe d\\'âge</b>, pour l\\'espèce sélectionnée. <br><br><b>Juv 0</b> correspond à un individu né dans l\\'année, n\\'ayant <u>pas encore</u> 1 an révolu.<br><b>Juv 1</b> correspond à un individu ayant 1 an révolu, donc dans sa 2<sup>e</sup> année de vie.<br>Etc."
                                ),
                                placement = "right",
                              trigger = "click",
@@ -781,6 +782,13 @@ rm(list = ls(all.names = TRUE))
                  hr(),
 
                  tags$h4(textOutput("title_traj_plot"), align = "center"),
+                 br(),
+
+                 wellPanel(
+                 span(textOutput("warning_traj_plot"), align = "left", style = "font-size: 14px;"),
+                 ),
+
+                 br(" "),
                  radioButtons(inputId = "age_class_show",
                               label = "Classes d'âge à inclure sur le graphe",
                               choices = c("Tous âges sauf juvéniles" = "NotJuv0",
