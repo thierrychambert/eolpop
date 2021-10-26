@@ -758,6 +758,10 @@ rm(list = ls(all.names = TRUE))
 
                  br(),
                  actionButton(inputId = "run", label = "Lancer l'analyse"),
+
+                 br(" "),
+                 span(textOutput("run_time"), align = "left", style = "font-weight: normal; font-size: 16px;"),
+
                  hr(),
 
 

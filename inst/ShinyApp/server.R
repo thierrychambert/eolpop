@@ -237,7 +237,7 @@ server <- function(input, output, session){
   ##############################################
   ##  Reactive values
   ##--------------------------------------------
-  out <- reactiveValues(run = NULL, msg = NULL, analysis_choice = NULL)
+  out <- reactiveValues(run = NULL, run_time = NULL, msg = NULL, analysis_choice = NULL)
 
   rv <- reactiveValues(distAVG = NULL, dist = NULL)
 
@@ -1409,6 +1409,17 @@ server <- function(input, output, session){
   }) # end observe
   #####
 
+
+  ## Function to translate time units in french
+  units_time_french <- function(u){
+    if(u == "secs")  u_fr <- "secondes"
+    if(u == "mins")  u_fr <- "minutes"
+    if(u == "hours") u_fr <- "heures"
+    if(u == "days")  u_fr <- "jours"
+    if(u == "weeks") u_fr <- "semaines"
+    return(u_fr)
+  }
+
   #####
   ##-----------------------------------------------------------------------------------
   ##                                RUN SIMULATIONS
@@ -1418,7 +1429,10 @@ server <- function(input, output, session){
   }, {
 
     if(ready$fatalities & ready$pop_size & ready$pop_growth & ready$carrying_capacity){
+
       out$analysis_choice <- input$analysis_choice
+      start_time <- Sys.time()
+
       withProgress(message = 'Simulation progress', value = 0, {
 
         out$run <- run_simul_shiny(nsim = param$nsim,
@@ -1450,6 +1464,12 @@ server <- function(input, output, session){
                                    fatal_constant = param$fatal_constant)
       }) # Close withProgress
 
+      end_time <- Sys.time()
+      duration <- end_time - start_time
+      out$run_time <- paste(round(as.numeric(duration), 2), units_time_french(units(duration)))
+      print(out$run_time)
+
+
     }else{
       out$run <- NULL
       out$msg <- "error_not_ready"
@@ -1463,6 +1483,13 @@ server <- function(input, output, session){
   ##-----------------------------------------------------------------------------------
   ##                                OUTPUTS
   ##-----------------------------------------------------------------------------------
+
+  ### Run time
+  output$run_time <- renderText({
+    req(input$run > 0)
+    paste("Temps de calcul (simulations) :", out$run_time)
+  })
+
 
   #######################################################################
   ## Impact : individual farms (for "cumulated impact" analysis only)

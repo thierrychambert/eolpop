@@ -102,7 +102,7 @@ length(survivals)
 ##==============================================================================
 ##                         Analyses (simulations)                             ==
 ##==============================================================================
-system.time(
+time <- system.time(
 run0 <- run_simul(nsim = nsim,
                             cumulated_impacts = cumulated_impacts,
 
@@ -134,6 +134,8 @@ run0 <- run_simul(nsim = nsim,
 
 #####################################################
 
+time
+names(time)
 
 names(run0)
 N <- run0$N ; dim(N)
