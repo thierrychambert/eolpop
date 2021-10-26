@@ -760,43 +760,48 @@ rm(list = ls(all.names = TRUE))
                  actionButton(inputId = "run", label = "Lancer l'analyse"),
                  hr(),
 
-                 span(textOutput("title_indiv_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
-                 strong(span(tableOutput("indiv_impact_table"), style="color:green; font-size:18px", align = "left")),
 
-                 hr(),
+                 ## Outputs
+                 {conditionalPanel("output.hide_results",
 
-                 span(textOutput("title_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
-                 strong(span(tableOutput("impact_table"), style="color:blue; font-size:18px", align = "left")),
+                    span(textOutput("title_indiv_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
+                    strong(span(tableOutput("indiv_impact_table"), style="color:green; font-size:18px", align = "left")),
 
-                 hr(),
+                    hr(),
 
-                 br(),
-                 span(textOutput("title_PrExt_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
-                 strong(span(tableOutput("PrExt_table"), style="color:orange; font-size:18px", align = "left")),
+                    span(textOutput("title_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
+                    strong(span(tableOutput("impact_table"), style="color:blue; font-size:18px", align = "left")),
 
-                 br(),
-                 hr(),
+                    hr(),
 
-                 tags$h4(textOutput("title_impact_plot"), align = "center"),
-                 plotOutput("impact_plot", width = "100%", height = "550px"),
-                 hr(),
+                    br(),
+                    span(textOutput("title_PrExt_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
+                    strong(span(tableOutput("PrExt_table"), style="color:orange; font-size:18px", align = "left")),
 
-                 tags$h4(textOutput("title_traj_plot"), align = "center"),
-                 br(),
+                    br(),
+                    hr(),
 
-                 wellPanel(
-                 span(textOutput("warning_traj_plot"), align = "left", style = "font-size: 14px;"),
-                 ),
+                    tags$h4(textOutput("title_impact_plot"), align = "center"),
+                    plotOutput("impact_plot", width = "100%", height = "550px"),
+                    hr(),
 
-                 br(" "),
-                 radioButtons(inputId = "age_class_show",
-                              label = "Classes d'âge à inclure sur le graphe",
-                              choices = c("Tous âges sauf juvéniles" = "NotJuv0",
-                                          "Tous âges, y compris juvéniles" = "all",
-                                          "Nombre de couples" = "pairs"),
-                              inline = TRUE
-                              ),
-                 plotOutput("traj_plot", width = "100%", height = "550px")
+                    tags$h4(textOutput("title_traj_plot"), align = "center"),
+                    br(),
+
+                    wellPanel(
+                    span(textOutput("warning_traj_plot"), align = "left", style = "font-size: 14px;"),
+                    ),
+
+                    br(" "),
+                    radioButtons(inputId = "age_class_show",
+                                 label = "Classes d'âge à inclure sur le graphe",
+                                 choices = c("Tous âges sauf juvéniles" = "NotJuv0",
+                                             "Tous âges, y compris juvéniles" = "all",
+                                             "Nombre de couples" = "pairs"),
+                                 inline = TRUE
+                                 ),
+                    plotOutput("traj_plot", width = "100%", height = "550px")
+                 )}, # close conditional panel
         )}, # End tabPanel
 
 

@@ -53,6 +53,16 @@ server <- function(input, output, session){
   })
 
 
+  ## Outputs / Results
+  output$hide_results <- eventReactive({
+    input$run
+  },{
+    if(input$run > 0) TRUE else FALSE
+  }, ignoreInit = TRUE)
+
+  outputOptions(output, "hide_results", suspendWhenHidden = FALSE)
+
+
 
   ##############################################
   ##  Hide/Show : level 2
