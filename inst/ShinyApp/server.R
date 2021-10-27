@@ -260,6 +260,7 @@ server <- function(input, output, session){
                           pop_size_unit = NULL,
 
                           pop_growth_mean = NULL,
+                          pop_growth_mean_use = NULL,
                           pop_growth_se = NULL,
 
                           fecundities = NULL,
