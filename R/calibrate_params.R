@@ -99,11 +99,20 @@ init_calib  <- function(s, f, lam0){
 
   nac = length(s)
 
+  # Define s_init and f_init
+  s_init <- head(vr1, nac)
+  f_init <- tail(vr1, nac)
+
+  # Apply correction to respect relative order of survivals and fecundities
+  s_init <- apply(cbind(s_init, s_init * (s/s[1]) / (s_init/s_init[1])), 1 , max, na.rm = TRUE)
+  f_init <- f_init * (f/max(f[f!=0])) / (f_init/max(f_init[f_init!=0]))
+  f_init[is.nan(f_init)] <- 0
+
   # Calibrate survivals
-  s_init <- ((head(vr1, nac)) %>% sapply(., max, 0.05)) %>% sapply(., min, 0.97)
+  s_init <- (s_init %>% sapply(., max, 0.05)) %>% sapply(., min, 0.97)
 
   # Calibrate fecundities
-  f_init <- (tail(vr1, nac)) %>% sapply(., max, 0.001)
+  f_init <- f_init %>% sapply(., max, 0.001)
   f_init[f == 0] <- 0
 
   # Combine vital rates
@@ -150,10 +159,12 @@ match_lam_delta <- function(diff_rel_lam, s, f){
 
   # Extract sensitivities and elasticities (for each vital rate)
   S <- el$sens_elas$sensitivity
-  names(S) <- el$vr_names
+  E <- el$sens_elas$elasticity
+  names(S) <- names(E) <- el$vr_names
 
   # Scale the DELTA for each vital rate based on sensitivities
-  scaling <- (sum(S)-S)
+  #scaling <- (sum(S)-S)
+  scaling <- (max(E[E!=0])/E)
   scaling[el$vital_rates == 0] <- 0
   scaling
 
