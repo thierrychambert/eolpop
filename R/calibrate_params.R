@@ -40,7 +40,7 @@ calibrate_params <- function(inits = NULL, s, f, lam0){
   # Set parameter boundaries for the optimization
   if(lam0 - lam00 < 0){
     #lower = c(rep(0, length(fu)), apply(cbind((s*0.5), 0.05), 1, max))
-    lower = c(rep(0, length(fu)), s*0.10)
+    lower = c(rep(0.01, length(fu)), s*0.10)
     upper = c(fu, s)
   }else{
     lower = c(fu, s)
