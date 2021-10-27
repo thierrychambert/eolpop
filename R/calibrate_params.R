@@ -44,7 +44,7 @@ calibrate_params <- function(inits = NULL, s, f, lam0){
     upper = c(fu, s)
   }else{
     lower = c(fu, s)
-    upper = c(rep(100, length(fu)), apply(cbind((s*1.25), 0.98), 1, min))
+    upper = c(rep(Inf, length(fu)), apply(cbind((s*1.25), 0.98), 1, min))
   }
 
   # Set initial values
@@ -57,7 +57,7 @@ calibrate_params <- function(inits = NULL, s, f, lam0){
 
   # Return output : New fecundity vector
   params <- c(tail(opt$par, nac), fo, head(opt$par, -nac))
-  names(params) <- c(paste0("s", 1:nac), paste0("f", 1:nac))
+  names(params) <- c(paste0("s", (1:nac)-1), paste0("f", (1:nac)-1))
 
   return(params)
 
@@ -86,23 +86,24 @@ calibrate_params <- function(inits = NULL, s, f, lam0){
 #' init_calib(s = s, f = f, lam0 = 1.08)
 #'
 init_calib  <- function(s, f, lam0){
+
   A00 <- build_Leslie(s=s, f=f)
+
+  # Difference to apply on lambda
   diff_rel_lam <- (lam0 - lambda(A00))/lambda(A00)
   d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
 
-  #A01 <- A00 * (1+d)
-
-  A01 <- A00 + d
+  el <- elements_Leslie(s=s, f=f)
+  vr0 = el$vital_rates
+  vr1 = vr0*(1+d)
 
   nac = length(s)
 
   # Calibrate survivals
-  keep <- which(A00[-1,] != 0)
-  s_init <- ((A01[-1,][keep]) %>% sapply(., max, 0.001)) %>% sapply(., min, 0.999)
+  s_init <- ((head(vr1, nac)) %>% sapply(., max, 0.05)) %>% sapply(., min, 0.97)
 
   # Calibrate fecundities
-  f00 <- (A01[1,]/s_init) %>% sapply(., max, 0.001)
-  f_init <- c(0, head(f00,-1))
+  f_init <- (tail(vr1, nac)) %>% sapply(., max, 0.001)
   f_init[f == 0] <- 0
 
   # Combine vital rates
@@ -142,21 +143,22 @@ init_calib  <- function(s, f, lam0){
 match_lam_delta <- function(diff_rel_lam, s, f){
 
   nac = length(s)
-  vr = c(s, f)
+
+  # Get elements of the Leslie matrix
+  el <- elements_Leslie(s=s, f=f)
   A00 <- build_Leslie(s=s, f=f)
 
+  # Extract sensitivities and elasticities (for each vital rate)
+  S <- el$sens_elas$sensitivity
+  names(S) <- el$vr_names
+
   # Scale the DELTA for each vital rate based on sensitivities
-  S <- A00 %>% sensitivity(zero = TRUE)
-  scaling <- (1/S)
-  scaling[A00 == 0] <- 0
-  scaling <- (scaling/sum(scaling))
+  scaling <- (sum(S)-S)
+  scaling[el$vital_rates == 0] <- 0
+  scaling
 
   # Infer the DELTA for each LESLIE MATRIX element
-  #d <- scaling * (diff_rel_lam*sqrt(abs(diff_rel_lam))) ; d
-  E <- A00 %>% elasticity
-  d <- scaling * (diff_rel_lam*A00/E)
-  d[is.nan(d)] <- 0
-  d
+  d <- scaling * diff_rel_lam
 
   return(d)
 } # End function
