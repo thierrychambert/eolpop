@@ -1235,7 +1235,7 @@ server <- function(input, output, session){
     # Case 1 : Values from expert elicitation
     if(input$pop_growth_input_type == "eli_exp"){
       if(!(is.null(param$pop_growth_eli_result))){
-        param$pop_growth_mean <- round(min(1 + param$rMAX_species, round(param$pop_growth_eli_result$mean, 2)), 4)
+        param$pop_growth_mean <- round(param$pop_growth_eli_result$mean, 4)
         param$pop_growth_se <- round(param$pop_growth_eli_result$SE, 5)
         ready$pop_growth <- TRUE
       } else {
@@ -1276,16 +1276,14 @@ server <- function(input, output, session){
         if(input$pop_growth_input_type == "val"){
           # Case 2 : Values directly provided as mean & SE
           ready$pop_growth <- TRUE
-          param$pop_growth_mean <- round(min(1 + param$rMAX_species, make_lambda(input$pop_growth_mean)), 4)
+          param$pop_growth_mean <- round(make_lambda(input$pop_growth_mean), 4)
           param$pop_growth_se <- round(input$pop_growth_se/100, 5)
 
         }else{
           # Case 3 : Values directly provided as lower/upper interval
           ready$pop_growth <- TRUE
-          param$pop_growth_mean <- round(min(1 + param$rMAX_species,
-                                             get_mu(lower = make_lambda(input$pop_growth_lower),
-                                                          upper = make_lambda(input$pop_growth_upper)))
-                                             , 4)
+          param$pop_growth_mean <- round(get_mu(lower = make_lambda(input$pop_growth_lower),
+                                                          upper = make_lambda(input$pop_growth_upper)), 4)
           param$pop_growth_se <- round(get_sd(lower = make_lambda(input$pop_growth_lower),
                                               upper = make_lambda(input$pop_growth_upper), coverage = CP), 5)
         } # end (if3)
@@ -1355,6 +1353,8 @@ server <- function(input, output, session){
     input$button_calibrate_vr
   },{
 
+    print(param$pop_growth_mean)
+
     vr_calib0 <- calibrate_params(
       inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
       f = param$fecundities, s = param$survivals, lam0 = param$pop_growth_mean
@@ -1372,12 +1372,14 @@ server <- function(input, output, session){
     rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
     param$rMAX_species <- rMAX_species
 
+    param$pop_growth_mean_use <- round(min(1 + rMAX_species, param$pop_growth_mean), 4)
+
     param$theta <- fixed_theta
     #param$theta <- theta_spp(rMAX_species)
 
     param$vr_calibrated <- calibrate_params(
-      inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
-      f = param$fecundities, s = param$survivals, lam0 = param$pop_growth_mean
+      inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean_use),
+      f = param$fecundities, s = param$survivals, lam0 = param$pop_growth_mean_use
     )
     param$s_calibrated <- head(param$vr_calibrated, length(param$survivals))
     param$f_calibrated <- tail(param$vr_calibrated, length(param$fecundities))
@@ -1428,6 +1430,8 @@ server <- function(input, output, session){
     input$run
   }, {
 
+    print(param$pop_growth_mean_use)
+
     if(ready$fatalities & ready$pop_size & ready$pop_growth & ready$carrying_capacity){
 
       out$analysis_choice <- input$analysis_choice
@@ -1446,7 +1450,7 @@ server <- function(input, output, session){
                                    pop_size_se = param$pop_size_se,
                                    pop_size_type = param$pop_size_unit,
 
-                                   pop_growth_mean = param$pop_growth_mean,
+                                   pop_growth_mean = param$pop_growth_mean_use,
                                    pop_growth_se = param$pop_growth_se,
 
                                    survivals = param$s_calibrated,

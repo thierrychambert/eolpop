@@ -512,18 +512,18 @@ rm(list = ls(all.names = TRUE))
                                            numericInput(inputId = "pop_growth_lower",
                                                         label = HTML("Borne inférieure<br>(taux d'accroissement en %)"),
                                                         value = -6,
-                                                        min = -100, max = 100, step = 1),
+                                                        min = -100, max = Inf, step = 1),
 
                                            numericInput(inputId = "pop_growth_upper",
                                                         label = HTML("Borne supérieure<br>(taux d'accroissement en %)"),
                                                         value = -6,
-                                                        min = -100, max = 100, step = 1),
+                                                        min = -100, max = Inf, step = 1),
 
                                            ## Input values: mean and se
                                            numericInput(inputId = "pop_growth_mean",
                                                         label = "Moyenne (taux d'accroissement en %)",
                                                         value = -1.5,
-                                                        min = -100, max = 100, step = 1),
+                                                        min = -100, max = Inf, step = 1),
 
                                            numericInput(inputId = "pop_growth_se",
                                                         label = "Erreur-type (aussi en %)",
