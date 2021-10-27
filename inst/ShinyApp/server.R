@@ -1040,7 +1040,7 @@ server <- function(input, output, session){
         output$lambda0_info <- renderText({
           req(all(!is.na(input$mat_fill_vr)))
           lam <- lambda(build_Leslie(s = param$s_calib0, f = param$f_calib0))
-          taux <- round(lam-1,2)*100
+          taux <- round(lam-1,4)*100
           if(taux < 0) Text <- "Déclin : " else Text <- "Croissance : "
           if(taux == 0) Text <- "Population stable : "
           paste0(Text, taux, "% par an")
