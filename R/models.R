@@ -190,16 +190,18 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params,
   A <- build_Leslie(s = s, f = f)
   diff_rel_lam <- (lam_Nt - lambda(A))/lambda(A)
   d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
-  #A01 <- A * (1+d)
-  A01 <- A + d
+
+  el <- elements_Leslie(s=s, f=f)
+  vr0 = el$vital_rates
+  vr1 = vr0*(1+d)
+
+  nac = length(s)
 
   # Calibrate survivals
-  keep <- which(A[-1,] != 0)
-  s_Nt <- ((A01[-1,][keep]) %>% sapply(., max, 0.001)) %>% sapply(., min, 0.999)
+  s_Nt <- ((head(vr1, nac)) %>% sapply(., max, 0.05)) %>% sapply(., min, 0.97)
 
   # Calibrate fecundities
-  f00 <- (A01[1,]/s_Nt) %>% sapply(., max, 0.001)
-  f_Nt <- c(0, head(f00,-1))
+  f_Nt <- (tail(vr1, nac)) %>% sapply(., max, 0.001)
   f_Nt[f == 0] <- 0
 
   ## Check if approximation is close enough to desired lambda
@@ -279,16 +281,18 @@ M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params,
   A <- build_Leslie(s = s, f = f)
   diff_rel_lam <- (lam_Nt - lambda(A))/lambda(A)
   d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
-  #A01 <- A * (1+d)
-  A01 <- A + d
+
+  el <- elements_Leslie(s=s, f=f)
+  vr0 = el$vital_rates
+  vr1 = vr0*(1+d)
+
+  nac = length(s)
 
   # Calibrate survivals
-  keep <- which(A[-1,] != 0)
-  s_Nt <- ((A01[-1,][keep]) %>% sapply(., max, 0.001)) %>% sapply(., min, 0.999)
+  s_Nt <- ((head(vr1, nac)) %>% sapply(., max, 0.05)) %>% sapply(., min, 0.97)
 
   # Calibrate fecundities
-  f00 <- (A01[1,]/s_Nt) %>% sapply(., max, 0.001)
-  f_Nt <- c(0, head(f00,-1))
+  f_Nt <- (tail(vr1, nac)) %>% sapply(., max, 0.001)
   f_Nt[f == 0] <- 0
 
   ## Check if approximation is close enough to desired lambda
