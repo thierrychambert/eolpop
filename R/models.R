@@ -190,11 +190,11 @@ M3_WithDD_noDemoStoch <- function(N1, s, f, h, DD_params,
   A <- build_Leslie(s = s, f = f)
   diff_rel_lam <- (lam_Nt - lambda(A))/lambda(A)
   #d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
+  d <- diff_rel_lam
 
   el <- elements_Leslie(s=s, f=f)
   vr0 = el$vital_rates
-  #vr1 = vr0*(1+d)
-  vr1 = vr0*(1+diff_rel_lam)
+  vr1 = vr0*(1+d)
 
   nac = length(s)
 
@@ -286,11 +286,11 @@ M4_WithDD_WithDemoStoch <- function(N1, s, f, h, DD_params,
   A <- build_Leslie(s = s, f = f)
   diff_rel_lam <- (lam_Nt - lambda(A))/lambda(A)
   #d <- match_lam_delta(diff_rel_lam = diff_rel_lam, s=s, f=f)
+  d <- diff_rel_lam
 
   el <- elements_Leslie(s=s, f=f)
   vr0 = el$vital_rates
-  #vr1 = vr0*(1+d)
-  vr1 = vr0*(1+diff_rel_lam)
+  vr1 = vr0*(1+d)
 
   nac = length(s)
 
