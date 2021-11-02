@@ -1174,27 +1174,6 @@ server <- function(input, output, session){
   }) # end observe
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
-
-  # Make sure fatalities are expressed as "number" (not rate) for the run_simul function
-  se_prod2 <- function(mu1, se1, mu2, se2) sqrt((se1^2 * se2^2) + (se1^2 * mu2^2) + (mu1^2 * se2^2))
-
-  observeEvent({
-    input$run
-  },{
-    if(input$fatalities_unit == "h"){
-      pop_size_tot <- sum(pop_vector(pop_size = param$pop_size_mean, pop_size_type = param$pop_size_type, s = param$s_calibrated, f = param$f_calibrated)[-1])
-      param$fatalities_mean_nb <- (param$fatalities_mean/100) * pop_size_tot
-      param$fatalities_se_nb <- se_prod2(mu1 = param$fatalities_mean/100,
-                                         se1 = param$fatalities_se/100,
-                                         mu2 = pop_size_tot,
-                                         se2 = (pop_size_tot/param$pop_size_mean) * param$pop_size_se)
-    }else{
-      param$fatalities_mean_nb <- param$fatalities_mean
-      param$fatalities_se_nb <- param$fatalities_se
-    }
-  })
-
-
   #################################
   ## Population size
   ##-------------------------------
@@ -1386,6 +1365,28 @@ server <- function(input, output, session){
     param$f_calibrated <- tail(param$vr_calibrated, length(param$fecundities))
   })
   #####
+
+  ############################################################
+  ## Convert Fatalities as numbers (not rates)
+  ##----------------------------------------------------------
+  # Make sure fatalities are expressed as "number" (not rate) for the run_simul function
+  se_prod2 <- function(mu1, se1, mu2, se2) sqrt((se1^2 * se2^2) + (se1^2 * mu2^2) + (mu1^2 * se2^2))
+
+  observeEvent({
+    input$run
+  },{
+    if(input$fatalities_unit == "h"){
+      pop_size_tot <- sum(pop_vector(pop_size = param$pop_size_mean, pop_size_type = param$pop_size_type, s = param$s_calibrated, f = param$f_calibrated)[-1])
+      param$fatalities_mean_nb <- (param$fatalities_mean/100) * pop_size_tot
+      param$fatalities_se_nb <- se_prod2(mu1 = param$fatalities_mean/100,
+                                         se1 = param$fatalities_se/100,
+                                         mu2 = pop_size_tot,
+                                         se2 = (pop_size_tot/param$pop_size_mean) * param$pop_size_se)
+    }else{
+      param$fatalities_mean_nb <- param$fatalities_mean
+      param$fatalities_se_nb <- param$fatalities_se
+    }
+  })
 
   ############################################################
   ## Observe parameter values to be used in simulations run
