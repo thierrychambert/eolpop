@@ -44,7 +44,7 @@ calibrate_params <- function(inits = NULL, s, f, lam0){
     upper = c(fu, s)
   }else{
     lower = c(fu, s)
-    upper = c(rep(Inf, length(fu)), apply(cbind((s*1.25), 0.98), 1, min))
+    upper = c(rep(Inf, length(fu)), apply(cbind((s*1.1), 0.97), 1, min))
   }
 
   # Set initial values
@@ -109,7 +109,12 @@ init_calib  <- function(s, f, lam0){
   f_init[is.nan(f_init)] <- 0
 
   # Calibrate survivals
-  s_init <- (s_init %>% sapply(., max, 0.05)) %>% sapply(., min, 0.97)
+  #s_init <- (s_init %>% sapply(., max, 0.05)) %>% sapply(., min, 0.97)
+  s_init <- cbind(
+        (s_init %>% sapply(., max, 0.05)) %>% sapply(., min, 0.97),
+        s*1.1) %>%
+    apply(., 1, min)
+
 
   # Calibrate fecundities
   f_init <- f_init %>% sapply(., max, 0.001)
@@ -164,9 +169,9 @@ match_lam_delta <- function(diff_rel_lam, s, f){
 
   # Scale the DELTA for each vital rate based on sensitivities
   #scaling <- (sum(S)-S)
-  scaling <- (max(E[E!=0])/E)
+  #scaling <- (max(E[E!=0])/E)
+  scaling <- ((1-E)/sum(1-E[E!=0]))*sum(el$vital_rates != 0)
   scaling[el$vital_rates == 0] <- 0
-  scaling
 
   # Infer the DELTA for each LESLIE MATRIX element
   d <- scaling * diff_rel_lam
