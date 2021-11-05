@@ -272,7 +272,9 @@ server <- function(input, output, session){
   ##############################################
   ##  Reactive values
   ##--------------------------------------------
-  out <- reactiveValues(run = NULL, run_time = NULL, msg = NULL, analysis_choice = NULL)
+  out <- reactiveValues(run = NULL, run_time = NULL, msg = NULL,
+                        analysis_choice = NULL, species_choice = NULL,
+                        trajectory_plot = NULL)
 
   rv <- reactiveValues(distAVG = NULL, dist = NULL)
 
@@ -1472,6 +1474,7 @@ server <- function(input, output, session){
     if(ready$fatalities & ready$pop_size & ready$pop_growth & ready$carrying_capacity){
 
       out$analysis_choice <- input$analysis_choice
+      out$species_choice <- input$species_choice
       start_time <- Sys.time()
 
       withProgress(message = 'Simulation progress', value = 0, {
@@ -1650,7 +1653,8 @@ server <- function(input, output, session){
   })
 
   output$impact_plot <- renderPlot({
-    plot_out_impact()
+    out$impact_plot <- plot_out_impact()
+    out$impact_plot
   })
 
   #############################################
@@ -1695,9 +1699,48 @@ server <- function(input, output, session){
 
 
   output$traj_plot <- renderPlot({
-    plot_out_traj()
+    out$trajectory_plot <- plot_out_traj()
+    out$trajectory_plot
   })
   #####
+
+
+
+  #############################################
+  ## Save outputs for report
+  ##-------------------------------------------
+
+
+  #####
+  ##-----------------------------------------------------------------------------------
+  ##                                REPORT
+  ##-----------------------------------------------------------------------------------
+  output$report <- downloadHandler(
+
+    filename = "RapportEolpopTEST001.pdf",
+
+    content = function(file) {
+      # Copy the report file to a temporary directory before processing it, in
+      # case we don't have write permissions to the current working dir (which
+      # can happen when deployed).
+      tempReport <- file.path(tempdir(), "report.Rmd")
+
+      file.copy("./inst/ShinyApp/report.Rmd", tempReport, overwrite = TRUE)
+
+      # Set up parameters to pass to Rmd document
+      paramsRMD <- list(analysis = out$analysis_choice, species = out$species_choice,
+                        impact_plot = out$impact_plot,
+                        trajectory_plot = out$trajectory_plot)
+
+      # Knit the document, passing in the `params` list, and eval it in a
+      # child of the global environment (this isolates the code in the document
+      # from the code in this app).
+      rmarkdown::render(tempReport, output_file = file,
+                        params = paramsRMD,
+                        envir = new.env(parent = globalenv())
+      )
+    }
+  ) # close downloadHandler
 
 
   ###################################################################################
