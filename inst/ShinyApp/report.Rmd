@@ -1,0 +1,23 @@
+---
+title: "Rapport de l'analyse avec eolpop"
+output: pdf_document
+params:
+  analysis: NA
+  species: NA
+  impact_plot: NA
+  trajectory_plot : NA
+---
+  
+## Type d'analyse realisee : `r paste(params$analysis)`
+
+## Espece choisie: `r paste(params$species)`
+
+# Graphique : Impact relatif au cours du temps
+```{r, echo=FALSE}
+params$impact_plot
+```
+
+# Graphique : Trajectoires demographiques
+```{r, echo=FALSE}
+params$trajectory_plot
+```

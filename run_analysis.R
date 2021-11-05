@@ -33,7 +33,7 @@ length(fatalities_mean)
 survivals <- c(0.3, 0.65)
 fecundities <- c(0, 4.5)
 
-pop_growth_mean = 1.98
+pop_growth_mean = 0.94
 # lambda( build_Leslie(s = survivals, f = fecundities) )
 pop_growth_se = 0
 
@@ -141,6 +141,7 @@ names(run0)
 N <- run0$N ; dim(N)
 #plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
 
+
 dim(N)
 dim(colSums(N))
 colSums(N) %>% apply(., c(1,2), mean)
@@ -182,6 +183,7 @@ sum(NN[,1,1])
 x11()
 plot_traj(N, age_class_use = "pairs", fecundities = fecundities,
           Legend = paste("sc", 1:length(fatalities_mean)), ylim = c(0, NA))
+
 
 plot_traj(N, age_class_use = "NotJuv0", fecundities = fecundities,
           Legend = paste("sc", 1:length(fatalities_mean)), ylim = c(0, NA))
