@@ -783,17 +783,8 @@ rm(list = ls(all.names = TRUE))
 
         ## Report
         {tabPanel(title = "Rapport",
-                 br(),
-                 radioButtons(inputId = "lifestyle",
-                              h4("Mode de vie de l'espèce"),
-                              choices = c("Sédentaire", "Non-sédentaire nicheur", "Non-sédentaire hivernant", "Migrateur de passage")),
-                 numericInput(inputId = "wind_farm_nb",
-                              h4("Nombre de parcs"),
-                              value = 1, min = 0, max = Inf, step = 1),
-                 numericInput(inputId = "wind_turbine_nb",
-                              h4("Nombre d'éoliennes"),
-                              value = 1, min = 0, max = Inf, step = 1)
-
+                  br(" "),
+                  downloadButton("report", "Generate report")
         )} # End tabPanel
 
       ) # End tabSetPanel
