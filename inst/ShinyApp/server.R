@@ -1,5 +1,40 @@
 server <- function(input, output, session){
 
+
+  ###################################################
+  ##  Fixed parameters in the server environment
+  ##-------------------------------------------------
+  ## Load species list
+  species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")
+
+  ## Load survival and fecundities data
+  data_sf <- read.csv("./inst/ShinyApp/survivals_fecundities_species.csv", sep = ",")#, encoding = "UTF-8")
+
+  # We define theta = 1 (same as in PBR) - for simplicity, given large uncertainty of real shape of density-dependence in nature
+  fixed_theta = 1
+
+  # Coefficient of environmental variation (SD)
+  ## Environnmental variance set at 8%, based on values found for birds in the literature:
+  ## (Saeher & Engen 2002) : between 7% et 14 ==> average : 10%
+  ## (Sæther et al. 2005) : between 2.5% et 10% ==> average : 6%
+  coeff_var_environ = sqrt(0.08) # SD ~28%
+
+  # Coverage probability used for lower/upper interval input values
+  CP = 0.99
+
+  # Values of pop_growth (assumed), when the "trend" option is chosen
+  growth_weak <- 1.05
+  growth_average <- 1.10
+  growth_strong <- 1.15
+
+  decline_weak <- 0.97
+  decline_average <- 0.94
+  decline_strong <- 0.91
+
+  pop_stable <- 1
+  trend_se <- 0.05 # SE to use for pop_growth, when the "trend" option is chosen
+
+
   ##############################################
   ##  Hide/Show : level 1
   ##--------------------------------------------
