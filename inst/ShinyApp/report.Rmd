@@ -8,9 +8,9 @@ params:
   trajectory_plot : NA
 ---
   
-## Type d'analyse realisee : `r paste(params$analysis)`
+## Type d'analyse realisée : `r paste(params$analysis)`
 
-## Espece choisie: `r paste(params$species)`
+## Espèce choisie: `r paste(params$species)`
 
 # Graphique : Impact relatif au cours du temps
 ```{r, echo=FALSE}
