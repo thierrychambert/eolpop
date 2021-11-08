@@ -2,15 +2,30 @@
 title: "Rapport de l'analyse avec eolpop"
 output: pdf_document
 params:
+  intro: NA
   analysis: NA
   species: NA
+  fatalities_input_type: NA
+  fatalities_val1: NA
+  fatalities_val2: NA
   impact_plot: NA
   trajectory_plot : NA
 ---
-  
+
+`r paste(params$intro)`
+
 ## Type d'analyse realisée : `r paste(params$analysis)`
 
 ## Espèce choisie: `r paste(params$species)`
+
+-----------------------------------------------------------------------------
+
+## Mortalités annuelles
+### `r paste(params$fatalities_input_type)`
+`r paste(params$fatalities_val1)`
+`r paste(params$fatalities_val2)`
+
+-----------------------------------------------------------------------------
 
 # Graphique : Impact relatif au cours du temps
 ```{r, echo=FALSE}

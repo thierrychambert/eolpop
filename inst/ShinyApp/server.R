@@ -273,7 +273,12 @@ server <- function(input, output, session){
   ##  Reactive values
   ##--------------------------------------------
   out <- reactiveValues(run = NULL, run_time = NULL, msg = NULL,
-                        analysis_choice = NULL, species_choice = NULL,
+                        analysis_choice = NULL, analysis_choice_report = NULL,
+                        species_choice = NULL,
+                        fatalities_input_type = NULL,
+                        fatalities_input_val1 = NULL,
+                        fatalities_input_val2 = NULL,
+
                         trajectory_plot = NULL)
 
   rv <- reactiveValues(distAVG = NULL, dist = NULL)
@@ -1709,6 +1714,25 @@ server <- function(input, output, session){
   #############################################
   ## Save outputs for report
   ##-------------------------------------------
+  # Type d'analyse
+  observeEvent({
+    input$run
+  }, {
+    if(out$analysis_choice == "single_farm") out$analysis_choice_report <- "Impacts non cumulés"
+    if(out$analysis_choice == "cumulated") out$analysis_choice_report <- "Impacts cumulés"
+    if(out$analysis_choice == "multi_scenario") out$analysis_choice_report <- "Multiple scénarios"
+  })
+
+  observeEvent({
+    input$run
+  }, {
+    #out$fatalities_input_type <- input$fatalities_input_type
+    if(input$fatalities_input_type == "itvl"){
+      out$fatalities_input_type <- "Saisie : intervalle\n"
+      out$fatalities_val1 <- paste0("Min : ", input$fatalities_lower, " ; ")
+      out$fatalities_val2 <- paste0("Max : ", input$fatalities_upper)
+    }
+  })
 
 
   #####
@@ -1728,9 +1752,19 @@ server <- function(input, output, session){
       file.copy("./inst/ShinyApp/report.Rmd", tempReport, overwrite = TRUE)
 
       # Set up parameters to pass to Rmd document
-      paramsRMD <- list(analysis = out$analysis_choice, species = out$species_choice,
-                        impact_plot = out$impact_plot,
-                        trajectory_plot = out$trajectory_plot)
+      paramsRMD <- list(
+        intro = input$intro_report,
+        analysis = out$analysis_choice_report,
+        species = out$species_choice,
+
+        fatalities_input_type = out$fatalities_input_type,
+        fatalities_val1 = out$fatalities_val1,
+        fatalities_val2 = out$fatalities_val2,
+
+        impact_plot = out$impact_plot,
+        trajectory_plot = out$trajectory_plot
+        )
+
 
       # Knit the document, passing in the `params` list, and eval it in a
       # child of the global environment (this isolates the code in the document

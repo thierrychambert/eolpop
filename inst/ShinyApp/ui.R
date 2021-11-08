@@ -784,6 +784,9 @@ rm(list = ls(all.names = TRUE))
         ## Report
         {tabPanel(title = "Rapport",
                   br(" "),
+                  textAreaInput("intro_report", label = "Texte introductif", value = "Analyse réalisée dans le cadre de ...", width = "1000px"),
+
+                  br(" "),
                   downloadButton("report", "Generate report")
         )} # End tabPanel
 
