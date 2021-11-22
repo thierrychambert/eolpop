@@ -494,7 +494,7 @@ rm(list = ls(all.names = TRUE))
                                            ## Input values: mean and se
                                            numericInput(inputId = "pop_growth_mean",
                                                         label = "Moyenne (taux d'accroissement en %)",
-                                                        value = -1.5,
+                                                        value = -7.5,
                                                         min = -100, max = Inf, step = 1),
 
                                            numericInput(inputId = "pop_growth_se",

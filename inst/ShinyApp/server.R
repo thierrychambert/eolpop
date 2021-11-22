@@ -1730,20 +1730,140 @@ server <- function(input, output, session){
     }
 
     if(input$fatalities_input_type == "itvl"){
-      out$fatalities_input_type <- "Saisie : intervalle\n"
+      out$fatalities_input_type <- "Saisie : intervalle"
       out$fatalities_val1 <- paste0("Min : ", input$fatalities_lower, unit, " ; ")
       out$fatalities_val2 <- paste0("Max : ", input$fatalities_upper, unit)
     }
     if(input$fatalities_input_type == "val"){
-      out$fatalities_input_type <- "Saisie : estimation et erreur-type\n"
+      out$fatalities_input_type <- "Saisie : estimation et erreur-type"
       out$fatalities_val1 <- paste0("Valeur estimée : ", input$fatalities_mean, unit, " ; ")
       out$fatalities_val2 <- paste0("Erreur-type : ", input$fatalities_se, unit)
     }
     if(input$fatalities_input_type == "eli_exp"){
-      out$fatalities_input_type <- "Saisie : élicitation d'experts\n"
+      out$fatalities_input_type <- "Saisie : élicitation d'experts"
       out$fatalities_val1 <- paste0("Moyenne estimée : ", round(param$fatalities_eli_result$mean, 2), unit, " ; ")
       out$fatalities_val2 <- paste0("Erreur_type : ", round(param$fatalities_eli_result$SE, 2), unit)
     }
+  })
+
+
+  # Population Size
+  observeEvent({
+    input$run
+  }, {
+    if(input$pop_size_unit == "Npair"){
+      out$pop_size_unit <- paste0("Unité : nombre de couples")
+      unit <- " couples"
+    }
+    if(input$pop_size_unit == "Ntotal"){
+      out$pop_size_unit <- paste0("Unité : effectif total")
+      unit <- " individus"
+    }
+
+    if(input$pop_size_input_type == "itvl"){
+      out$pop_size_input_type <- "Saisie : intervalle"
+      out$pop_size_val1 <- paste0("Min : ", input$pop_size_lower, unit, " ; ")
+      out$pop_size_val2 <- paste0("Max : ", input$pop_size_upper, unit)
+    }
+    if(input$pop_size_input_type == "val"){
+      out$pop_size_input_type <- "Saisie : estimation et erreur-type"
+      out$pop_size_val1 <- paste0("Valeur estimée : ", input$pop_size_mean, unit, " ; ")
+      out$pop_size_val2 <- paste0("Erreur-type : ", input$pop_size_se, unit)
+    }
+    if(input$pop_size_input_type == "eli_exp"){
+      out$pop_size_input_type <- "Saisie : élicitation d'experts"
+      out$pop_size_val1 <- paste0("Moyenne estimée : ", round(param$pop_size_eli_result$mean, 2), unit, " ; ")
+      out$pop_size_val2 <- paste0("Erreur_type : ", round(param$pop_size_eli_result$SE, 2), unit)
+    }
+  })
+
+
+  # Population Growth rate
+  observeEvent({
+    input$run
+  }, {
+    unit <- "%"
+
+    if(input$pop_growth_input_type == "itvl"){
+      out$pop_growth_input_type <- "Saisie : intervalle"
+      out$pop_growth_val1 <- paste0("Min : ", input$pop_growth_lower, unit, " ; ")
+      out$pop_growth_val2 <- paste0("Max : ", input$pop_growth_upper, unit)
+    }
+    if(input$pop_growth_input_type == "val"){
+      out$pop_growth_input_type <- "Saisie : estimation et erreur-type"
+      out$pop_growth_val1 <- paste0("Valeur estimée : ", input$pop_growth_mean, unit, " ; ")
+      out$pop_growth_val2 <- paste0("Erreur-type : ", input$pop_growth_se, unit)
+    }
+    if(input$pop_growth_input_type == "eli_exp"){
+      out$pop_growth_input_type <- "Saisie : élicitation d'experts"
+      out$pop_growth_val1 <- paste0("Moyenne estimée : ", round(param$pop_growth_eli_result$mean, 2), unit, " ; ")
+      out$pop_growth_val2 <- paste0("Erreur_type : ", round(param$pop_growth_eli_result$SE, 2), unit)
+    }
+
+    ## TREND
+
+    if(input$pop_growth_input_type == "trend"){
+      out$pop_growth_input_type <- "Saisie : tendance"
+
+      if(input$pop_trend == "stable"){
+        V1 <- "Stable"
+        V2 <- NULL
+      }
+
+      if(input$pop_trend == "growth"){
+        V1 <- "En croissance"
+        if(input$pop_trend_strength == "weak") V2 <- "faible"
+        if(input$pop_trend_strength == "average") V2 <- "modérée"
+        if(input$pop_trend_strength == "strong") V2 <- "forte"
+      }
+
+      if(input$pop_trend == "decline"){
+        V1 <- "En déclin"
+        if(input$pop_trend_strength == "weak") V2 <- "faible"
+        if(input$pop_trend_strength == "average") V2 <- "modéré"
+        if(input$pop_trend_strength == "strong") V2 <- "fort"
+      }
+        out$pop_growth_val1 <- V1
+        out$pop_growth_val2 <- V2
+    }
+
+  })
+
+  # Carrying capacity
+  observeEvent({
+    input$run
+  }, {
+    if(input$pop_size_unit == "Npair"){
+      out$carrying_cap_unit <- paste0("Unité : nombre de couples")
+      unit <- " couples"
+    }
+    if(input$pop_size_unit == "Ntotal"){
+      out$carrying_cap_unit <- paste0("Unité : effectif total")
+      unit <- " individus"
+    }
+
+    if(input$carrying_cap_input_type == "itvl"){
+      out$carrying_cap_input_type <- "Saisie : intervalle"
+      out$carrying_cap_val1 <- paste0("Min : ", input$carrying_capacity_lower, unit, " ; ")
+      out$carrying_cap_val2 <- paste0("Max : ", input$carrying_capacity_upper, unit)
+    }
+    if(input$carrying_cap_input_type == "val"){
+      out$carrying_cap_input_type <- "Saisie : estimation et erreur-type"
+      out$carrying_cap_val1 <- paste0("Valeur estimée : ", input$carrying_capacity_mean, unit, " ; ")
+      out$carrying_cap_val2 <- paste0("Erreur-type : ", input$carrying_capacity_se, unit)
+    }
+    if(input$carrying_cap_input_type == "eli_exp"){
+      out$carrying_cap_input_type <- "Saisie : élicitation d'experts"
+      out$carrying_cap_val1 <- paste0("Moyenne estimée : ", round(param$carrying_cap_eli_result$mean, 2), unit, " ; ")
+      out$carrying_cap_val2 <- paste0("Erreur_type : ", round(param$carrying_cap_eli_result$SE, 2), unit)
+    }
+
+    if(input$carrying_cap_input_type == "no_K"){
+      out$carrying_cap_input_type <- NULL
+      out$carrying_cap_val1 <- paste0("Absence de capacité de charge")
+      out$carrying_cap_val2 <- paste0("Justifié ou pas ??")
+    }
+
   })
 
 
@@ -1776,20 +1896,19 @@ server <- function(input, output, session){
         fatalities_val1 = out$fatalities_val1,
         fatalities_val2 = out$fatalities_val2,
 
-        #pop_size_unit = out$pop_size_unit,
-        #pop_size_input_type = out$pop_size_input_type,
-        #pop_size_val1 = out$pop_size_val1,
-        #pop_size_val2 = out$pop_size_val2,
+        pop_size_unit = out$pop_size_unit,
+        pop_size_input_type = out$pop_size_input_type,
+        pop_size_val1 = out$pop_size_val1,
+        pop_size_val2 = out$pop_size_val2,
 
-        #pop_growth_unit = out$pop_growth_unit,
-        #pop_growth_input_type = out$pop_growth_input_type,
-        #pop_growth_val1 = out$pop_growth_val1,
-        #pop_growth_val2 = out$pop_growth_val2,
+        pop_growth_input_type = out$pop_growth_input_type,
+        pop_growth_val1 = out$pop_growth_val1,
+        pop_growth_val2 = out$pop_growth_val2,
 
-        #carr_cap_unit = out$carr_cap_unit,
-        #carr_cap_input_type = out$carr_cap_input_type,
-        #carr_cap_val1 = out$carr_cap_val1,
-        #carr_cap_val2 = out$carr_cap_val2,
+        carrying_cap_unit = out$carrying_cap_unit,
+        carrying_cap_input_type = out$carrying_cap_input_type,
+        carrying_cap_val1 = out$carrying_cap_val1,
+        carrying_cap_val2 = out$carrying_cap_val2,
 
         impact_plot = out$impact_plot,
         trajectory_plot = out$trajectory_plot
