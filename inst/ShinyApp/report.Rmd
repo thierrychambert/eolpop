@@ -5,9 +5,14 @@ params:
   intro: NA
   analysis: NA
   species: NA
+  #def_pop_text: NA
+  #vital_rates: NA
+  
+  fatalities_unit: NA
   fatalities_input_type: NA
   fatalities_val1: NA
   fatalities_val2: NA
+  
   impact_plot: NA
   trajectory_plot : NA
 ---
@@ -21,6 +26,7 @@ params:
 -----------------------------------------------------------------------------
 
 ## Mortalités annuelles
+### `r paste(params$fatalities_unit)`
 ### `r paste(params$fatalities_input_type)`
 `r paste(params$fatalities_val1)`
 `r paste(params$fatalities_val2)`

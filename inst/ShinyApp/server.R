@@ -272,14 +272,7 @@ server <- function(input, output, session){
   ##############################################
   ##  Reactive values
   ##--------------------------------------------
-  out <- reactiveValues(run = NULL, run_time = NULL, msg = NULL,
-                        analysis_choice = NULL, analysis_choice_report = NULL,
-                        species_choice = NULL,
-                        fatalities_input_type = NULL,
-                        fatalities_input_val1 = NULL,
-                        fatalities_input_val2 = NULL,
-
-                        trajectory_plot = NULL)
+  out <- reactiveValues(run = NULL, run_time = NULL, msg = NULL)
 
   rv <- reactiveValues(distAVG = NULL, dist = NULL)
 
@@ -1723,14 +1716,33 @@ server <- function(input, output, session){
     if(out$analysis_choice == "multi_scenario") out$analysis_choice_report <- "Multiple scénarios"
   })
 
+  # Fatalities
   observeEvent({
     input$run
   }, {
-    #out$fatalities_input_type <- input$fatalities_input_type
+    if(input$fatalities_unit == "M"){
+      out$fatalities_unit <- paste0("Unité : nombre de mortalités annuelles")
+      unit <- " mortalités"
+    }
+    if(input$fatalities_unit == "h"){
+      out$fatalities_unit <- paste0("Unité : taux de mortalité (%) annuel")
+      unit <- " %"
+    }
+
     if(input$fatalities_input_type == "itvl"){
       out$fatalities_input_type <- "Saisie : intervalle\n"
-      out$fatalities_val1 <- paste0("Min : ", input$fatalities_lower, " ; ")
-      out$fatalities_val2 <- paste0("Max : ", input$fatalities_upper)
+      out$fatalities_val1 <- paste0("Min : ", input$fatalities_lower, unit, " ; ")
+      out$fatalities_val2 <- paste0("Max : ", input$fatalities_upper, unit)
+    }
+    if(input$fatalities_input_type == "val"){
+      out$fatalities_input_type <- "Saisie : estimation et erreur-type\n"
+      out$fatalities_val1 <- paste0("Valeur estimée : ", input$fatalities_mean, unit, " ; ")
+      out$fatalities_val2 <- paste0("Erreur-type : ", input$fatalities_se, unit)
+    }
+    if(input$fatalities_input_type == "eli_exp"){
+      out$fatalities_input_type <- "Saisie : élicitation d'experts\n"
+      out$fatalities_val1 <- paste0("Moyenne estimée : ", round(param$fatalities_eli_result$mean, 2), unit, " ; ")
+      out$fatalities_val2 <- paste0("Erreur_type : ", round(param$fatalities_eli_result$SE, 2), unit)
     }
   })
 
@@ -1756,10 +1768,28 @@ server <- function(input, output, session){
         intro = input$intro_report,
         analysis = out$analysis_choice_report,
         species = out$species_choice,
+        #def_pop_text = input$intro_report,
+        #vital_rates = out$vital_rates,
 
+        fatalities_unit = out$fatalities_unit,
         fatalities_input_type = out$fatalities_input_type,
         fatalities_val1 = out$fatalities_val1,
         fatalities_val2 = out$fatalities_val2,
+
+        #pop_size_unit = out$pop_size_unit,
+        #pop_size_input_type = out$pop_size_input_type,
+        #pop_size_val1 = out$pop_size_val1,
+        #pop_size_val2 = out$pop_size_val2,
+
+        #pop_growth_unit = out$pop_growth_unit,
+        #pop_growth_input_type = out$pop_growth_input_type,
+        #pop_growth_val1 = out$pop_growth_val1,
+        #pop_growth_val2 = out$pop_growth_val2,
+
+        #carr_cap_unit = out$carr_cap_unit,
+        #carr_cap_input_type = out$carr_cap_input_type,
+        #carr_cap_val1 = out$carr_cap_val1,
+        #carr_cap_val2 = out$carr_cap_val2,
 
         impact_plot = out$impact_plot,
         trajectory_plot = out$trajectory_plot
