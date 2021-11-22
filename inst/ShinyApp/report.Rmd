@@ -5,7 +5,7 @@ params:
   intro: NA
   analysis: NA
   species: NA
-  #def_pop_text: NA
+  def_pop_text: NA
   #vital_rates: NA
   
   fatalities_unit: NA
@@ -31,12 +31,20 @@ params:
   trajectory_plot : NA
 ---
 
-## Contexte de l'étude
-`r paste(params$intro)`
 
 ### Type d'analyse realisée : `r paste(params$analysis)`
 
 ### Espèce choisie: `r paste(params$species)`
+
+
+
+## Contexte de l'étude
+`r paste(params$intro)`
+
+
+## Défintion de la population impactée
+`r paste(params$def_pop_text)`
+
 
 ***
 

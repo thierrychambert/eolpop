@@ -784,7 +784,12 @@ rm(list = ls(all.names = TRUE))
         ## Report
         {tabPanel(title = "Rapport",
                   br(" "),
-                  textAreaInput("intro_report", label = "Texte introductif", value = "Analyse réalisée dans le cadre de ...", width = "1000px"),
+                  textAreaInput("intro_report", label = "Contexte de l'étude", value = "Analyse réalisée dans le cadre de ...", width = "1000px"),
+
+                  br(" "),
+                  textAreaInput("def_pop_text", label = "Délimitation de la population",
+                                value = "Veuillez décrire ici l'approche et les informations utilisées pour délimiter la population concernée par cette étude d'impact démographique",
+                                width = "1000px"),
 
                   br(" "),
                   downloadButton("report", "Generate report")

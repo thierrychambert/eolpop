@@ -1888,7 +1888,7 @@ server <- function(input, output, session){
         intro = input$intro_report,
         analysis = out$analysis_choice_report,
         species = out$species_choice,
-        #def_pop_text = input$intro_report,
+        def_pop_text = input$def_pop_text,
         #vital_rates = out$vital_rates,
 
         fatalities_unit = out$fatalities_unit,
