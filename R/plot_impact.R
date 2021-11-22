@@ -11,6 +11,8 @@
 #' @param xlab a character string. Label for the x axis.
 #' @param ylab a character string. Label for the y axis.
 #' @param Legend a vector of character strings. The legend to show on the side of the plot.
+#' @param legend_position Position of the legend : "bottom", "right", etc. See option in ggplot2.
+#' @param text_size Size of labels and legend text. Either "large" or "small".
 #' @param ... any other graphical input similar to the R plot function
 #'
 #' @return a plot of the relative impact of each scenario.
@@ -22,7 +24,7 @@
 #'
 #'
 plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", ylab = "Relative impact (%)",
-                        Legend = NULL, ...){
+                        Legend = NULL, legend_position = "right", text_size = "large", ...){
 
   # Get metrics and dimensions
   if(percent) out <- get_metrics(N)$scenario$impact*100 else out <- get_metrics(N)$scenario$impact
@@ -54,18 +56,33 @@ plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", yla
 
 
   # Add x/y labels and legend
+  if(text_size == "large"){
+    ts1 = 20
+    ts2 = 18
+    ts3 = 14
+    u1 = 2
+    u2 = 3
+  }else{
+    ts1 = 12
+    ts2 = 12
+    ts3 = 10
+    u1 = 1
+    u2 = 1.5
+  }
+
   p <- p +
     labs(x = xlab, y = ylab,
          col = "Scenario", fill = "Scenario") +
     theme(
-      axis.title=element_text(size = 20, face = "bold"),
-      axis.text=element_text(size = 14)
+      axis.title=element_text(size = ts1, face = "bold"),
+      axis.text=element_text(size = ts3)
     ) +
 
-    theme(legend.key.height = unit(2, 'line'),
-          legend.key.width = unit(3, 'line'),
-          legend.title = element_text(size = 18, face = "bold"),
-          legend.text = element_text(size = 14))
+    theme(legend.position = legend_position,
+      legend.key.height = unit(u1, 'line'),
+          legend.key.width = unit(u2, 'line'),
+          legend.title = element_text(size = ts2, face = "bold"),
+          legend.text = element_text(size = ts3))
 
   # Add y-axis on right side, and make pretty x/y axis and limits
   p <- p +

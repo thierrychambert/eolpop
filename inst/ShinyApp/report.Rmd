@@ -34,9 +34,9 @@ params:
 
 ### Type d'analyse realisée : `r paste(params$analysis)`
 
-### Espèce choisie: `r paste(params$species)`
-
-
+### Espèce choisie: `r paste(params$species)`  
+  
+  
 
 ## Contexte de l'étude
 `r paste(params$intro)`
@@ -85,12 +85,12 @@ params:
 
 # Résultats
 
-# Graphique : Impact relatif au cours du temps
+## Graphique : Impact relatif au cours du temps
 ```{r, echo=FALSE}
 params$impact_plot
 ```
 
-# Graphique : Trajectoires demographiques
+## Graphique : Trajectoires demographiques
 ```{r, echo=FALSE}
 params$trajectory_plot
 ```

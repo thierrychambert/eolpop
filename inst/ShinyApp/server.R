@@ -1630,7 +1630,7 @@ server <- function(input, output, session){
   ## Plot Impacts
   ##-------------------------------------------
   ## Function to plot the impact
-  plot_out_impact <- function(){
+  plot_out_impact <- function(legend_position, text_size){
     if(is.null(out$run)) {} else {
 
       n_scen <- dim(out$run$N)[3]
@@ -1640,7 +1640,8 @@ server <- function(input, output, session){
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", (1:n_scen)-1)
 
       plot_impact(N = out$run$N, onset_year = param$onset_year, percent = TRUE,
-                  xlab = "\nAnnée", ylab = "Impact relatif (%)\n", Legend = Legend)
+                  xlab = "\nAnnée", ylab = "Impact relatif (%)\n", Legend = Legend,
+                  legend_position = legend_position, text_size = text_size)
       }
   }
 
@@ -1651,9 +1652,9 @@ server <- function(input, output, session){
   })
 
   output$impact_plot <- renderPlot({
-    out$impact_plot <- plot_out_impact()
-    out$impact_plot
+    plot_out_impact(legend_position = "right", text_size = "large")
   })
+
 
   #############################################
   ## Plot Demographic Trajectories
@@ -1865,6 +1866,17 @@ server <- function(input, output, session){
     }
 
   })
+
+
+  ## Results
+
+  # Graphs
+  observeEvent({
+    input$run
+  }, {
+    out$impact_plot <- plot_out_impact(legend_position = "bottom", text_size = "small")
+  })
+
 
 
   #####

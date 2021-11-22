@@ -11,6 +11,8 @@ plot_impact(
   xlab = "Year",
   ylab = "Relative impact (\%)",
   Legend = NULL,
+  legend_position = "right",
+  text_size = "large",
   ...
 )
 }
@@ -28,6 +30,10 @@ If FALSE, the impact value displayed is between 0 and -1 (negative impact).}
 \item{ylab}{a character string. Label for the y axis.}
 
 \item{Legend}{a vector of character strings. The legend to show on the side of the plot.}
+
+\item{legend_position}{Position of the legend : "bottom", "right", etc. See option in ggplot2.}
+
+\item{text_size}{Size of labels and legend text. Either "large" or "small".}
 
 \item{...}{any other graphical input similar to the R plot function}
 }
