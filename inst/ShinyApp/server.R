@@ -1640,7 +1640,7 @@ server <- function(input, output, session){
       if(out$analysis_choice == "cumulated") Legend <- c("Sans parc", "+ Parc 1", paste("... + Parc", (3:n_scen)-1))
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", (1:n_scen)-1)
 
-      plot_impact(N = out$run$N, onset_year = param$onset_year, percent = TRUE,
+      plot_impact(N = out$run$N, onset_year = param$onset_year, percent = TRUE, show_CI = input$show_CI/100,
                   xlab = "\nAnnée", ylab = "Impact relatif (%)\n", Legend = Legend,
                   legend_position = legend_position, text_size = text_size)
       }
