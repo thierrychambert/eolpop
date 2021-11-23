@@ -4,10 +4,10 @@
 \alias{quantiles_impact}
 \title{Calculate quantile values of impact at time horizon}
 \usage{
-quantiles_impact(N, show_quantile = 0.975, show_CI = 0.95, percent = TRUE)
+quantiles_impact(dr_N, show_quantile = 0.975, show_CI = 0.95, percent = TRUE)
 }
 \arguments{
-\item{N}{a 4-D array containing demographic projection outputs}
+\item{dr_N}{a 3-D array (year, nsim, nsc) containing the output : relative difference of population size}
 
 \item{show_quantile}{value between 0 and 1. The quantile to of the CDF to calculate}
 
