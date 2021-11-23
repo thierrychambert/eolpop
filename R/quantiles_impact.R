@@ -12,6 +12,7 @@
 #'
 quantiles_impact <- function(dr_N, show_quantile = 0.975, show_CI = 0.95, percent = TRUE){
 
+  dr_N[which(is.nan(dr_N))] <- -1
   if(percent) dr_N <- dr_N*100
 
   CI <- QT <- NA

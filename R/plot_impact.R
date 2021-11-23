@@ -28,7 +28,11 @@ plot_impact <- function(N, onset_year = NULL, percent = TRUE, show_CI = 0.95, xl
                         Legend = NULL, legend_position = "right", text_size = "large", ...){
 
   # Get metrics and dimensions
-  if(percent) out <- get_metrics(N)$scenario$DR_N*100 else out <- get_metrics(N)$scenario$DR_N
+  out <- get_metrics(N)$scenario$DR_N
+  out[which(is.nan(out))] <- -1
+
+  if(percent) out <- out*100
+
   TH <- dim(N)[2]
   nsc <- dim(N)[3]
   if(is.null(onset_year)) onset_year <- 1
