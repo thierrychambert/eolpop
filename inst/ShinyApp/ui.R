@@ -740,6 +740,8 @@ rm(list = ls(all.names = TRUE))
                  ## Outputs
                  {conditionalPanel("output.hide_results",
 
+                    sliderInput("show_CI", label = "% intervalle de confiance", min = 0, max = 100, value = 95, step = 1),
+
                     span(textOutput("title_indiv_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
                     strong(span(tableOutput("indiv_impact_table"), style="color:green; font-size:18px", align = "left")),
 

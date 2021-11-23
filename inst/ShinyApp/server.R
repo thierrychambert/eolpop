@@ -1573,7 +1573,8 @@ server <- function(input, output, session){
     if(out$analysis_choice == "cumulated") RowNam <- c("Parc 1", paste("... + Parc", (2:n_scen)))
     if(out$analysis_choice == "multi_scenario") RowNam <- paste("Scenario", (1:n_scen))
 
-    fil <- paste0(round(t(res$scenario$impact[param$time_horizon, -2, -1]),2)*100, "%")
+    fil <- paste0(round(t(quantiles_impact(out$run$N, show_quantile = NULL, show_CI = input$show_CI/100)$CI)[-1,]), "%")
+      #paste0(round(t(quantiles_impact(out$run$N, show_quantile = FALSE, show_CI = input$show_CI)$CI)), "%")
     matrix(fil,
            nrow = n_scen,
            dimnames = list(RowNam, c("Impact", "IC (min)", "IC (max)"))
