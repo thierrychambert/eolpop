@@ -13,7 +13,7 @@ get_metrics(N, cumulated_impacts = FALSE)
 a cumulated impacts demographic analysis (see ?run_simul).}
 }
 \value{
-a list of metric outputs : mean, SD, 95\% C.I. of the
+a list of metric outputs : median, SD, 95\% C.I. of the
 }
 \description{
 get_metrics takes the output array of the simulations run and calculate two impact metrics :
