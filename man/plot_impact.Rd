@@ -8,6 +8,7 @@ plot_impact(
   N,
   onset_year = NULL,
   percent = TRUE,
+  show_CI = 0.95,
   xlab = "Year",
   ylab = "Relative impact (\%)",
   Legend = NULL,
@@ -24,6 +25,8 @@ plot_impact(
 
 \item{percent}{a logical value indicating whether the impact should be displayed in \% (y axis).
 If FALSE, the impact value displayed is between 0 and -1 (negative impact).}
+
+\item{show_CI}{value between 0 and 1. The limits of C.I. to calculate}
 
 \item{xlab}{a character string. Label for the x axis.}
 

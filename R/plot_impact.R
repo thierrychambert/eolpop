@@ -8,6 +8,7 @@
 #' (thus, the year at whihc each fatality value starts kicking in)
 #' @param percent a logical value indicating whether the impact should be displayed in % (y axis).
 #' If FALSE, the impact value displayed is between 0 and -1 (negative impact).
+#' @param show_CI value between 0 and 1. The limits of C.I. to calculate
 #' @param xlab a character string. Label for the x axis.
 #' @param ylab a character string. Label for the y axis.
 #' @param Legend a vector of character strings. The legend to show on the side of the plot.
@@ -23,19 +24,25 @@
 #' @import ggplot2
 #'
 #'
-plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", ylab = "Relative impact (%)",
+plot_impact <- function(N, onset_year = NULL, percent = TRUE, show_CI = 0.95, xlab = "Year", ylab = "Relative impact (%)",
                         Legend = NULL, legend_position = "right", text_size = "large", ...){
 
   # Get metrics and dimensions
-  if(percent) out <- get_metrics(N)$scenario$impact*100 else out <- get_metrics(N)$scenario$impact
+  #  if(percent) out <- get_metrics(N)$scenario$impact*100 else out <- get_metrics(N)$scenario$impact
+  if(percent) out <- get_metrics(N)$scenario$DR_N*100 else out <- get_metrics(N)$scenario$DR_N
   TH <- dim(N)[2]
   nsc <- dim(N)[3]
   if(is.null(onset_year)) onset_year <- 1
   years <- min(onset_year) + (1:TH) - 1
 
+  dim(out)
+  CI <- t(apply(out[,,], c(1,3), quantile, probs = c(0.5, 1-(1-show_CI)/2, (1-show_CI)/2)))
+  rownames(CI) <- c("avg", "lci", "uci")
+  CI
+
   # Build dataframe
-  df <- as.data.frame(cbind(year = years, out[,,1], scenario = 1))
-  for(j in 2:nsc) df <- rbind(df, cbind(year = years, out[,,j], scenario = j))
+  df <- as.data.frame(cbind(year = years, t(CI[,,1]), scenario = 1))
+  for(j in 2:nsc) df <- rbind(df, cbind(year = years, t(CI[,,j]), scenario = j))
 
   ## Define Graphic Parameters
   size = 1.5
