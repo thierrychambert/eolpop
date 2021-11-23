@@ -124,10 +124,15 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
   indiv_impacts <- list(impacts = NULL)
 
   ### Impact of each WIND FARM (only in case of a cumluted impact run)
+  DR_N_indiv <- array(NA, dim = c(dim(N)[2], dim(N)[4], dim(N)[3]),
+                   dimnames = list(paste0("year", 1:dim(N)[2]),
+                                   NULL,
+                                   paste0("wind_farm", (1:dim(N)[3])-1)
+                   ))
   impact_indiv <- array(NA, dim = c(dim(N)[2], 4, dim(N)[3]),
                         dimnames = list(paste0("year", 1:dim(N)[2]),
                                         c("avg", "se", "lci", "uci"),
-                                        paste0("sc", (1:dim(N)[3])-1)
+                                        paste0("wind_farm", (1:dim(N)[3])-1)
                         ))
 
   Pext_indiv <- DR_Pext_indiv <- NA
@@ -135,7 +140,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
   if(cumulated_impacts){
 
     ## Relative difference of population size
-    impact_indiv[,,1] <- 0
+    impact_indiv[,,1] <- DR_N_indiv[,,1] <- 0
 
     for(j in 2:dim(N)[3]){
 
@@ -162,6 +167,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
       # Relative Difference of Population Size
       DR_N <- (colSums(N[,,j,]) - N_ref) / N_ref
+      DR_N_indiv[,,j] <- DR_N
 
       # Remove cases where impact > 0
       sel <- which(DR_N > 0, arr.ind = TRUE)
@@ -203,7 +209,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
     # Save individual wind farm impacts into a list
     indiv_impacts <- list(
-      DR_N = DR_N,
+      DR_N = DR_N_indiv,
       impact = impact_indiv,
       Pext = Pext_indiv,
       DR_Pext = DR_Pext_indiv)
