@@ -16,8 +16,8 @@ quantiles_impact <- function(dr_N, show_quantile = 0.975, show_CI = 0.95, percen
 
   CI <- QT <- NA
 
-  TH <- dim(N)[2]
-  nsc <- dim(N)[3]
+  TH <- dim(dr_N)[1]
+  nsc <- dim(dr_N)[3]
 
   if(!is.null(show_CI)) CI <- apply(-dr_N[TH,,], 2, quantile, probs = c(0.5, (1-show_CI)/2, 1-(1-show_CI)/2))
   if(!is.null(show_quantile)) QT <- apply(-dr_N[TH,,], 2, quantile, probs = show_quantile)
