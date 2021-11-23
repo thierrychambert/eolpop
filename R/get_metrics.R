@@ -17,7 +17,7 @@
 #' @param cumulated_impacts Logical. Must be set to TRUE if the output array N corresponds to
 #' a cumulated impacts demographic analysis (see ?run_simul).
 #'
-#' @return a list of metric outputs : mean, SD, 95% C.I. of the
+#' @return a list of metric outputs : median, SD, 95% C.I. of the
 #' @export
 #'
 #' @examples
@@ -34,6 +34,12 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
   warning <- NULL
 
   ### Impact of each SCENARIO #####
+  DR_N_sc <- array(NA, dim = c(dim(N)[2], dim(N)[4], dim(N)[3]),
+                   dimnames = list(paste0("year", 1:dim(N)[2]),
+                                   NULL,
+                                   paste0("sc", (1:dim(N)[3])-1)
+                   ))
+
   impact_sc <- array(NA, dim = c(dim(N)[2], 4, dim(N)[3]),
                      dimnames = list(paste0("year", 1:dim(N)[2]),
                                      c("avg", "se", "lci", "uci"),
@@ -50,8 +56,8 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
   ## Create a warning if the sample size (number of useable iterations for calculation) becomes too small
   spl_size <- apply(N_ref, 1,
-        function(x) sum(!is.nan(x))
-        )
+                    function(x) sum(!is.nan(x))
+  )
 
   # Warning message, if required
   if (min(spl_size) < 200) warning <- paste0(
@@ -59,12 +65,13 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
     min(which(spl_size < 200)),
     ", due to high extinction rate.
     Use more simulations to get accurate proportions and uncertainty metrics."
-    )
+  )
 
 
   for(j in 1:dim(N)[3]){
     # Relative Difference of Population Size
     DR_N <- (colSums(N[,,j,]) - N_ref) / N_ref
+    DR_N_sc[,,j] <- DR_N
 
     # Remove cases where impact > 0
     sel <- which(DR_N > 0, arr.ind = TRUE)
@@ -73,10 +80,8 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
       DR_N <- DR_N[,-sel2]
     }
 
-    # Impact metric : Average value
-    impact_sc[,"avg",j] <- apply(DR_N, 1, mean, na.rm = TRUE)
-
-    # Impact metric : SE
+    # Impact metric : Median and SE
+    impact_sc[,"avg",j] <- apply(DR_N, 1, median, na.rm = TRUE)
     impact_sc[,"se",j] <- apply(DR_N, 1, sd, na.rm = TRUE)
 
     # Impact metric : Upper and Lower Confidence Intervals for DR_N
@@ -105,6 +110,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
   # Save scenario impacts into a list
   scenario_impacts <- list(
+    DR_N = DR_N_sc,
     impact = impact_sc,
     Pext = Pext_sc,
     DR_Pext = DR_Pext_sc)
@@ -122,7 +128,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
                         dimnames = list(paste0("year", 1:dim(N)[2]),
                                         c("avg", "se", "lci", "uci"),
                                         paste0("sc", (1:dim(N)[3])-1)
-                          ))
+                        ))
 
   Pext_indiv <- DR_Pext_indiv <- NA
 
@@ -164,8 +170,8 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
         DR_N <- DR_N[,-sel2]
       }
 
-      # Mean and SE
-      impact_indiv[,"avg",j] <- apply(DR_N, 1, mean, na.rm = TRUE)
+      # Median and SE
+      impact_indiv[,"avg",j] <- apply(DR_N, 1, median, na.rm = TRUE)
       impact_indiv[,"se",j] <- apply(DR_N, 1, sd, na.rm = TRUE)
 
       # Upper and Lower Confidence Intervals for DR_N
@@ -197,12 +203,13 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
     # Save individual wind farm impacts into a list
     indiv_impacts <- list(
+      DR_N = DR_N,
       impact = impact_indiv,
       Pext = Pext_indiv,
       DR_Pext = DR_Pext_indiv)
 
 
-  } # end if "ci=umulated_impacts"
+  } # end if "cumulated_impacts"
 
 
 
