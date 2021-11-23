@@ -7,7 +7,7 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 10
+nsim = 100
 
 pop_size_mean = 350
 pop_size_se = 0
@@ -154,6 +154,10 @@ dim(out$run$N)
 get_metrics(N = out$run$N)$scenario$impact[time_horizon, ,-1] %>% round(.,2)
 
 res = get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)
+
+
+
+
 
 ###
 

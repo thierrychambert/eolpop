@@ -1,11 +1,8 @@
-##==============================================================================
-##                        Plot of the relative impact                         ==
-##==============================================================================
-#' Plot the relative impact for each scenario
+#' Plot the estimated cumulative distribution function (ECDF) impact for each scenario
 #'
 #' @param N a 4-D array containing demographic projection outputs
-#' @param onset_year a vector containing the years of each wind farm start being active
-#' (thus, the year at whihc each fatality value starts kicking in)
+#' @param show_quantile value between 0 and 1. The quantile to display on the plot
+#' @param sel_sc an integer. The scenario selected for quantile display on the plot
 #' @param percent a logical value indicating whether the impact should be displayed in % (y axis).
 #' If FALSE, the impact value displayed is between 0 and -1 (negative impact).
 #' @param xlab a character string. Label for the x axis.
@@ -23,36 +20,33 @@
 #' @import ggplot2
 #'
 #'
-plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", ylab = "Relative impact (%)",
+ECDF_impact <- function(N, show_quantile = 0.95, sel_sc = 1,
+                        percent = TRUE, xlab = "Relative impact (%)", ylab = "Cumulative density",
                         Legend = NULL, legend_position = "right", text_size = "large", ...){
 
   # Get metrics and dimensions
-  if(percent) out <- get_metrics(N)$scenario$impact*100 else out <- get_metrics(N)$scenario$impact
+  if(percent) out <- get_metrics(N)$scenario$DR_N*100 else out <- get_metrics(N)$scenario$DR_N
   TH <- dim(N)[2]
   nsc <- dim(N)[3]
-  if(is.null(onset_year)) onset_year <- 1
-  years <- min(onset_year) + (1:TH) - 1
+
 
   # Build dataframe
-  df <- as.data.frame(cbind(year = years, out[,,1], scenario = 1))
-  for(j in 2:nsc) df <- rbind(df, cbind(year = years, out[,,j], scenario = j))
+  df <- as.data.frame(cbind(impact = -out[TH,,2], scenario = 1))
+  if(nsc > 2) for(j in 3:nsc) df <- rbind(df, cbind(impact = -out[TH,,j], scenario = j-1))
+
 
   ## Define Graphic Parameters
   size = 1.5
 
 
   # Plot lines
-  p <-
-    ggplot(data = df, aes(x = .data$year, y = .data$avg)) +
-    geom_line(size = size, aes(colour = factor(.data$scenario))) +
-    geom_ribbon(
-      aes(ymin = .data$uci, ymax = .data$lci, fill = factor(.data$scenario)), linetype = 0, alpha = 0.100)
+  p <- ggplot(df, aes(x = impact)) +
+    stat_ecdf(geom = "step", size = size, aes(colour = factor(.data$scenario)))
 
-  # change color palette (we want sc0 in black)
+  # change color palette
   p <- p +
-    scale_color_manual(breaks = 1:nsc,
-                       values = custom_palette_c25()[1:nsc],
-                       labels = Legend, aesthetics = c("colour", "fill"))
+    scale_color_manual(values = custom_palette_c25()[2:nsc],
+                       labels = Legend, aesthetics = c("colour"))
 
 
   # Add x/y labels and legend
@@ -86,16 +80,22 @@ plot_impact <- function(N, onset_year = NULL, percent = TRUE, xlab = "Year", yla
 
   # Add y-axis on right side, and make pretty x/y axis and limits
   p <- p +
-    scale_y_continuous(limits = c(-100,0), expand = expansion(mult = c(0.015, 0.005)),
+    scale_y_continuous(limits = c(0,1), expand = expansion(mult = c(0.015, 0.005)),
                        breaks = scales::pretty_breaks(n = 10),
                        sec.axis = sec_axis(trans = ~.*1, name = "",
                                            breaks = scales::pretty_breaks(n = 10))) +
     scale_x_continuous(expand = expansion(mult = c(0.015, 0)),
                        breaks = scales::pretty_breaks(n = 10))
 
-  # Add horizontal dashed lines (for better viz)
-  p <- p + geom_hline(yintercept = seq(0 , -100, by = -10), size = 0.5, linetype = 3, colour = grey(0.15))
 
+  # Add quantile vline
+  QT <- apply(-out[TH,,], 2, quantile, probs = show_quantile)
+  sel_sc <- sel_sc + 1
+  p <- p + geom_segment(mapping = aes(x = QT[sel_sc],
+                                        xend = QT[sel_sc],
+                                        y = 0,
+                                        yend = show_quantile),
+                          color=custom_palette_c25()[sel_sc], linetype="dashed", size=1)
 
 
   return(p)
