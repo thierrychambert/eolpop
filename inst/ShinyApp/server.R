@@ -1540,7 +1540,9 @@ server <- function(input, output, session){
     req(out$run)
     res <- get_metrics(N = out$run$N, cumulated_impacts = TRUE)
     n_farm <- (dim(res$indiv_farm$impact)[3]-1)
-    fil <- paste0(round(t(res$indiv_farm$impact[param$time_horizon, -2, -1]),2)*100, "%")
+
+    fil <- paste0(round(t(quantiles_impact(res$indiv_farm$DR_N, show_quantile = NULL, show_CI = input$show_CI/100)$CI)[-1,]), "%")
+      #paste0(round(t(res$indiv_farm$impact[param$time_horizon, -2, -1]),2)*100, "%")
     matrix(fil,
            nrow = n_farm,
            dimnames = list(paste("Parc",1:n_farm), c("Impact", "IC (min)", "IC (max)"))
@@ -1573,7 +1575,7 @@ server <- function(input, output, session){
     if(out$analysis_choice == "cumulated") RowNam <- c("Parc 1", paste("... + Parc", (2:n_scen)))
     if(out$analysis_choice == "multi_scenario") RowNam <- paste("Scenario", (1:n_scen))
 
-    fil <- paste0(round(t(quantiles_impact(out$run$N, show_quantile = NULL, show_CI = input$show_CI/100)$CI)[-1,]), "%")
+    fil <- paste0(round(t(quantiles_impact(res$scenario$DR_N, show_quantile = NULL, show_CI = input$show_CI/100)$CI)[-1,]), "%")
       #paste0(round(t(quantiles_impact(out$run$N, show_quantile = FALSE, show_CI = input$show_CI)$CI)), "%")
     matrix(fil,
            nrow = n_scen,
