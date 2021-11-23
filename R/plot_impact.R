@@ -28,17 +28,14 @@ plot_impact <- function(N, onset_year = NULL, percent = TRUE, show_CI = 0.95, xl
                         Legend = NULL, legend_position = "right", text_size = "large", ...){
 
   # Get metrics and dimensions
-  #  if(percent) out <- get_metrics(N)$scenario$impact*100 else out <- get_metrics(N)$scenario$impact
   if(percent) out <- get_metrics(N)$scenario$DR_N*100 else out <- get_metrics(N)$scenario$DR_N
   TH <- dim(N)[2]
   nsc <- dim(N)[3]
   if(is.null(onset_year)) onset_year <- 1
   years <- min(onset_year) + (1:TH) - 1
 
-  dim(out)
-  CI <- t(apply(out[,,], c(1,3), quantile, probs = c(0.5, 1-(1-show_CI)/2, (1-show_CI)/2)))
+  CI <- apply(out[,,], c(1,3), quantile, probs = c(0.5, 1-(1-show_CI)/2, (1-show_CI)/2))
   rownames(CI) <- c("avg", "lci", "uci")
-  CI
 
   # Build dataframe
   df <- as.data.frame(cbind(year = years, t(CI[,,1]), scenario = 1))
