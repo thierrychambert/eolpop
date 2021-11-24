@@ -23,6 +23,9 @@ quantiles_impact <- function(dr_N, show_quantile = 0.975, show_CI = 0.95, percen
   if(!is.null(show_CI)) CI <- apply(-dr_N[TH,,], 2, quantile, probs = c(0.5, (1-show_CI)/2, 1-(1-show_CI)/2))
   if(!is.null(show_quantile)) QT <- apply(-dr_N[TH,,], 2, quantile, probs = show_quantile)
 
+  CI[] <- sapply(CI, max, 0)
+  QT[] <- sapply(QT, max, 0)
+
   return(list(CI = CI, QT = QT))
 }
 
