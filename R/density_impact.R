@@ -32,6 +32,17 @@ density_impact <- function(N, show_CI = 0.95, sel_sc = "all", xlims = NULL,
     TH <- dim(N)[2]
     nsc <- dim(N)[3]
 
+
+    df0 <- as.data.frame(cbind(impact = -out[TH,,2], scenario = 1))
+    if(nsc > 2) for(j in 3:nsc) df0 <- rbind(df0, cbind(impact = -out[TH,,j], scenario = j-1))
+
+    max_y <- c()
+    for(j in unique(df0$scenario)){
+      dd <- density(df0$impact[df0$scenario == j])
+      max_y[j] <- max(dd$y)
+    }
+    max_y <- max(max_y)
+
     # Build dataframe
     if(sel_sc == "all"){
       df <- as.data.frame(cbind(impact = -out[TH,,2], scenario = 1))
@@ -89,7 +100,7 @@ density_impact <- function(N, show_CI = 0.95, sel_sc = "all", xlims = NULL,
 
     # Add y-axis on right side, and make pretty x/y axis and limits
     p <- p +
-      scale_y_continuous(expand = expansion(mult = c(0.015, 0.005)),
+      scale_y_continuous(limits = c(0, max_y), expand = expansion(mult = c(0.015, 0.005)),
                          breaks = scales::pretty_breaks(n = 10)) +
       scale_x_continuous(limits = xlims, expand = expansion(mult = c(0.001, 0.001)),
                          breaks = scales::pretty_breaks(n = 10))
