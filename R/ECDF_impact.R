@@ -2,7 +2,7 @@
 #'
 #' @param N a 4-D array containing demographic projection outputs
 #' @param show_quantile value between 0 and 1. The quantile to display on the plot
-#' @param sel_sc an integer. The scenario selected for quantile display on the plot
+#' @param xlims a vector of 2 values. x-axis limits (lower and upper).
 #' @param percent a logical value indicating whether the impact should be displayed in % (y axis).
 #' If FALSE, the impact value displayed is between 0 and -1 (negative impact).
 #' @param xlab a character string. Label for the x axis.
@@ -20,7 +20,7 @@
 #' @import ggplot2
 #'
 #'
-ECDF_impact <- function(N, show_quantile = 0.95, sel_sc = 1,
+ECDF_impact <- function(N, show_quantile = 0.95, xlims = NULL,
                         percent = TRUE, xlab = "Relative impact (%)", ylab = "Cumulative density",
                         Legend = NULL, legend_position = "right", text_size = "large", ...){
 
@@ -40,7 +40,7 @@ ECDF_impact <- function(N, show_quantile = 0.95, sel_sc = 1,
 
 
   # Plot lines
-  p <- ggplot(df, aes(x = impact)) +
+  p <- ggplot(df, aes(x = .data$impact)) +
     stat_ecdf(geom = "step", size = size, aes(colour = factor(.data$scenario)))
 
   # change color palette
@@ -84,18 +84,22 @@ ECDF_impact <- function(N, show_quantile = 0.95, sel_sc = 1,
                        breaks = scales::pretty_breaks(n = 10),
                        sec.axis = sec_axis(trans = ~.*1, name = "",
                                            breaks = scales::pretty_breaks(n = 10))) +
-    scale_x_continuous(expand = expansion(mult = c(0.015, 0)),
+    scale_x_continuous(limits = xlims, expand = expansion(mult = c(0.015, 0)),
                        breaks = scales::pretty_breaks(n = 10))
 
 
   # Add quantile vline
   QT <- apply(-out[TH,,], 2, quantile, probs = show_quantile)
-  sel_sc <- sel_sc + 1
-  p <- p + geom_segment(mapping = aes(x = QT[sel_sc],
-                                        xend = QT[sel_sc],
-                                        y = 0,
-                                        yend = show_quantile),
-                          color=custom_palette_c25()[sel_sc], linetype="dashed", size=1)
+  QT <- QT[-1]
+
+  df_qt <- data.frame(x = QT, xend = QT, y = 0, yend = show_quantile)
+
+  p <- p + geom_segment(data = df_qt,
+                   mapping = aes(x = .data$x,
+                                 xend = .data$xend,
+                                 y = .data$y,
+                                 yend = .data$yend),
+                   color=custom_palette_c25()[2:nsc], linetype="dashed", size=1)
 
 
   return(p)

@@ -9,7 +9,7 @@ library(eolpop)
 ## Inputs
 nsim = 100
 
-pop_size_mean = 350
+pop_size_mean = 800
 pop_size_se = 0
 pop_size_type = "Npair"
 
@@ -19,8 +19,8 @@ carrying_capacity_se = 100
 
 #(4.8/100)*sum(N000[-1])
 #(0.7/100)*sum(N000[-1])
-fatalities_mean = c(0, 8, 3, 15) #c(0, 5, 3, 4, 2, 1, 4, 2, 2, 3)
-fatalities_se = c(0, 0.5, 0.5, 0.5) # c(0, rep(0.5,9))
+fatalities_mean = c(0, 3)#, 5, 0.8) #c(0, 5, 3, 4, 2, 1, 4, 2, 2, 3)
+fatalities_se = c(0, 0.5)#, 0.5, 0.5) # c(0, rep(0.5,9))
 length(fatalities_mean)
 onset_year = c(2010, 2013, 2016) #, 2016, 2017, 2019, 2020, 2020, 2020, 2021) #rep(2010, 10)#
 
@@ -46,7 +46,7 @@ fatal_constant = "M"
 
 
 #if(length(fatalities_mean) > 2) cumulated_impacts = TRUE else cumulated_impacts = FALSE
-cumulated_impacts = TRUE
+cumulated_impacts = FALSE
 
 
 length(onset_year)
@@ -150,7 +150,7 @@ colSums(N) %>% apply(., c(1,2), mean)
 out = list()
 out$run = run0
 
-names(out$run$N)
+dim(out$run$N)
 
 get_metrics(N = out$run$N)$scenario$impact[time_horizon, ,-1] %>% round(.,2)
 
@@ -158,7 +158,13 @@ res = get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)
 names(res)
 
 
+dr_N <- res$indiv_farm$DR_N
 
+###
+dim(N)
+ECDF_impact(N, show_quantile = 0.95, sel_sc = 1,
+                        percent = TRUE, xlab = "Relative impact (%)", ylab = "Cumulative density",
+                        Legend = NULL, legend_position = "right", text_size = "large")
 
 ###
 

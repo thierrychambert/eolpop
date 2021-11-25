@@ -7,7 +7,7 @@
 ECDF_impact(
   N,
   show_quantile = 0.95,
-  sel_sc = 1,
+  xlims = NULL,
   percent = TRUE,
   xlab = "Relative impact (\%)",
   ylab = "Cumulative density",
@@ -22,7 +22,7 @@ ECDF_impact(
 
 \item{show_quantile}{value between 0 and 1. The quantile to display on the plot}
 
-\item{sel_sc}{an integer. The scenario selected for quantile display on the plot}
+\item{xlims}{a vector of 2 values. x-axis limits (lower and upper).}
 
 \item{percent}{a logical value indicating whether the impact should be displayed in \% (y axis).
 If FALSE, the impact value displayed is between 0 and -1 (negative impact).}

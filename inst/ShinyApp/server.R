@@ -1534,7 +1534,7 @@ server <- function(input, output, session){
 
 
   #######################################################################
-  ## Impact : individual farms (for "cumulated impact" analysis only)
+  ## Impact (text) : individual farms (for "cumulated impact" analysis only)
   ##---------------------------------------------------------------------
   print_indiv_impact <- function(){
     req(out$run)
@@ -1562,7 +1562,7 @@ server <- function(input, output, session){
 
 
   ##################################################
-  ## Impact : GLOBAL (for all types of analysis)
+  ## Impact (text) : GLOBAL (for all types of analysis)
   ##------------------------------------------------
   print_impact <- function(){
     req(out$run)
@@ -1595,7 +1595,7 @@ server <- function(input, output, session){
 
 
   #############################################
-  ## Probability of extinction
+  ## Text : Probability of extinction
   ##-------------------------------------------
   print_PrExt <- function(){
     req(out$run)
@@ -1627,8 +1627,37 @@ server <- function(input, output, session){
   }, rownames = TRUE)
 
 
+
   #############################################
-  ## Plot Impacts
+  ## Plot : Cumulative distribution of Impact
+  ##-------------------------------------------
+  plot_out_ECDF <- function(legend_position, text_size){
+    if(is.null(out$run)) {} else {
+
+      n_scen <- dim(out$run$N)[3]
+      Legend <- NULL
+      if(out$analysis_choice == "single_farm") Legend <- c("Parc 1")
+      if(out$analysis_choice == "cumulated") Legend <- c("Parc 1", paste("... + Parc", (3:n_scen)-1))
+      if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", 1:(n_scen-1))
+
+      ECDF_impact(N = out$run$N, show_quantile = 1-(input$risk_A/100), xlims = c(0,100),
+                  percent = TRUE, xlab = "Relative impact (%)", ylab = "Cumulative density",
+                  Legend = Legend, legend_position = legend_position, text_size = text_size)
+    }
+  }
+
+  output$title_ECDF_plot <- renderText({
+    if(input$run > 0){
+      paste("Résultat : Distribution cumulative de l'impact relatif à", param$time_horizon, "ans")
+    }
+  })
+
+  output$ECDF_plot <- renderPlot({
+    plot_out_ECDF(legend_position = "right", text_size = "large")
+  })
+
+  #############################################
+  ## Plot Impacts over time
   ##-------------------------------------------
   ## Function to plot the impact
   plot_out_impact <- function(legend_position, text_size){

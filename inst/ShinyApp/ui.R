@@ -316,9 +316,9 @@ rm(list = ls(all.names = TRUE))
                                                                                 options = list(container='body')
                                                                       )
                                                        ),
-                                                       value = matrix(c(8, 0.5, 2010,
-                                                                        3, 0.5, 2015,
-                                                                        15, 0.5, 2018),
+                                                       value = matrix(c(2, 0.5, 2010,
+                                                                        5, 0.5, 2015,
+                                                                        3, 0.5, 2018),
                                                                       nrow = 3, ncol = 3, byrow = TRUE,
                                                                       dimnames = list(c(paste0("Parc num.", c(1:3))),
                                                                                       c("Moyenne",
@@ -403,18 +403,18 @@ rm(list = ls(all.names = TRUE))
                                          # Interval
                                          numericInput(inputId = "pop_size_lower",
                                                       label = "Borne inférieure (taille population)",
-                                                      value = 350,
+                                                      value = 750,
                                                       min = 0, max = Inf, step = 10),
 
                                          numericInput(inputId = "pop_size_upper",
                                                       label = "Borne supérieure (taille population)",
-                                                      value = 350,
+                                                      value = 850,
                                                       min = 0, max = Inf, step = 10),
 
                                          # Values
                                          numericInput(inputId = "pop_size_mean",
                                                       label = "Moyenne de la taille de la population",
-                                                      value = 200,
+                                                      value = 800,
                                                       min = 0, max = Inf, step = 50),
 
                                          numericInput(inputId = "pop_size_se",
@@ -726,7 +726,7 @@ rm(list = ls(all.names = TRUE))
                  br(),
                  numericInput(inputId = "nsim",
                               label = "Nombre de simulations",
-                              value = 10, min = 0, max = Inf, step = 10),
+                              value = 100, min = 0, max = Inf, step = 10),
 
                  br(),
                  actionButton(inputId = "run", label = "Lancer l'analyse"),
@@ -740,29 +740,54 @@ rm(list = ls(all.names = TRUE))
                  ## Outputs
                  {conditionalPanel("output.hide_results",
 
+                    ## Choose CI
                     sliderInput("show_CI", label = "Intervalle de confiance (%)", min = 0, max = 100, value = 95, step = 1),
 
+                    # Text : Indiv impact
                     span(textOutput("title_indiv_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
                     strong(span(tableOutput("indiv_impact_table"), style="color:green; font-size:18px", align = "left")),
 
                     hr(),
 
+                    # Text : Global impact
                     span(textOutput("title_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
                     strong(span(tableOutput("impact_table"), style="color:blue; font-size:18px", align = "left")),
 
                     hr(),
 
+                    # Text : Pr. Extinction
                     br(),
                     span(textOutput("title_PrExt_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
                     strong(span(tableOutput("PrExt_table"), style="color:orange; font-size:18px", align = "left")),
 
+
+                    ## Choose "quantile" : level of under-estimation risk (1 - QT)
+                    sliderInput("risk_A", label = "Risque (%) de sous-estimation de l'impact", min = 0, max = 100, value = 5, step = 0.5),
+                    hr(),
+
+                    ## Choose "scenario" to show
+                    hr(),
+
+                    ## Text : Quantile impact
+                    span(textOutput("title_quantile_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
+                    strong(span(tableOutput("quantile_impact"), style="color:blue; font-size:18px", align = "left")),
+
                     br(),
                     hr(),
 
+                    ## Graph : Cumulative Distibution (ECDF)
+                    tags$h4(textOutput("title_ECDF_plot"), align = "center"),
+                    plotOutput("ECDF_plot", width = "100%", height = "550px"),
+                    hr(),
+
+
+                    ## Graph : Relative Impact over time
                     tags$h4(textOutput("title_impact_plot"), align = "center"),
                     plotOutput("impact_plot", width = "100%", height = "550px"),
                     hr(),
 
+
+                    ## Graph : Population trajectory (pop size over time)
                     tags$h4(textOutput("title_traj_plot"), align = "center"),
                     br(),
 
@@ -779,6 +804,8 @@ rm(list = ls(all.names = TRUE))
                                  inline = TRUE
                                  ),
                     plotOutput("traj_plot", width = "100%", height = "550px")
+                    ##
+
                  )}, # close conditional panel
         )}, # End tabPanel
 
