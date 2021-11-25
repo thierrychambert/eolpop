@@ -7,9 +7,9 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 100
+nsim = 500
 
-pop_size_mean = 800
+pop_size_mean = 300
 pop_size_se = 0
 pop_size_type = "Npair"
 
@@ -19,8 +19,8 @@ carrying_capacity_se = 100
 
 #(4.8/100)*sum(N000[-1])
 #(0.7/100)*sum(N000[-1])
-fatalities_mean = c(0, 3)#, 5, 0.8) #c(0, 5, 3, 4, 2, 1, 4, 2, 2, 3)
-fatalities_se = c(0, 0.5)#, 0.5, 0.5) # c(0, rep(0.5,9))
+fatalities_mean = c(0, 3, 5, 0.8) #c(0, 5, 3, 4, 2, 1, 4, 2, 2, 3)
+fatalities_se = c(0, 0.5, 0.5, 0.5) # c(0, rep(0.5,9))
 length(fatalities_mean)
 onset_year = c(2010, 2013, 2016) #, 2016, 2017, 2019, 2020, 2020, 2020, 2021) #rep(2010, 10)#
 
@@ -34,7 +34,7 @@ onset_year = c(2010, 2013, 2016) #, 2016, 2017, 2019, 2020, 2020, 2020, 2021) #r
 survivals <- c(0.3, 0.65)
 fecundities <- c(0, 4.5)
 
-pop_growth_mean = 0.94
+pop_growth_mean = 0.98
 # lambda( build_Leslie(s = survivals, f = fecundities) )
 pop_growth_se = 0
 
@@ -46,7 +46,7 @@ fatal_constant = "M"
 
 
 #if(length(fatalities_mean) > 2) cumulated_impacts = TRUE else cumulated_impacts = FALSE
-cumulated_impacts = FALSE
+cumulated_impacts = TRUE
 
 
 length(onset_year)
@@ -156,6 +156,12 @@ get_metrics(N = out$run$N)$scenario$impact[time_horizon, ,-1] %>% round(.,2)
 
 res = get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)
 names(res)
+
+
+
+
+
+
 
 
 dr_N <- res$indiv_farm$DR_N

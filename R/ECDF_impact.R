@@ -84,7 +84,7 @@ ECDF_impact <- function(N, show_quantile = 0.95, xlims = NULL,
                        breaks = scales::pretty_breaks(n = 10),
                        sec.axis = sec_axis(trans = ~.*1, name = "",
                                            breaks = scales::pretty_breaks(n = 10))) +
-    scale_x_continuous(limits = xlims, expand = expansion(mult = c(0.015, 0)),
+    scale_x_continuous(limits = xlims, expand = expansion(mult = c(0.001, 0.001)),
                        breaks = scales::pretty_breaks(n = 10))
 
 
