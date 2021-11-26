@@ -649,7 +649,7 @@ rm(list = ls(all.names = TRUE))
     ##  Side Panel : Parameter information
     {sidebarPanel(
 
-      p("Valeurs sélectionnées", style="font-size:28px",
+      p("Valeurs sélectionnées", style="font-size:24px",
         bsButton("Q_selected_values", label = "", icon = icon("question"), size = "extra-small"),
         bsTooltip(id = "Q_selected_values",
                   title = "Rappel des valeurs de paramètres actuellement sélectionnées.",
@@ -660,39 +660,30 @@ rm(list = ls(all.names = TRUE))
       ),
 
       # Mortalites annuelles
-      {wellPanel(style = "background:#DCDCDC",
-                 p("Mortalités annuelles", style="font-size:20px; font-weight: bold"),
-                 shiny::tags$u(textOutput(outputId = "fatalities_unit_info"), style="font-size:16px"),
-                 p(""),
-                 span(textOutput(outputId = "fatalities_mean_info"), style="font-size:16px"),
-                 span(textOutput(outputId = "fatalities_se_info"), style="font-size:16px"),
-      )},
+      span("Mortalités annuelles", style="font-size:18px; font-weight: bold"),
+      shiny::tags$i(textOutput(outputId = "fatalities_unit_info"), style="font-size:15px"),
+      span(textOutput(outputId = "fatalities_mean_info"), style="font-size:15px"),
+      span(textOutput(outputId = "fatalities_se_info"), style="font-size:15px"),
 
+      br(),
       # Taille de population
-      {wellPanel(style = "background:#DCDCDC",
-                 p("Taille de la population", style="font-size:20px; font-weight: bold"),
-                 shiny::tags$u(textOutput(outputId = "pop_size_unit_info"), style="font-size:16px"),
-                 p(""),
-                 span(textOutput(outputId = "pop_size_mean_info"), style="font-size:16px"),
-                 span(textOutput(outputId = "pop_size_se_info"), style="font-size:16px"),
+      span("Taille de la population", style="font-size:18px; font-weight: bold"),
+      shiny::tags$i(textOutput(outputId = "pop_size_unit_info"), style="font-size:15px"),
+      span(textOutput(outputId = "pop_size_mean_info"), style="font-size:15px"),
+      span(textOutput(outputId = "pop_size_se_info"), style="font-size:15px"),
 
-      )},
-
+      br(),
       # Tendance de la population
-      {wellPanel(style = "background:#DCDCDC",
-                 p(HTML("Taux de croissance (&lambda;)"), style="font-size:20px; font-weight: bold"),
-                 span(textOutput(outputId = "pop_growth_mean_info"), style="font-size:16px"),
-                 span(textOutput(outputId = "pop_growth_se_info"), style="font-size:16px"),
-      )},
+      span(HTML("Taux de croissance (&lambda;)"), style="font-size:18px; font-weight: bold"),
+      span(textOutput(outputId = "pop_growth_mean_info"), style="font-size:15px"),
+      span(textOutput(outputId = "pop_growth_se_info"), style="font-size:15px"),
 
+      br(),
       # Capacite de charge
-      {wellPanel(style = "background:#DCDCDC",
-                 p("Capacité de charge", style="font-size:20px; font-weight: bold"),
-                 shiny::tags$u(textOutput(outputId = "carrying_capacity_unit_info"), style="font-size:16px"),
-                 p(""),
-                 span(textOutput(outputId = "carrying_capacity_mean_info"), style="font-size:16px"),
-                 span(textOutput(outputId = "carrying_capacity_se_info"), style="font-size:16px"),
-      )},
+      span("Capacité de charge", style="font-size:18px; font-weight: bold"),
+      shiny::tags$i(textOutput(outputId = "carrying_capacity_unit_info"), style="font-size:15px"),
+      span(textOutput(outputId = "carrying_capacity_mean_info"), style="font-size:15px"),
+      span(textOutput(outputId = "carrying_capacity_se_info"), style="font-size:15px"),
 
 
     )}, # End sidebarPanel
@@ -726,108 +717,22 @@ rm(list = ls(all.names = TRUE))
                  br(),
                  numericInput(inputId = "nsim",
                               label = "Nombre de simulations",
-                              value = 100, min = 0, max = Inf, step = 10),
+                              value = 10, min = 0, max = Inf, step = 10),
 
                  br(),
                  actionButton(inputId = "run", label = "Lancer l'analyse"),
 
                  br(" "),
+                 br(" "),
                  span(textOutput("run_time"), align = "left", style = "font-weight: normal; font-size: 16px;"),
 
-                 hr(),
+                 #hr(),
+                 #br(),
+                 #actionButton(inputId = "show_results", label = "Résultats"),
+                 #p("Résultats", style="font-size:28px"),
 
 
-                 ## Outputs
-                 {conditionalPanel("output.hide_results",
 
-                    ## Choose CI
-                    sliderInput("show_CI", label = "Intervalle de confiance (%)", min = 0, max = 100, value = 95, step = 1),
-
-                    # Text : Indiv impact
-                    span(textOutput("title_indiv_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
-                    strong(span(tableOutput("indiv_impact_table"), style="color:green; font-size:18px", align = "left")),
-
-                    hr(),
-
-                    # Text : Global impact
-                    span(textOutput("title_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
-                    strong(span(tableOutput("impact_table"), style="color:blue; font-size:18px", align = "left")),
-
-                    hr(),
-
-                    # Text : Pr. Extinction
-                    br(),
-                    span(textOutput("title_PrExt_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
-                    strong(span(tableOutput("PrExt_table"), style="color:orange; font-size:18px", align = "left")),
-
-
-                    ######################################################################################################
-
-                    ## Text : Desnity impact
-                    span(textOutput("title_density_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
-                    strong(span(tableOutput("density_impact"), style="color:blue; font-size:18px", align = "left")),
-
-                    br(),
-                    hr(),
-
-                    ## Graph : Probability Density (PDF)
-                    tags$h4(textOutput("title_PDF_plot"), align = "center"),
-                    plotOutput("PDF_plot", width = "100%", height = "550px"),
-                    hr(),
-
-                    ######################################################################################################
-
-
-                    ## Choose "quantile" : level of under-estimation risk (1 - QT)
-                    sliderInput("risk_A", label = "Risque (%) de sous-estimation de l'impact", min = 0, max = 100, value = 5, step = 0.5),
-                    hr(),
-
-                    ## Choose "scenario" to show
-                    radioButtons("show_scenario", label = "Choix du scénario",
-                                 choices = c("all")),
-                    hr(),
-
-                    ## Text : Quantile impact
-                    span(textOutput("title_quantile_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
-                    strong(span(tableOutput("quantile_impact"), style="color:blue; font-size:18px", align = "left")),
-
-                    br(),
-                    hr(),
-
-                    ## Graph : Cumulative Distibution (ECDF)
-                    tags$h4(textOutput("title_ECDF_plot"), align = "center"),
-                    plotOutput("ECDF_plot", width = "100%", height = "550px"),
-                    hr(),
-
-                    ######################################################################################################
-
-
-                    ## Graph : Relative Impact over time
-                    tags$h4(textOutput("title_impact_plot"), align = "center"),
-                    plotOutput("impact_plot", width = "100%", height = "550px"),
-                    hr(),
-
-
-                    ## Graph : Population trajectory (pop size over time)
-                    tags$h4(textOutput("title_traj_plot"), align = "center"),
-                    br(),
-
-                    wellPanel(
-                    span(textOutput("warning_traj_plot"), align = "left", style = "font-size: 14px;"),
-                    ),
-
-                    br(" "),
-                    radioButtons(inputId = "age_class_show",
-                                 label = "Classes d'âge à inclure sur le graphe",
-                                 choices = c("Tous âges sauf juvéniles" = "NotJuv0",
-                                             "Tous âges, y compris juvéniles" = "all",
-                                             "Nombre de couples" = "pairs"),
-                                 inline = TRUE
-                                 ),
-                    plotOutput("traj_plot", width = "100%", height = "550px")
-                    ##
-
-                 )}, # close conditional panel
         )}, # End tabPanel
 
 
@@ -848,7 +753,136 @@ rm(list = ls(all.names = TRUE))
       ) # End tabSetPanel
     )} # End mainPanel
 
-  )} # sidebarLayout
+  )}, # sidebarLayout
+
+
+  ###############################################################################################################################
+  hr(),
+
+  ## Results : text
+  {sidebarLayout(
+
+    ##  Side Panel
+    {conditionalPanel("output.hide_show_CI",
+      {sidebarPanel(
+        ##
+        ## Choose CI
+        sliderInput("show_CI", label = "Intervalle de confiance (%)", min = 0, max = 100, value = 95, step = 1),
+        hr(),
+      )}, # End sidebarPanel
+    )}, # close conditional panel
+
+    #######################################################
+
+    {mainPanel(
+      ## Outputs
+      {conditionalPanel("output.hide_results",
+        ##
+        # Text : Global impact
+        {column(
+          width = 7,
+          span(textOutput("title_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
+          strong(span(tableOutput("impact_table"), style="color:blue; font-size:18px", align = "left")),
+        )},
+
+        {column(
+          width = 5,
+          span(textOutput("title_PrExt_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
+          strong(span(tableOutput("PrExt_table"), style="color:orange; font-size:18px", align = "left")),
+        )},
+        ##
+      )}, # close conditional panel
+    )}, # End mainPanel
+
+
+  )}, # sidebarLayout
+
+
+  ###############################################################################################################################
+  hr(),
+
+  ## Results : Graphs
+  {sidebarLayout(
+
+    ##  Side Panel
+    {conditionalPanel("output.hide_graph_choice",
+      {sidebarPanel(
+                        ##
+                        ## Choose which graph to show
+                        radioButtons("choose_graph", label = h5(strong("Graphique (choix)")),
+                                     choices = c(
+                                       "Impact final : densité de probabilité" = "show_PDF",
+                                       "Impact final : probabilité cumulée" = "show_ECDF",
+                                       "Impact relatif au cours du temps" = "show_impact_time",
+                                       "Projections démographiques" = "show_demog_proj"
+                                     )),
+
+                        br(),
+                        ## Choose "scenario" to show
+                        radioButtons("show_scenario", label = h5(strong("Choix du scénario")),
+                                     choices = c("all")),
+
+                        br(),
+                        hr(),
+                        br(),
+
+                        ## Choose "quantile" : level of under-estimation risk (1 - QT)
+                        conditionalPanel("output.hide_risk_A",
+                          wellPanel(style = "background:#F0F8FF",
+                            sliderInput("risk_A", label = "Risque (%) de sous-estimation de l'impact", min = 0, max = 100, value = 5, step = 0.5),
+                          )
+                        ), # close conditional panel
+
+                        ##
+      )}, # End sidebarPanel
+    )}, # close conditional panel
+
+    #######################################################
+
+    {mainPanel(
+      ## Graph : Probability Density (PDF)
+      {conditionalPanel("output.hide_graph_PDF",
+                        tags$h4(textOutput("title_PDF_plot"), align = "center"),
+                        plotOutput("PDF_plot", width = "100%", height = "550px"),
+      )}, # close conditional panel
+
+      ## Graph : Cumulative Distibution (ECDF)
+      {conditionalPanel("output.hide_graph_ECDF",
+                        tags$h4(textOutput("title_ECDF_plot"), align = "center"),
+                        plotOutput("ECDF_plot", width = "100%", height = "550px"),
+      )}, # close conditional panel
+
+      ## Graph : Relative Impact over time
+      {conditionalPanel("output.hide_graph_impact_time",
+                        tags$h4(textOutput("title_impact_plot"), align = "center"),
+                        plotOutput("impact_plot", width = "100%", height = "550px"),
+      )}, # close conditional panel
+
+      ## Graph : Population trajectory (pop size over time)
+      {conditionalPanel("output.hide_graph_demog_proj",
+                        tags$h4(textOutput("title_traj_plot"), align = "center"),
+                        br(),
+
+                        wellPanel(
+                          span(textOutput("warning_traj_plot"), align = "left", style = "font-size: 14px;"),
+                        ),
+
+                        br(" "),
+                        radioButtons(inputId = "age_class_show",
+                                     label = "Classes d'âge à inclure sur le graphe",
+                                     choices = c("Tous âges sauf juvéniles" = "NotJuv0",
+                                                 "Tous âges, y compris juvéniles" = "all",
+                                                 "Nombre de couples" = "pairs"),
+                                     inline = TRUE
+                        ),
+                        plotOutput("traj_plot", width = "100%", height = "550px")
+                        ##
+      )}, # close conditional panel
+
+    )}, # End mainPanel
+
+
+  )}, # sidebarLayout
 
 )} # FluidPage
 
