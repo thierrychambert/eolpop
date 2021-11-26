@@ -2,6 +2,7 @@
 #'
 #' @param N a 4-D array containing demographic projection outputs
 #' @param show_CI value between 0 and 1. The quantile to display on the plot
+#' @param center choose either "median" or "mode" to display central value
 #' @param sel_sc scenario to display on the plot. Either "all" or the ID number of a given scenario.
 #' @param xlims a vector of 2 values. x-axis limits (lower and upper).
 #' @param percent a logical value indicating whether the impact should be displayed in % (y axis).

@@ -7,6 +7,7 @@
 density_impact(
   N,
   show_CI = 0.95,
+  center = "median",
   sel_sc = "all",
   xlims = NULL,
   percent = TRUE,
@@ -22,6 +23,8 @@ density_impact(
 \item{N}{a 4-D array containing demographic projection outputs}
 
 \item{show_CI}{value between 0 and 1. The quantile to display on the plot}
+
+\item{center}{choose either "median" or "mode" to display central value}
 
 \item{sel_sc}{scenario to display on the plot. Either "all" or the ID number of a given scenario.}
 
