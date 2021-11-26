@@ -20,7 +20,7 @@
 #' @import ggplot2
 #'
 #'
-density_impact <- function(N, show_CI = 0.95, sel_sc = "all", xlims = NULL,
+density_impact <- function(N, show_CI = 0.95, center = "median", sel_sc = "all", xlims = NULL,
                         percent = TRUE, xlab = "Relative impact (%)", ylab = "Probability density",
                         Legend = NULL, legend_position = "right", text_size = "large", ...){
 
@@ -139,7 +139,7 @@ density_impact <- function(N, show_CI = 0.95, sel_sc = "all", xlims = NULL,
                                         xend = .data$xend,
                                         y = .data$y,
                                         yend = .data$yend),
-                          color=ColoR, size = 2)
+                          color=ColoR, size = 1.5, linetype="dotted")
 
 
     # Add UCI vlines
@@ -155,12 +155,19 @@ density_impact <- function(N, show_CI = 0.95, sel_sc = "all", xlims = NULL,
                                    xend = .data$xend,
                                    y = .data$y,
                                    yend = .data$yend),
-                     color=ColoR, size = 2)
+                     color=ColoR, size = 1.5, linetype="dotted")
 
 
     # Add CENTRAL VALUE vlines
-    xQT <- get_density(dat = p$data, QT = "mode")$x
-    yend <- get_density(dat = p$data, QT = "mode")$yend
+    if(center == "mode"){
+      xQT <- get_density(dat = p$data, QT = "mode")$x
+      yend <- get_density(dat = p$data, QT = "mode")$yend
+    }else{
+      xQT <- apply(-out[TH,,], 2, quantile, probs = 0.5)
+      xQT <- xQT[-1]
+      yend <- get_density(dat = p$data, QT = xQT)$yend
+      if(sel_sc != "all") xQT <- xQT[sel_sc]
+    }
 
     df_MED <- data.frame(x = xQT, xend = xQT, y = 0, yend = yend)
     p <- p + geom_segment(data = df_MED,
