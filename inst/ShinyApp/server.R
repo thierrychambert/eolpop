@@ -1628,6 +1628,65 @@ server <- function(input, output, session){
 
 
 
+
+
+
+  #############################################
+  ## Graphs (PDF & ECDF) : choose scenario
+  ##-------------------------------------------
+  # Choose which scenario(s) to show
+  observe({
+    if(!is.null(out$run)){
+      n_scen <- dim(out$run$N)[3] - 1
+
+      choices <- c("all", paste(1:n_scen))
+      names(choices) <- c("Tous", paste("Scenario", 1:n_scen))
+
+      updateRadioButtons(session, "show_scenario",
+                         label = "Choix du scénario",
+                         choices = choices, # c("all", paste("scénario", 1:n_scen)),
+                         selected = "all"
+      )
+    }
+  })
+
+  #############################################
+  ## Plot : Porbability Density of Impact
+  ##-------------------------------------------
+  plot_out_PDF <- function(legend_position, text_size, show_scenario){
+    if(is.null(out$run)) {} else {
+
+      n_scen <- dim(out$run$N)[3]
+      Legend <- NULL
+      if(out$analysis_choice == "single_farm") Legend <- c("Parc 1")
+      if(out$analysis_choice == "cumulated") Legend <- c("Parc 1", paste("... + Parc", (3:n_scen)-1))
+      if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", 1:(n_scen-1))
+
+      density_impact(N = out$run$N, show_CI = input$show_CI/100, center = "median",
+                    sel_sc = show_scenario, xlims = c(0,100),
+                    percent = TRUE, xlab = "Relative impact (%)", ylab = "Cumulative density",
+                    Legend = Legend, legend_position = legend_position, text_size = text_size)
+    }
+  }
+
+  output$title_PDF_plot <- renderText({
+    if(input$run > 0){
+      paste("Résultat : Densité de probabilité de l'impact relatif à", param$time_horizon, "ans")
+    }
+  })
+
+  output$PDF_plot <- renderPlot({
+    plot_out_PDF(legend_position = "right", text_size = "large", show_scenario = input$show_scenario)
+  })
+
+
+
+
+
+
+
+
+
   #############################################
   ## Plot : Cumulative distribution of Impact
   ##-------------------------------------------
@@ -1646,22 +1705,6 @@ server <- function(input, output, session){
                   Legend = Legend, legend_position = legend_position, text_size = text_size)
     }
   }
-
-  # Choose which scenario(s) to show
-  observe({
-    if(!is.null(out$run)){
-      n_scen <- dim(out$run$N)[3] - 1
-
-      choices <- c("all", paste(1:n_scen))
-      names(choices) <- c("Tous", paste("Scenario", 1:n_scen))
-
-      updateRadioButtons(session, "show_scenario",
-                         label = "Choix du scénario",
-                         choices = choices, # c("all", paste("scénario", 1:n_scen)),
-                         selected = "all"
-      )
-    }
-  })
 
   output$title_ECDF_plot <- renderText({
     if(input$run > 0){
