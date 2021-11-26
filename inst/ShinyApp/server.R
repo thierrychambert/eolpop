@@ -1631,7 +1631,7 @@ server <- function(input, output, session){
   #############################################
   ## Plot : Cumulative distribution of Impact
   ##-------------------------------------------
-  plot_out_ECDF <- function(legend_position, text_size){
+  plot_out_ECDF <- function(legend_position, text_size, show_scenario){
     if(is.null(out$run)) {} else {
 
       n_scen <- dim(out$run$N)[3]
@@ -1640,11 +1640,28 @@ server <- function(input, output, session){
       if(out$analysis_choice == "cumulated") Legend <- c("Parc 1", paste("... + Parc", (3:n_scen)-1))
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", 1:(n_scen-1))
 
-      ECDF_impact(N = out$run$N, show_quantile = 1-(input$risk_A/100), xlims = c(0,100),
+      ECDF_impact(N = out$run$N, show_quantile = 1-(input$risk_A/100), sel_sc = show_scenario,
+                  xlims = c(0,100),
                   percent = TRUE, xlab = "Relative impact (%)", ylab = "Cumulative density",
                   Legend = Legend, legend_position = legend_position, text_size = text_size)
     }
   }
+
+  # Choose which scenario(s) to show
+  observe({
+    if(!is.null(out$run)){
+      n_scen <- dim(out$run$N)[3] - 1
+
+      choices <- c("all", paste(1:n_scen))
+      names(choices) <- c("Tous", paste("Scenario", 1:n_scen))
+
+      updateRadioButtons(session, "show_scenario",
+                         label = "Choix du scénario",
+                         choices = choices, # c("all", paste("scénario", 1:n_scen)),
+                         selected = "all"
+      )
+    }
+  })
 
   output$title_ECDF_plot <- renderText({
     if(input$run > 0){
@@ -1653,7 +1670,7 @@ server <- function(input, output, session){
   })
 
   output$ECDF_plot <- renderPlot({
-    plot_out_ECDF(legend_position = "right", text_size = "large")
+    plot_out_ECDF(legend_position = "right", text_size = "large", show_scenario = input$show_scenario)
   })
 
   #############################################

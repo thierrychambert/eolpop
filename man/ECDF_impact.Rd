@@ -7,6 +7,7 @@
 ECDF_impact(
   N,
   show_quantile = 0.95,
+  sel_sc = "all",
   xlims = NULL,
   percent = TRUE,
   xlab = "Relative impact (\%)",
@@ -21,6 +22,8 @@ ECDF_impact(
 \item{N}{a 4-D array containing demographic projection outputs}
 
 \item{show_quantile}{value between 0 and 1. The quantile to display on the plot}
+
+\item{sel_sc}{scenario to display on the plot. Either "all" or the ID number of a given scenario.}
 
 \item{xlims}{a vector of 2 values. x-axis limits (lower and upper).}
 

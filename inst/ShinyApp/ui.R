@@ -761,11 +761,16 @@ rm(list = ls(all.names = TRUE))
                     strong(span(tableOutput("PrExt_table"), style="color:orange; font-size:18px", align = "left")),
 
 
+                    ######################################################################################################
+
+
                     ## Choose "quantile" : level of under-estimation risk (1 - QT)
                     sliderInput("risk_A", label = "Risque (%) de sous-estimation de l'impact", min = 0, max = 100, value = 5, step = 0.5),
                     hr(),
 
                     ## Choose "scenario" to show
+                    radioButtons("show_scenario", label = "Choix du scénario",
+                                 choices = c("all")),
                     hr(),
 
                     ## Text : Quantile impact
@@ -779,6 +784,25 @@ rm(list = ls(all.names = TRUE))
                     tags$h4(textOutput("title_ECDF_plot"), align = "center"),
                     plotOutput("ECDF_plot", width = "100%", height = "550px"),
                     hr(),
+
+                    ######################################################################################################
+
+                    ## Choose "scenario" to show
+                    hr(),
+
+                    ## Text : Quantile impact
+                    #span(textOutput("title_quantile_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
+                    #strong(span(tableOutput("quantile_impact"), style="color:blue; font-size:18px", align = "left")),
+
+                    br(),
+                    hr(),
+
+                    ## Graph : Cumulative Distibution (ECDF)
+                    #tags$h4(textOutput("title_ECDF_plot"), align = "center"),
+                    #plotOutput("ECDF_plot", width = "100%", height = "550px"),
+                    hr(),
+
+                    ######################################################################################################
 
 
                     ## Graph : Relative Impact over time

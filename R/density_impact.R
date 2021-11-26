@@ -26,6 +26,7 @@ density_impact <- function(N, show_CI = 0.95, center = "median", sel_sc = "all",
                         Legend = NULL, legend_position = "right", text_size = "large", ...){
 
     # select subset of legends, if needed
+    if(sel_sc != "all") sel_sc = as.numeric(sel_sc)
     if(sel_sc != "all") Legend = Legend[sel_sc]
 
     # Get metrics and dimensions
