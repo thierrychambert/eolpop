@@ -36,6 +36,65 @@ server <- function(input, output, session){
 
 
   ##############################################
+  ##  Reactive values
+  ##--------------------------------------------
+  out <- reactiveValues(run = NULL, run_time = NULL, msg = NULL, show_scen_options = FALSE)
+
+  rv <- reactiveValues(distAVG = NULL, dist = NULL)
+
+  ready <- reactiveValues(fatalities = TRUE, pop_size = TRUE, pop_growth = TRUE, carrying_capacity = TRUE)
+
+  param <- reactiveValues(N1 = NULL,
+                          nsim = NULL,
+                          cumulated_impacts = FALSE,
+
+                          fatalities_mean = NULL,
+                          fatalities_mean_nb = NULL,
+                          fatalities_se = NULL,
+                          fatalities_se_nb = NULL,
+                          onset_time = NULL,
+                          onset_year = NULL,
+                          out_fatal = NULL,
+
+                          pop_size_mean = NULL,
+                          pop_size_se = NULL,
+                          pop_size_unit = NULL,
+
+                          pop_growth_mean = NULL,
+                          pop_growth_mean_use = NULL,
+                          pop_growth_se = NULL,
+
+                          fecundities = NULL,
+                          survivals = NULL,
+                          s_calib0 = NULL,
+                          f_calib0 = NULL,
+                          s_calibrated = NULL,
+                          f_calibrated = NULL,
+                          vr_calibrated = NULL,
+
+                          carrying_capacity_mean = NULL,
+                          carrying_capacity_se = NULL,
+
+
+                          theta = NULL,
+                          rMAX_species = NULL,
+
+                          model_demo = NULL,
+                          time_horizon = NULL,
+                          coeff_var_environ = NULL,
+                          fatal_constant = NULL,
+
+                          fatalities_eli_result = NULL,
+                          pop_size_eli_result = NULL,
+                          pop_growth_eli_result = NULL,
+                          carrying_cap_eli_result = NULL
+  )
+  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
+
+
+
+  #####
+  ##############################################
   ##  Hide/Show : level 1
   ##--------------------------------------------
 
@@ -220,12 +279,16 @@ server <- function(input, output, session){
 
     shinyjs::hide("age_class_show")
 
+    shinyjs::hide("show_scenario")
+    if(out$show_scen_options){
+      shinyjs::show("show_scenario")
+    }
+
     #------------
     # Show some
     #------------
     # Show inputs for fatalities part
     if(input$button_fatalities%%2 == 1){
-      #shinyjs::show("fatal_constant")
 
       # Show inputs for single farm option (non-cumulated impacts)
       if(input$analysis_choice == "single_farm"){
@@ -336,66 +399,6 @@ server <- function(input, output, session){
 
   }) # en observe show/hide
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
-
-
-  #####
-
-  ##############################################
-  ##  Reactive values
-  ##--------------------------------------------
-  out <- reactiveValues(run = NULL, run_time = NULL, msg = NULL)
-
-  rv <- reactiveValues(distAVG = NULL, dist = NULL)
-
-  ready <- reactiveValues(fatalities = TRUE, pop_size = TRUE, pop_growth = TRUE, carrying_capacity = TRUE)
-
-  param <- reactiveValues(N1 = NULL,
-                          nsim = NULL,
-                          cumulated_impacts = FALSE,
-
-                          fatalities_mean = NULL,
-                          fatalities_mean_nb = NULL,
-                          fatalities_se = NULL,
-                          fatalities_se_nb = NULL,
-                          onset_time = NULL,
-                          onset_year = NULL,
-                          out_fatal = NULL,
-
-                          pop_size_mean = NULL,
-                          pop_size_se = NULL,
-                          pop_size_unit = NULL,
-
-                          pop_growth_mean = NULL,
-                          pop_growth_mean_use = NULL,
-                          pop_growth_se = NULL,
-
-                          fecundities = NULL,
-                          survivals = NULL,
-                          s_calib0 = NULL,
-                          f_calib0 = NULL,
-                          s_calibrated = NULL,
-                          f_calibrated = NULL,
-                          vr_calibrated = NULL,
-
-                          carrying_capacity_mean = NULL,
-                          carrying_capacity_se = NULL,
-
-
-                          theta = NULL,
-                          rMAX_species = NULL,
-
-                          model_demo = NULL,
-                          time_horizon = NULL,
-                          coeff_var_environ = NULL,
-                          fatal_constant = NULL,
-
-                          fatalities_eli_result = NULL,
-                          pop_size_eli_result = NULL,
-                          pop_growth_eli_result = NULL,
-                          carrying_cap_eli_result = NULL
-  )
-  ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
-
 
 
   #####
@@ -1538,12 +1541,12 @@ server <- function(input, output, session){
     input$run
   }, {
 
-    print(param$pop_growth_mean_use)
-
     if(ready$fatalities & ready$pop_size & ready$pop_growth & ready$carrying_capacity){
 
       out$analysis_choice <- input$analysis_choice
       out$species_choice <- input$species_choice
+      if(out$analysis_choice != "single_farm") out$show_scen_options <- TRUE
+
       start_time <- Sys.time()
 
       withProgress(message = 'Simulation progress', value = 0, {
