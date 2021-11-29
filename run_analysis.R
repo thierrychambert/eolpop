@@ -157,6 +157,13 @@ get_metrics(N = out$run$N)$scenario$impact[time_horizon, ,-1] %>% round(.,2)
 res = get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)
 names(res)
 
+N_0 = N
+
+N=N_0
+
+
+
+
 
 plot_impact(N, sel_sc = "3", show_CI = 0.999, Legend = paste("sc", (1:length(fatalities_mean))-1))
 

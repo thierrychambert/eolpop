@@ -9,6 +9,7 @@ plot_traj(
   age_class_use = "NotJuv0",
   fecundities = NULL,
   onset_year = NULL,
+  sel_sc = "all",
   xlab = "Year",
   ylab = "Population size",
   Legend = NULL,
@@ -27,6 +28,8 @@ if age_class_use = "pairs", to determine which age classes are mature (thus cont
 
 \item{onset_year}{a vector containing the years of each wind farm start being active
 (thus, the year at whihc each fatality value starts kicking in)}
+
+\item{sel_sc}{scenario to display on the plot. Either "all" or the ID number of a given scenario.}
 
 \item{xlab}{a character string. Label for the x axis.}
 
