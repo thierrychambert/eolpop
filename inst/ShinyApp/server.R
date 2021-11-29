@@ -1714,7 +1714,7 @@ server <- function(input, output, session){
 
 
   # Function to plot trajectories
-  plot_out_traj <- function(){
+  plot_out_traj <- function(show_scenario){
     if(is.null(out$run)) {
     } else {
 
@@ -1727,7 +1727,8 @@ server <- function(input, output, session){
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", (1:n_scen)-1)
 
       # Plot population trajectories
-      plot_traj(N = out$run$N, age_class_use = input$age_class_show, fecundities = param$f_calibrated, onset_year = param$onset_year,
+      plot_traj(N = out$run$N, age_class_use = input$age_class_show, fecundities = param$f_calibrated,
+                onset_year = param$onset_year, sel_sc = show_scenario,
                 xlab = "\nAnnée", ylab = "Taille de population\n", Legend = Legend, ylim = c(0, NA))}
   }
 
@@ -1892,7 +1893,7 @@ server <- function(input, output, session){
 
 
   output$traj_plot <- renderPlot({
-    out$trajectory_plot <- plot_out_traj()
+    out$trajectory_plot <- plot_out_traj(show_scenario = input$show_scenario)
     out$trajectory_plot
   })
   #####
