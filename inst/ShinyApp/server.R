@@ -1696,7 +1696,7 @@ server <- function(input, output, session){
 
 
   ## Function to plot the relative impact over time
-  plot_out_impact <- function(legend_position, text_size){
+  plot_out_impact <- function(legend_position, text_size, show_scenario){
     if(is.null(out$run)) {} else {
 
       n_scen <- dim(out$run$N)[3]
@@ -1705,7 +1705,8 @@ server <- function(input, output, session){
       if(out$analysis_choice == "cumulated") Legend <- c("Sans parc", "+ Parc 1", paste("... + Parc", (3:n_scen)-1))
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", (1:n_scen)-1)
 
-      plot_impact(N = out$run$N, onset_year = param$onset_year, percent = TRUE, show_CI = input$show_CI/100,
+      plot_impact(N = out$run$N, onset_year = param$onset_year, sel_sc = show_scenario,
+                  percent = TRUE, show_CI = input$show_CI/100,
                   xlab = "\nAnnée", ylab = "Impact relatif (%)\n", Legend = Legend,
                   legend_position = legend_position, text_size = text_size)
     }
@@ -1864,7 +1865,7 @@ server <- function(input, output, session){
   })
 
   output$impact_plot <- renderPlot({
-    plot_out_impact(legend_position = "right", text_size = "large")
+    plot_out_impact(legend_position = "right", text_size = "large", show_scenario = input$show_scenario)
   })
 
 
@@ -2067,7 +2068,7 @@ server <- function(input, output, session){
   observeEvent({
     input$run
   }, {
-    out$impact_plot <- plot_out_impact(legend_position = "bottom", text_size = "small")
+    out$impact_plot <- plot_out_impact(legend_position = "bottom", text_size = "small", show_scenario = "all")
   })
 
 
