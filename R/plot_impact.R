@@ -6,6 +6,7 @@
 #' @param N a 4-D array containing demographic projection outputs
 #' @param onset_year a vector containing the years of each wind farm start being active
 #' (thus, the year at whihc each fatality value starts kicking in)
+#' @param sel_sc scenario to display on the plot. Either "all" or the ID number of a given scenario.
 #' @param percent a logical value indicating whether the impact should be displayed in % (y axis).
 #' If FALSE, the impact value displayed is between 0 and -1 (negative impact).
 #' @param show_CI value between 0 and 1. The limits of C.I. to calculate
@@ -24,8 +25,12 @@
 #' @import ggplot2
 #'
 #'
-plot_impact <- function(N, onset_year = NULL, percent = TRUE, show_CI = 0.95, xlab = "Year", ylab = "Relative impact (%)",
+plot_impact <- function(N, onset_year = NULL, sel_sc = "all", percent = TRUE, show_CI = 0.95, xlab = "Year", ylab = "Relative impact (%)",
                         Legend = NULL, legend_position = "right", text_size = "large", ...){
+
+  # select subset of legends, if needed
+  if(sel_sc != "all") sel_sc = as.numeric(sel_sc)
+  if(sel_sc != "all") Legend = Legend[c(1, sel_sc+1)]
 
   # Get metrics and dimensions
   out <- get_metrics(N)$scenario$DR_N
@@ -41,9 +46,15 @@ plot_impact <- function(N, onset_year = NULL, percent = TRUE, show_CI = 0.95, xl
   CI <- apply(out[,,], c(1,3), quantile, probs = c(0.5, 1-(1-show_CI)/2, (1-show_CI)/2))
   rownames(CI) <- c("avg", "lci", "uci")
 
+
   # Build dataframe
-  df <- as.data.frame(cbind(year = years, t(CI[,,1]), scenario = 1))
-  for(j in 2:nsc) df <- rbind(df, cbind(year = years, t(CI[,,j]), scenario = j))
+  if(sel_sc == "all"){
+    df <- as.data.frame(cbind(year = years, t(CI[,,1]), scenario = 1))
+    for(j in 2:nsc) df <- rbind(df, cbind(year = years, t(CI[,,j]), scenario = j))
+  }else{
+    df <- as.data.frame(cbind(year = years, t(CI[,,1]), scenario = 1))
+    df <- rbind(df, cbind(year = years, t(CI[,,sel_sc+1]), scenario = sel_sc+1))
+  }
 
   ## Define Graphic Parameters
   size = 1.5
@@ -57,9 +68,10 @@ plot_impact <- function(N, onset_year = NULL, percent = TRUE, show_CI = 0.95, xl
       aes(ymin = .data$uci, ymax = .data$lci, fill = factor(.data$scenario)), linetype = 0, alpha = 0.100)
 
   # change color palette (we want sc0 in black)
+  if(sel_sc == "all") ColoR <- custom_palette_c25()[1:nsc] else ColoR <- custom_palette_c25()[c(1, sel_sc + 1)]
+
   p <- p +
-    scale_color_manual(breaks = 1:nsc,
-                       values = custom_palette_c25()[1:nsc],
+    scale_color_manual(values = ColoR,
                        labels = Legend, aesthetics = c("colour", "fill"))
 
 

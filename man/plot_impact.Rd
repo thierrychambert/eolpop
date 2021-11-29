@@ -7,6 +7,7 @@
 plot_impact(
   N,
   onset_year = NULL,
+  sel_sc = "all",
   percent = TRUE,
   show_CI = 0.95,
   xlab = "Year",
@@ -22,6 +23,8 @@ plot_impact(
 
 \item{onset_year}{a vector containing the years of each wind farm start being active
 (thus, the year at whihc each fatality value starts kicking in)}
+
+\item{sel_sc}{scenario to display on the plot. Either "all" or the ID number of a given scenario.}
 
 \item{percent}{a logical value indicating whether the impact should be displayed in \% (y axis).
 If FALSE, the impact value displayed is between 0 and -1 (negative impact).}

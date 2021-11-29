@@ -158,6 +158,7 @@ res = get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)
 names(res)
 
 
+plot_impact(N, sel_sc = "3", show_CI = 0.999, Legend = paste("sc", (1:length(fatalities_mean))-1))
 
 
 
@@ -182,7 +183,6 @@ ECDF_impact(N, show_quantile = 0.975, sel_sc = 3,
 
 ###
 
-plot_impact(N, show_CI = 0.999, Legend = paste("sc", 1:length(fatalities_mean)))
 
 
 
