@@ -11,6 +11,10 @@ rm(list = ls(all.names = TRUE))
   library(tidyverse)
   library(eolpop)
   library(popbio)
+  library(knitr)
+  library(kableExtra)
+
+  options(knitr.table.format = "latex")
 
   ## Load species list
   species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")

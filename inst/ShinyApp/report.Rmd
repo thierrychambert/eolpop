@@ -1,5 +1,7 @@
 ---
 title: "Rapport : analyse démographique (eolpop)"
+header-includes:
+- \usepackage{booktabs}
 output: pdf_document
 params:
   intro: NA
@@ -27,17 +29,24 @@ params:
   carrying_cap_val1: NA
   carrying_cap_val2: NA
   
+  PDF_plot: NA
+  ECDF_plot: NA
   impact_plot: NA
-  trajectory_plot : NA
+  #trajectory_plot : NA
+  
+  time_horizon: NA
+  impact_table: NA
+  PrExt_table: NA 
 ---
-
 
 ### Type d'analyse realisée : `r paste(params$analysis)`
 
 ### Espèce choisie: `r paste(params$species)`  
-  
-  
 
+### Horizon temporel: `r paste(params$time_horizon)` ans    
+    
+***
+  
 ## Contexte de l'étude
 `r paste(params$intro)`
 
@@ -51,7 +60,7 @@ params:
 # Paramètres d'entrée utilisés
 
 ## Mortalités annuelles
-`r paste(params$fatalities_unit)`  
+*`r paste(params$fatalities_unit)`*  
 `r paste(params$fatalities_input_type)`  
   
 **`r paste(params$fatalities_val1)` `r paste(params$fatalities_val2)`**
@@ -59,7 +68,7 @@ params:
 
 
 ## Taille de la population
-`r paste(params$pop_size_unit)`  
+*`r paste(params$pop_size_unit)`*  
 `r paste(params$pop_size_input_type)`  
   
 **`r paste(params$pop_size_val1)` `r paste(params$pop_size_val2)`**
@@ -74,7 +83,7 @@ params:
 
 
 ## Capacité de charge
-`r paste(params$carrying_cap_unit)`  
+*`r paste(params$carrying_cap_unit)`*  
 `r paste(params$carrying_cap_input_type)`  
   
 **`r paste(params$carrying_cap_val1)` `r paste(params$carrying_cap_val2)`**
@@ -85,12 +94,37 @@ params:
 
 # Résultats
 
+```{r, echo=FALSE}
+library(kableExtra)
+```
+
+## Impact global estimé au bout de `r params$time_horizon` ans
+```{r, echo=FALSE}
+kable(params$impact_table, align = "ccc", booktabs=T) %>% 
+  kable_styling(font_size = 20)
+```  
+
+## `r paste("Probabilité d'extinction à", params$time_horizon, "ans")`
+```{r, echo=FALSE}
+kbl(params$PrExt_table, align = "c", booktabs=T)
+```  
+
+
+
+## Graphique : Densité de probabilité de l'impact relatif (final)
+```{r, echo=FALSE}
+params$PDF_plot
+```
+
+
+## Graphique : Probabilité cumulée de l'impact relatif (final)
+```{r, echo=FALSE}
+params$ECDF_plot
+```
+
+
 ## Graphique : Impact relatif au cours du temps
 ```{r, echo=FALSE}
 params$impact_plot
 ```
 
-## Graphique : Trajectoires demographiques
-```{r, echo=FALSE}
-params$trajectory_plot
-```

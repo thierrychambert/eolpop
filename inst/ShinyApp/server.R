@@ -1623,7 +1623,7 @@ server <- function(input, output, session){
   }
 
   ## Function to print the global impacts
-  print_impact <- function(){
+  print_impact <- function(show_CI){
     req(out$run)
     res <- get_metrics(N = out$run$N, cumulated_impacts = FALSE)
     n_scen <- (dim(res$scenario$impact)[3]-1)
@@ -1633,7 +1633,7 @@ server <- function(input, output, session){
     if(out$analysis_choice == "cumulated") RowNam <- c("Parc 1", paste("... + Parc", (2:n_scen)))
     if(out$analysis_choice == "multi_scenario") RowNam <- paste("Scenario", (1:n_scen))
 
-    fil <- paste0(round(t(quantiles_impact(res$scenario$DR_N, show_quantile = NULL, show_CI = input$show_CI/100)$CI)[-1,]), "%")
+    fil <- paste0(round(t(quantiles_impact(res$scenario$DR_N, show_quantile = NULL, show_CI = show_CI)$CI)[-1,]), "%")
     matrix(fil,
            nrow = n_scen,
            dimnames = list(RowNam, c("Impact", "IC (min)", "IC (max)"))
@@ -1654,13 +1654,13 @@ server <- function(input, output, session){
     fil <- paste0(round(t(res$scenario$Pext),2)*100, "%")
     matrix(fil,
            nrow = n_scen,
-           dimnames = list(RowNam, c("Probabilité d'extinction"))
+           dimnames = list(RowNam, c("Prob. extinction"))
     )
   }
 
 
   ## Function to plot the probability density of the impact
-  plot_out_PDF <- function(legend_position, text_size, show_scenario){
+  plot_out_PDF <- function(legend_position, text_size, show_scenario, show_CI){
     if(is.null(out$run)) {} else {
 
       n_scen <- dim(out$run$N)[3]
@@ -1669,16 +1669,16 @@ server <- function(input, output, session){
       if(out$analysis_choice == "cumulated") Legend <- c("Parc 1", paste("... + Parc", (3:n_scen)-1))
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", 1:(n_scen-1))
 
-      density_impact(N = out$run$N, show_CI = input$show_CI/100, center = "median",
+      density_impact(N = out$run$N, show_CI = show_CI, center = "median",
                      sel_sc = show_scenario, xlims = c(0,100),
-                     percent = TRUE, xlab = "Relative impact (%)", ylab = "Cumulative density",
+                     percent = TRUE, xlab = "\nImpact relatif (%)", ylab = "Densité de probabilité\n",
                      Legend = Legend, legend_position = legend_position, text_size = text_size)
     }
   }
 
 
   ## Function to plot the cumulative probability density of the impact
-  plot_out_ECDF <- function(legend_position, text_size, show_scenario){
+  plot_out_ECDF <- function(legend_position, text_size, show_scenario, show_quantile){
     if(is.null(out$run)) {} else {
 
       n_scen <- dim(out$run$N)[3]
@@ -1687,16 +1687,16 @@ server <- function(input, output, session){
       if(out$analysis_choice == "cumulated") Legend <- c("Parc 1", paste("... + Parc", (3:n_scen)-1))
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", 1:(n_scen-1))
 
-      ECDF_impact(N = out$run$N, show_quantile = 1-(input$risk_A/100), sel_sc = show_scenario,
+      ECDF_impact(N = out$run$N, show_quantile = show_quantile, sel_sc = show_scenario,
                   xlims = c(0,100),
-                  percent = TRUE, xlab = "Relative impact (%)", ylab = "Cumulative density",
+                  percent = TRUE, xlab = "\nImpact relatif (%)", ylab = "Densité de probabilité cumulée\n",
                   Legend = Legend, legend_position = legend_position, text_size = text_size)
     }
   }
 
 
   ## Function to plot the relative impact over time
-  plot_out_impact <- function(legend_position, text_size, show_scenario){
+  plot_out_impact <- function(legend_position, text_size, show_scenario, show_CI){
     if(is.null(out$run)) {} else {
 
       n_scen <- dim(out$run$N)[3]
@@ -1706,7 +1706,7 @@ server <- function(input, output, session){
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", (1:n_scen)-1)
 
       plot_impact(N = out$run$N, onset_year = param$onset_year, sel_sc = show_scenario,
-                  percent = TRUE, show_CI = input$show_CI/100,
+                  percent = TRUE, show_CI = show_CI,
                   xlab = "\nAnnée", ylab = "Impact relatif (%)\n", Legend = Legend,
                   legend_position = legend_position, text_size = text_size)
     }
@@ -1736,23 +1736,6 @@ server <- function(input, output, session){
   ##################################################
   ## Impact (text) : GLOBAL (for all types of analysis)
   ##------------------------------------------------
-  print_impact <- function(){
-    req(out$run)
-    res <- get_metrics(N = out$run$N, cumulated_impacts = FALSE)
-    n_scen <- (dim(res$scenario$impact)[3]-1)
-
-    RowNam <- NULL
-    if(out$analysis_choice == "single_farm") RowNam <- c("Parc 1")
-    if(out$analysis_choice == "cumulated") RowNam <- c("Parc 1", paste("... + Parc", (2:n_scen)))
-    if(out$analysis_choice == "multi_scenario") RowNam <- paste("Scenario", (1:n_scen))
-
-    fil <- paste0(round(t(quantiles_impact(res$scenario$DR_N, show_quantile = NULL, show_CI = input$show_CI/100)$CI)[-1,]), "%")
-    matrix(fil,
-           nrow = n_scen,
-           dimnames = list(RowNam, c("Impact", "IC (min)", "IC (max)"))
-    )
-  } # end function print_impact
-
   # Display title
   output$title_impact_result <- renderText({
     req(input$run)
@@ -1762,30 +1745,14 @@ server <- function(input, output, session){
   # Display impact result (table)
   output$impact_table <- renderTable({
     req(input$run)
-    print_impact()
-  }, rownames = TRUE)
+    out$impact_table <- print_impact(show_CI = input$show_CI/100)
+    out$impact_table
+  }, rownames = TRUE, align = "lccc", width = "auto")
 
 
   #############################################
   ## Text : Probability of extinction
   ##-------------------------------------------
-  print_PrExt <- function(){
-    req(out$run)
-    res <- get_metrics(N = out$run$N, cumulated_impacts = FALSE)
-    n_scen <- dim(res$scenario$impact)[3]
-
-    RowNam <- NULL
-    if(out$analysis_choice == "single_farm") RowNam <- c("Sans parc", "Avec parc")
-    if(out$analysis_choice == "cumulated") RowNam <- c("Sans parc", "+ Parc 1", paste("... + Parc", (3:n_scen)-1))
-    if(out$analysis_choice == "multi_scenario") RowNam <- paste("Scenario", (1:n_scen)-1)
-
-    fil <- paste0(round(t(res$scenario$Pext),2)*100, "%")
-    matrix(fil,
-           nrow = n_scen,
-           dimnames = list(RowNam, c("Pr. extinction"))
-    )
-  } # end function print_PrExt
-
   # Display title
   output$title_PrExt_result <- renderText({
     req(input$run)
@@ -1795,8 +1762,9 @@ server <- function(input, output, session){
   # Display impact result (table)
   output$PrExt_table <- renderTable({
     req(input$run)
-    print_PrExt()
-  }, rownames = TRUE)
+    out$PrExt_table <- print_PrExt()
+    out$PrExt_table
+  }, rownames = TRUE, align = "c", width = "auto")
 
 
 
@@ -1832,7 +1800,8 @@ server <- function(input, output, session){
   })
 
   output$PDF_plot <- renderPlot({
-    plot_out_PDF(legend_position = "right", text_size = "large", show_scenario = input$show_scenario)
+    plot_out_PDF(legend_position = "right", text_size = "large",
+                 show_scenario = input$show_scenario, show_CI = input$show_CI/100)
   })
 
   #############################################
@@ -1845,13 +1814,15 @@ server <- function(input, output, session){
   })
 
   output$ECDF_plot <- renderPlot({
-    plot_out_ECDF(legend_position = "right", text_size = "large", show_scenario = input$show_scenario)
+    plot_out_ECDF(legend_position = "right", text_size = "large",
+                  show_scenario = input$show_scenario, show_quantile = 1-(input$risk_A/100))
   })
 
 
   output$quantile_impact_result <- renderText({
     dr_N <- get_metrics(N = out$run$N, cumulated_impacts = param$cumulated_impacts)$scenario$DR_N
     QT <- quantiles_impact(dr_N, show_quantile = 1-(input$risk_A/100), show_CI = NULL, percent = TRUE)$QT[-1]
+    out$QT <- QT
     paste0("Scénario ", 1:length(QT), " : ", round(QT,1), "%\n", collapse = "")
   })
 
@@ -1866,7 +1837,8 @@ server <- function(input, output, session){
   })
 
   output$impact_plot <- renderPlot({
-    plot_out_impact(legend_position = "right", text_size = "large", show_scenario = input$show_scenario)
+    plot_out_impact(legend_position = "right", text_size = "large",
+                    show_scenario = input$show_scenario, show_CI = input$show_CI/100)
   })
 
 
@@ -1893,8 +1865,7 @@ server <- function(input, output, session){
 
 
   output$traj_plot <- renderPlot({
-    out$trajectory_plot <- plot_out_traj(show_scenario = input$show_scenario)
-    out$trajectory_plot
+    plot_out_traj(show_scenario = input$show_scenario)
   })
   #####
 
@@ -1903,16 +1874,17 @@ server <- function(input, output, session){
   #############################################
   ## Save outputs for report
   ##-------------------------------------------
-  # Type d'analyse
+  # Type of analysis & time horizon ####
   observeEvent({
     input$run
   }, {
+    out$time_horizon <- param$time_horizon
     if(out$analysis_choice == "single_farm") out$analysis_choice_report <- "Impacts non cumulés"
     if(out$analysis_choice == "cumulated") out$analysis_choice_report <- "Impacts cumulés"
     if(out$analysis_choice == "multi_scenario") out$analysis_choice_report <- "Multiple scénarios"
   })
 
-  # Fatalities
+  # Fatalities ####
   observeEvent({
     input$run
   }, {
@@ -1943,7 +1915,7 @@ server <- function(input, output, session){
   })
 
 
-  # Population Size
+  # Population Size ####
   observeEvent({
     input$run
   }, {
@@ -1974,7 +1946,7 @@ server <- function(input, output, session){
   })
 
 
-  # Population Growth rate
+  # Population Growth rate ####
   observeEvent({
     input$run
   }, {
@@ -1996,8 +1968,7 @@ server <- function(input, output, session){
       out$pop_growth_val2 <- paste0("Erreur_type : ", round(param$pop_growth_eli_result$SE, 2), unit)
     }
 
-    ## TREND
-
+    ## TREND ####
     if(input$pop_growth_input_type == "trend"){
       out$pop_growth_input_type <- "Saisie : tendance"
 
@@ -2022,10 +1993,9 @@ server <- function(input, output, session){
         out$pop_growth_val1 <- V1
         out$pop_growth_val2 <- V2
     }
-
   })
 
-  # Carrying capacity
+  # Carrying capacity ####
   observeEvent({
     input$run
   }, {
@@ -2063,13 +2033,22 @@ server <- function(input, output, session){
   })
 
 
-  ## Results
 
-  # Graphs
+  #####
+
+  ## Results #####
+  # Graphs ####
   observeEvent({
     input$run
+    input$show_CI
+    input$risk_A
   }, {
-    out$impact_plot <- plot_out_impact(legend_position = "bottom", text_size = "small", show_scenario = "all")
+    out$PDF_plot <- plot_out_PDF(legend_position = "bottom", text_size = "small",
+                                 show_scenario = "all", show_CI = input$show_CI/100)
+    out$ECDF_plot <- plot_out_ECDF(legend_position = "bottom", text_size = "small",
+                                   show_scenario = "all", show_quantile = 1-(input$risk_A/100))
+    out$impact_plot <- plot_out_impact(legend_position = "bottom", text_size = "small",
+                                       show_scenario = "all", show_CI = input$show_CI/100)
   })
 
 
@@ -2120,8 +2099,14 @@ server <- function(input, output, session){
         carrying_cap_val1 = out$carrying_cap_val1,
         carrying_cap_val2 = out$carrying_cap_val2,
 
+        PDF_plot = out$PDF_plot,
+        ECDF_plot = out$ECDF_plot,
         impact_plot = out$impact_plot,
-        trajectory_plot = out$trajectory_plot
+        #trajectory_plot = out$trajectory_plot
+
+        time_horizon = out$time_horizon,
+        impact_table = out$impact_table,
+        PrExt_table = out$PrExt_table
         )
 
 
