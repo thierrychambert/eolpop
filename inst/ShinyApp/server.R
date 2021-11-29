@@ -1844,6 +1844,13 @@ server <- function(input, output, session){
   })
 
 
+  output$quantile_impact_result <- renderText({
+    dr_N <- get_metrics(N = out$run$N, cumulated_impacts = param$cumulated_impacts)$scenario$DR_N
+    QT <- quantiles_impact(dr_N, show_quantile = 1-(input$risk_A/100), show_CI = NULL, percent = TRUE)$QT[-1]
+    paste0("Scénario ", 1:length(QT), " : ", round(QT,1), "%\n", collapse = "")
+  })
+
+
   #############################################
   ## Plot Impacts over time
   ##-------------------------------------------

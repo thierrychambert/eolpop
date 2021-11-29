@@ -7,7 +7,7 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 500
+nsim = 50
 
 pop_size_mean = 300
 pop_size_se = 0
@@ -163,12 +163,20 @@ names(res)
 
 
 
+# indiv
+#dr_N <- get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)$indiv_farm$DR_N
 
-dr_N <- res$indiv_farm$DR_N
+# scenario
+dr_N <- get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)$scenario$DR_N
+
+quantiles_impact(dr_N, show_quantile = 0.975, show_CI = NULL, percent = TRUE)$QT[-1]
+
+QT <- quantiles_impact(dr_N, show_quantile = 0.975, show_CI = NULL, percent = TRUE)$QT[-1]
+paste("Scénario", 1:length(QT), ":", round(QT,1), "\n")
 
 ###
 dim(N)
-ECDF_impact(N, show_quantile = 0.95, sel_sc = 1,
+ECDF_impact(N, show_quantile = 0.975, sel_sc = 3,
                         percent = TRUE, xlab = "Relative impact (%)", ylab = "Cumulative density",
                         Legend = NULL, legend_position = "right", text_size = "large")
 

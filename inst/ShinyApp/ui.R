@@ -830,6 +830,12 @@ rm(list = ls(all.names = TRUE))
                         conditionalPanel("output.hide_risk_A",
                           wellPanel(style = "background:#F0F8FF",
                             sliderInput("risk_A", label = "Risque (%) de sous-estimation de l'impact", min = 0, max = 100, value = 5, step = 0.5),
+
+                            br(),
+
+                            h5(strong("Valeur (quantile) de l'impact")),
+                            #, style = "font-weight: bold; font-size: 18px;")
+                            span(verbatimTextOutput("quantile_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
                           )
                         ), # close conditional panel
 
