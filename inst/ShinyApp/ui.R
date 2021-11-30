@@ -751,7 +751,7 @@ rm(list = ls(all.names = TRUE))
                                 width = "1000px"),
 
                   br(" "),
-                  downloadButton("report", "Generate report")
+                  downloadButton("report", "Produire un rapport")
         )} # End tabPanel
 
       ) # End tabSetPanel
