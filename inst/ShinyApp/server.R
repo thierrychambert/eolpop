@@ -1472,6 +1472,15 @@ server <- function(input, output, session){
     )
     param$s_calibrated <- head(param$vr_calibrated, length(param$survivals))
     param$f_calibrated <- tail(param$vr_calibrated, length(param$fecundities))
+
+    # Make matrix of vital rate values for the report
+    tab_species <- make_mat_vr(data_sf = data_sf, species = input$species_choice)
+    ages <- tab_species$classes_age
+    out$vital_rates_mat <- matrix(data = round(c(param$s_calibrated, param$f_calibrated), 2),
+                                  nrow = length(param$s_calibrated),
+                                  ncol = 2,
+                                  dimnames = list(ages, c("Survie", "Fécondité"))
+    )
   })
   #####
 
@@ -2109,6 +2118,7 @@ server <- function(input, output, session){
         analysis = out$analysis_choice_report,
         species = out$species_choice,
         def_pop_text = input$def_pop_text,
+        vital_rates_mat = out$vital_rates_mat,
         #vital_rates = out$vital_rates,
 
         fatalities_unit = out$fatalities_unit,

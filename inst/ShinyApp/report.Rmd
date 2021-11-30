@@ -8,7 +8,7 @@ params:
   analysis: NA
   species: NA
   def_pop_text: NA
-  #vital_rates: NA
+  vital_rates_mat: NA
   
   fatalities_unit: NA
   fatalities_input_type: NA
@@ -94,6 +94,13 @@ params:
 `r paste(params$carrying_cap_input_type)`  
   
 **`r paste(params$carrying_cap_val1)` `r paste(params$carrying_cap_val2)`**
+
+
+## Paramètres démographiques
+```{r, echo=FALSE}
+kable(params$vital_rates_mat, align = "c", booktabs=T)
+```  
+
 
 
 ***
