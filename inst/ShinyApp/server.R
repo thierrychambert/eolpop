@@ -1640,6 +1640,28 @@ server <- function(input, output, session){
     )
   }
 
+  ## Function to make a table of the impacts at given quantile
+  table_impact_QT <- function(show_quantile){
+    req(out$run)
+    res <- get_metrics(N = out$run$N, cumulated_impacts = FALSE)
+    n_scen <- (dim(res$scenario$impact)[3]-1)
+
+    RowNam <- NULL
+    if(out$analysis_choice == "single_farm") RowNam <- c("Parc 1")
+    if(out$analysis_choice == "cumulated") RowNam <- c("Parc 1", paste("... + Parc", (2:n_scen)))
+    if(out$analysis_choice == "multi_scenario") RowNam <- paste("Scenario", (1:n_scen))
+
+    dr_N <- get_metrics(N = out$run$N, cumulated_impacts = param$cumulated_impacts)$scenario$DR_N
+    fil <- paste0(round(
+      quantiles_impact(dr_N, show_quantile = 1-(input$risk_A/100), show_CI = NULL, percent = TRUE)$QT[-1]
+      , 1), "%")
+
+    matrix(fil,
+           nrow = n_scen,
+           dimnames = list(RowNam, c("Impact au quantile"))
+    )
+  }
+
   ## Function to print the Probability of Extinction
   print_PrExt <- function(){
     req(out$run)
@@ -1657,7 +1679,6 @@ server <- function(input, output, session){
            dimnames = list(RowNam, c("Prob. extinction"))
     )
   }
-
 
   ## Function to plot the probability density of the impact
   plot_out_PDF <- function(legend_position, text_size, show_scenario, show_CI){
@@ -1822,8 +1843,7 @@ server <- function(input, output, session){
   output$quantile_impact_result <- renderText({
     dr_N <- get_metrics(N = out$run$N, cumulated_impacts = param$cumulated_impacts)$scenario$DR_N
     impact_QT <- quantiles_impact(dr_N, show_quantile = 1-(input$risk_A/100), show_CI = NULL, percent = TRUE)$QT[-1]
-    out$impact_QT <- impact_QT
-    paste0("Scénario ", 1:length(impact_QT), " : ", round(impact_QT,1), "%\n", collapse = "")
+    paste0("Scénario ", 1:length(impact_QT), " : ", round(impact_QT,1), "%", collapse = "\n")
   })
 
 
@@ -2027,7 +2047,7 @@ server <- function(input, output, session){
     if(input$carrying_cap_input_type == "no_K"){
       out$carrying_cap_input_type <- NULL
       out$carrying_cap_val1 <- paste0("Absence de capacité de charge")
-      out$carrying_cap_val2 <- paste0("Justifié ou pas ??")
+      out$carrying_cap_val2 <- NULL
     }
 
   })
@@ -2043,6 +2063,7 @@ server <- function(input, output, session){
     input$show_CI
     input$risk_A
   }, {
+    req(input$run > 0)
     out$PDF_plot <- plot_out_PDF(legend_position = "bottom", text_size = "small",
                                  show_scenario = "all", show_CI = input$show_CI/100)
     out$ECDF_plot <- plot_out_ECDF(legend_position = "bottom", text_size = "small",
@@ -2053,6 +2074,12 @@ server <- function(input, output, session){
     out$CI <- input$show_CI
     out$QT <- 100-(input$risk_A)
     out$risk_A <- input$risk_A
+
+    #dr_N <- get_metrics(N = out$run$N, cumulated_impacts = param$cumulated_impacts)$scenario$DR_N
+    #out$impact_QT <- quantiles_impact(dr_N, show_quantile = 1-(input$risk_A/100), show_CI = NULL, percent = TRUE)$QT[-1]
+    out$impact_QT_table <- table_impact_QT(show_quantile = 1-(input$risk_A/100))
+
+    print(out$impact_QT_table)
   })
 
 
@@ -2115,7 +2142,7 @@ server <- function(input, output, session){
         CI = out$CI,
         QT = out$QT,
         risk_A = out$risk_A,
-        impact_QT = out$impact_QT
+        impact_QT_table = out$impact_QT_table
         )
 
 
