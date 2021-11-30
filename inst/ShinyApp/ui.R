@@ -837,7 +837,7 @@ rm(list = ls(all.names = TRUE))
 
                             br(),
 
-                            h5(strong("Valeur (quantile) de l'impact")),
+                            h5(strong("Valeur de l'impact au quantile choisi")),
                             #, style = "font-weight: bold; font-size: 18px;")
                             span(verbatimTextOutput("quantile_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
                           )

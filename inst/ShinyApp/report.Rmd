@@ -37,11 +37,18 @@ params:
   time_horizon: NA
   impact_table: NA
   PrExt_table: NA 
+  
+  CI: NA
+  QT: NA
+  risk_A: NA
+  impact_QT: NA
 ---
+
+### Date de création: `r strftime(Sys.Date(), "%d/%m/%Y")`  
 
 ### Type d'analyse realisée : `r paste(params$analysis)`
 
-### Espèce choisie: `r paste(params$species)`  
+### Espèce analysée: `r paste(params$species)`  
 
 ### Horizon temporel: `r paste(params$time_horizon)` ans    
     
@@ -100,9 +107,12 @@ library(kableExtra)
 
 ## Impact global estimé au bout de `r params$time_horizon` ans
 ```{r, echo=FALSE}
-kable(params$impact_table, align = "ccc", booktabs=T) %>% 
-  kable_styling(font_size = 20)
+kable(params$impact_table, align = "ccc", booktabs=T)
 ```  
+Note : Intervalle de confiance (IC) à `r params$CI`%
+
+## Valeur de l'impact au quantile de `r params$QT`%  
+`r paste0("Scénario ", 1:length(params$impact_QT), " : ", round(as.numeric(params$impact_QT),1), "%\n", collapse = "")`
 
 ## `r paste("Probabilité d'extinction à", params$time_horizon, "ans")`
 ```{r, echo=FALSE}
@@ -115,16 +125,17 @@ kbl(params$PrExt_table, align = "c", booktabs=T)
 ```{r, echo=FALSE}
 params$PDF_plot
 ```
-
+Note : La médiane et l'intervalle de confiance (IC à `r params$CI`%) sont montrés sur le graphe.  
 
 ## Graphique : Probabilité cumulée de l'impact relatif (final)
 ```{r, echo=FALSE}
 params$ECDF_plot
 ```
-
+Note : Quantile = `r params$QT`%,  
+soit un risque de sous-estimation de l'impact de `r params$risk_A`%  
 
 ## Graphique : Impact relatif au cours du temps
 ```{r, echo=FALSE}
 params$impact_plot
 ```
-
+Note : Intervalle de confiance (IC) à `r params$CI`%  

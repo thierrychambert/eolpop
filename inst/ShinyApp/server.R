@@ -1821,9 +1821,9 @@ server <- function(input, output, session){
 
   output$quantile_impact_result <- renderText({
     dr_N <- get_metrics(N = out$run$N, cumulated_impacts = param$cumulated_impacts)$scenario$DR_N
-    QT <- quantiles_impact(dr_N, show_quantile = 1-(input$risk_A/100), show_CI = NULL, percent = TRUE)$QT[-1]
-    out$QT <- QT
-    paste0("Scénario ", 1:length(QT), " : ", round(QT,1), "%\n", collapse = "")
+    impact_QT <- quantiles_impact(dr_N, show_quantile = 1-(input$risk_A/100), show_CI = NULL, percent = TRUE)$QT[-1]
+    out$impact_QT <- impact_QT
+    paste0("Scénario ", 1:length(impact_QT), " : ", round(impact_QT,1), "%\n", collapse = "")
   })
 
 
@@ -2049,6 +2049,10 @@ server <- function(input, output, session){
                                    show_scenario = "all", show_quantile = 1-(input$risk_A/100))
     out$impact_plot <- plot_out_impact(legend_position = "bottom", text_size = "small",
                                        show_scenario = "all", show_CI = input$show_CI/100)
+
+    out$CI <- input$show_CI
+    out$QT <- 100-(input$risk_A)
+    out$risk_A <- input$risk_A
   })
 
 
@@ -2106,7 +2110,12 @@ server <- function(input, output, session){
 
         time_horizon = out$time_horizon,
         impact_table = out$impact_table,
-        PrExt_table = out$PrExt_table
+        PrExt_table = out$PrExt_table,
+
+        CI = out$CI,
+        QT = out$QT,
+        risk_A = out$risk_A,
+        impact_QT = out$impact_QT
         )
 
 
