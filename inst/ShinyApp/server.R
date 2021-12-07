@@ -5,10 +5,10 @@ server <- function(input, output, session){
   ##  Fixed parameters in the server environment
   ##-------------------------------------------------
   ## Load species list
-  species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ",")
+  species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ";")
 
   ## Load survival and fecundities data
-  data_sf <- read.csv("./inst/ShinyApp/survivals_fecundities_species.csv", sep = ",")#, encoding = "UTF-8")
+  data_sf <- read.csv("./inst/ShinyApp/data_sf.csv", sep = ";")
 
   # We define theta = 1 (same as in PBR) - for simplicity, given large uncertainty of real shape of density-dependence in nature
   fixed_theta = 1
@@ -987,7 +987,7 @@ server <- function(input, output, session){
   # Function to create the table
   make_mat_popsizes <- function(data_sf, species, pop_size, pop_size_unit, survivals, fecundities){
     nam <- data_sf %>%
-      filter(NomEspece == species) %>%
+      filter(Species_fr == species) %>%
       select(classes_age) %>%
       unlist %>%
       as.vector
@@ -1065,7 +1065,7 @@ server <- function(input, output, session){
   # Function to create the matrix
   make_mat_vr <- function(data_sf, species){
     out_mat <- data_sf %>%
-      filter(NomEspece == species) %>%
+      filter(Species_fr == species) %>%
       select(classes_age, survie, fecondite)
     return(out_mat)
   }
@@ -1167,7 +1167,7 @@ server <- function(input, output, session){
     input$species_choice
   }, {
     distAVG <- species_data %>%
-      filter(NomEspece == input$species_choice) %>%
+      filter(Species_fr == input$species_choice) %>%
       select(DistDispMoyKM)
 
     rv$distAVG <- round(distAVG, 1)
