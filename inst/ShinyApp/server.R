@@ -8,7 +8,14 @@ server <- function(input, output, session){
   species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ";")
 
   ## Load survival and fecundities data
-  data_sf <- read.csv("./inst/ShinyApp/data_sf.csv", sep = ";")
+  data_sf_with_stars <- read.csv("./inst/ShinyApp/data_sf.csv", sep = ";")
+  data_sf <- data_sf_with_stars
+  data_sf$survie <- as.numeric(gsub("p", "", data_sf$survie))
+  data_sf$fecondite <- as.numeric(gsub("p", "", data_sf$fecondite))
+
+  ## Replace p with stars
+  data_sf_with_stars$survie <- gsub("p", "*", data_sf_with_stars$survie)
+  data_sf_with_stars$fecondite <- gsub("p", "*", data_sf_with_stars$fecondite)
 
   # We define theta = 1 (same as in PBR) - for simplicity, given large uncertainty of real shape of density-dependence in nature
   fixed_theta = 1
@@ -1132,7 +1139,7 @@ server <- function(input, output, session){
 
           #input$mat_fill_vr
 
-          tab_species <- make_mat_vr(data_sf = data_sf, species = input$species_choice)
+          tab_species <- make_mat_vr(data_sf = data_sf_with_stars, species = input$species_choice)
           ages <- tab_species$classes_age
           matrix(data = c(param$s_calib0, param$f_calib0),
                   nrow = length(param$s_calib0),
@@ -1149,8 +1156,17 @@ server <- function(input, output, session){
   delay(ms = 300,
         output$lambda0_info <- renderText({
           req(all(!is.na(input$mat_fill_vr)))
-          lam <- lambda(build_Leslie(s = param$s_calib0, f = param$f_calib0))
-          taux <- round(lam-1,4)*100
+
+          if(is.numeric(param$s_calib0) & is.numeric(param$s_calib0)){
+            s_use <- param$s_calib0
+            f_use <- param$f_calib0
+          } else {
+            s_use <- input$mat_fill_vr[,1]
+            f_use <- input$mat_fill_vr[,2]
+          }
+
+          lam <- lambda(build_Leslie(s = s_use, f = f_use))
+          taux <- round((lam-1)*100,1)
           if(taux < 0) Text <- "Déclin : " else Text <- "Croissance : "
           if(taux == 0) Text <- "Population stable : "
           paste0(Text, taux, "% par an")
@@ -1428,8 +1444,9 @@ server <- function(input, output, session){
     param$fecundities <- input$mat_fill_vr[,2]
 
     # for now, until calibration is really done
-    param$s_calib0 <- param$survivals
-    param$f_calib0 <- param$fecundities
+    tab_species <- make_mat_vr(data_sf = data_sf_with_stars, species = input$species_choice)
+    param$s_calib0 <- tab_species$survie
+    param$f_calib0 <- tab_species$fecondite
 
   }) # end observeEvent
   #####

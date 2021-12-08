@@ -125,11 +125,11 @@ rm(list = ls(all.names = TRUE))
                  )
               ),
               #br(),
-              span(textOutput(outputId = "dispersal_mean_info"), style="font-size:16px"),
+              span(textOutput(outputId = "dispersal_mean_info"), style="font-size:14px"),
               br(),
-              span(textOutput(outputId = "dispersal_d03p_info"), style="font-size:16px"),
-              span(textOutput(outputId = "dispersal_d05p_info"), style="font-size:16px"),
-              span(textOutput(outputId = "dispersal_d10p_info"), style="font-size:16px"),
+              span(textOutput(outputId = "dispersal_d03p_info"), style="font-size:12px"),
+              span(textOutput(outputId = "dispersal_d05p_info"), style="font-size:12px"),
+              span(textOutput(outputId = "dispersal_d10p_info"), style="font-size:12px"),
 
       )}, # close column
 
@@ -150,6 +150,7 @@ rm(list = ls(all.names = TRUE))
                    )
                 ),
                 tableOutput(outputId = "vital_rates_info"),
+
               ), # close fluidRow
 
 
@@ -167,7 +168,15 @@ rm(list = ls(all.names = TRUE))
                            options = list(container='body')
                  )
               ),
-              span(textOutput(outputId = "lambda0_info", inline = TRUE), style = "color:black; font-size:16px"),
+              div(textOutput(outputId = "lambda0_info", inline = TRUE), style = "color:black; font-size:16px"),
+
+              br(),
+
+              span("* Les valeurs marquées d'une astérisque ne sont pas issues de la littérature.
+                  Elles ont été inférées à partir des autres valeurs de paramètres.
+                  Il y a donc plus d'incertitude quant à leur exactitude.",
+                  style = "color:black; font-size:12px"),
+
 
       )}, # close column
 
