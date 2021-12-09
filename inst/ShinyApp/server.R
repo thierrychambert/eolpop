@@ -30,9 +30,9 @@ server <- function(input, output, session){
   CP = 0.99
 
   # Values of pop_growth (assumed), when the "trend" option is chosen
-  growth_weak <- 1.05
-  growth_average <- 1.10
-  growth_strong <- 1.15
+  growth_weak <- 1.04
+  growth_average <- 1.08
+  growth_strong <- 1.12
 
   decline_weak <- 0.97
   decline_average <- 0.94
@@ -439,7 +439,7 @@ server <- function(input, output, session){
     updateMatrixInput(session, inputId = "fatalities_mat_cumulated",
                       value =  matrix(fill_mat, nrow = n_farm, ncol = 3, byrow = TRUE,
                                       dimnames = list(paste("Parc", c(1:n_farm)),
-                                                      c("Moyenne",
+                                                      c("Valeur centrale",
                                                         "Erreur-type",
                                                         "Année (début)"))))
   })
@@ -462,7 +462,7 @@ server <- function(input, output, session){
     updateMatrixInput(session, inputId = "fatalities_mat_expert",
                       value = matrix(fill_mat, nrow = n_experts, ncol = 5, byrow = TRUE,
                                      dimnames = list(paste0("#", 1:n_experts),
-                                                     c("Poids", "Min", "Best", "Max", "% IC" ))
+                                                     c("Poids", "Min", "Best", "Max", "%IC" ))
                                      )
                       )
   })
@@ -485,7 +485,7 @@ server <- function(input, output, session){
     updateMatrixInput(session, inputId = "pop_size_mat_expert",
                       value = matrix(fill_mat, nrow = n_experts, ncol = 5, byrow = TRUE,
                                      dimnames = list(paste0("#", 1:n_experts),
-                                                     c("Poids", "Min", "Best", "Max", "% IC" ))
+                                                     c("Poids", "Min", "Best", "Max", "%IC" ))
                       )
     )
   })
@@ -508,7 +508,7 @@ server <- function(input, output, session){
     updateMatrixInput(session, inputId = "pop_growth_mat_expert",
                       value = matrix(fill_mat, nrow = n_experts, ncol = 5, byrow = TRUE,
                                      dimnames = list(paste0("#", 1:n_experts),
-                                                     c("Poids", "Min", "Best", "Max", "% IC" ))
+                                                     c("Poids", "Min", "Best", "Max", "%IC" ))
                       )
     )
   })
@@ -531,7 +531,7 @@ server <- function(input, output, session){
     updateMatrixInput(session, inputId = "carrying_cap_mat_expert",
                       value = matrix(fill_mat, nrow = n_experts, ncol = 5, byrow = TRUE,
                                      dimnames = list(paste0("#", 1:n_experts),
-                                                     c("Poids", "Min", "Best", "Max", "% IC" ))
+                                                     c("Poids", "Min", "Best", "Max", "%IC" ))
                       )
     )
   })
