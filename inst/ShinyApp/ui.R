@@ -90,7 +90,7 @@ rm(list = ls(all.names = TRUE))
                                                 options = list(container='body')
                                       )
                            ),
-                           choices = c("Impacts non cumulés" = "single_farm", "Impacts cumulés" = "cumulated", "Multiple scénarios" = "multi_scenario")
+                           choices = c("Impacts non cumulés" = "single_farm", "Impacts cumulés" = "cumulated", "Scénarios hypothétiques" = "multi_scenario")
               )},
 
               # Choose species (selectInput)
