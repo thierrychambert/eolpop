@@ -817,7 +817,7 @@ server <- function(input, output, session){
         )
       }else{
         ## 3. When analysis = multi_scenarios
-        output$title_distri_plot <- renderText({ "Pas de graphe (pas d'incertitude dans le cas 'mulitple scénarios')" })
+        output$title_distri_plot <- renderText({ "Pas de graphe (pas d'incertitude dans le cas 'scénarios hypothétiques')" })
         output$distri_plot <- NULL
       } # end "else"
 
@@ -1012,8 +1012,15 @@ server <- function(input, output, session){
             matrix("Valeurs de survies et/ ou de fécondités manquantes",
                    nrow = 1, dimnames = list(NULL, "Erreur"))
           }else{
+            if(is.numeric(param$s_calib0) & is.numeric(param$s_calib0)){
+              s_use <- param$s_calib0
+              f_use <- param$f_calib0
+            } else {
+              s_use <- input$mat_fill_vr[,1]
+              f_use <- input$mat_fill_vr[,2]
+            }
             make_mat_popsizes(data_sf = data_sf, species = input$species_choice, pop_size = param$pop_size_mean,
-                              pop_size_unit = input$pop_size_unit, s = param$s_calib0, f = param$f_calib0)
+                              pop_size_unit = input$pop_size_unit, s = s_use, f = f_use)
           } # end if
         },
         width = "500px",
@@ -1443,7 +1450,7 @@ server <- function(input, output, session){
     param$survivals <- input$mat_fill_vr[,1]
     param$fecundities <- input$mat_fill_vr[,2]
 
-    # for now, until calibration is really done
+    # for now, until calibration is really done # parameters to display in the table
     tab_species <- make_mat_vr(data_sf = data_sf_with_stars, species = input$species_choice)
     param$s_calib0 <- tab_species$survie
     param$f_calib0 <- tab_species$fecondite
@@ -1927,7 +1934,7 @@ server <- function(input, output, session){
     out$time_horizon <- param$time_horizon
     if(out$analysis_choice == "single_farm") out$analysis_choice_report <- "Impacts non cumulés"
     if(out$analysis_choice == "cumulated") out$analysis_choice_report <- "Impacts cumulés"
-    if(out$analysis_choice == "multi_scenario") out$analysis_choice_report <- "Multiple scénarios"
+    if(out$analysis_choice == "multi_scenario") out$analysis_choice_report <- "Scénarios hypothétiques"
   })
 
   # Fatalities ####
