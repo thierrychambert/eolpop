@@ -399,9 +399,10 @@ rm(list = ls(all.names = TRUE))
                               br(),
 
                               {wellPanel(style = "background:#FFF8DC",
-                                 radioButtons(inputId = "pop_size_unit", inline = TRUE,
+                                 radioButtons(inputId = "pop_size_unit", inline = FALSE,
                                               label = "Unité",
-                                              choices = c("Nombre de couples" = "Npair", "Effectif total" = "Ntotal"),
+                                              choices = c("Nombre de couples" = "Npair",
+                                                          "Effectif total" = "Ntotal"),
                                               selected = "Npair"),
                               )}, # close wellPanel 1
 
