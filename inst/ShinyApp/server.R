@@ -154,6 +154,15 @@ server <- function(input, output, session){
   })
 
 
+  ## SHOW Result TITLE
+  output$hide_RES_TITLE <- eventReactive({
+    input$run
+  },{
+    if(input$run > 0) TRUE else FALSE
+  }, ignoreInit = TRUE)
+
+  outputOptions(output, "hide_RES_TITLE", suspendWhenHidden = FALSE)
+
   ## Outputs / show CI
   output$hide_show_CI <- eventReactive({
     input$run
