@@ -12,7 +12,7 @@ rm(list = ls(all.names = TRUE))
   library(eolpop)
   library(popbio)
   library(knitr)
-  library(kableExtra)
+  #library(kableExtra)
 
   options(knitr.table.format = "latex")
 
@@ -60,11 +60,40 @@ rm(list = ls(all.names = TRUE))
 ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 ##  User Interface
 ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
-# fluidPage
-{ui <- fluidPage(
+# Define User Interface ########################################################
+{ui <- navbarPage(
+  "EolPop",
+
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  # Tab/Page 1 : About ########################################################
+  {tabPanel(
+    "A propos",
+
+    h4("Présentation"),
+
+    p(HTML("<i>Eolpop</i> est un outil permettant de quantifier l'<b>impact démographique</b>
+    des mortalités aviaires causées par les collisions avec les éoliennes.<br>
+    Il s'agit d'un outil d'aide à la décision, à vocation <i><b>informative</b></i>.
+    Il vise à <i>fournir une évaluation objective</i> des conséquences de la mortalités
+         aviaire à l'échelle des populations.")),
+
+    br(),
+
+    h5("Cette application a été développée par Thierry Chambert dans le cadre du projet MAPE"),
+
+    p(strong("Contact: thierry.chambert@gmail.com")),
+
+    p(tags$a(href="https://shiny.cefe.cnrs.fr/eolpop/Manuel.pdf", "Comment utiliser cette application ?")),
+
+  )}, # End Page 1 #########################################################
+
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
+  # Tab/Page 2 : Analytical tool #############################################
+  {tabPanel(
+    HTML("Outil démographique <i>eolpop</i>"),
 
   useShinyjs(),
-  titlePanel("eolpop : Impact demographique des collisions aviaires avec les éoliennes"),
+  titlePanel("eolpop : Impact démographique des collisions aviaires avec les éoliennes"),
 
 
   ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
@@ -904,7 +933,9 @@ rm(list = ls(all.names = TRUE))
 
   )}, # sidebarLayout
 
-)} # FluidPage
+  )} # End Page 2 ###################################################
+
+)} # End "NavBarPage ###################################################
 
 # End UI #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 
