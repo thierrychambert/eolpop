@@ -46,7 +46,7 @@ params:
 
 ### Date de création: `r strftime(Sys.Date(), "%d/%m/%Y")`
 
-### Type d'analyse realisée : `r paste(params$analysis)`
+### Type d'analyse réalisée : `r paste(params$analysis)`
 
 ### Espèce analysée: `r paste(params$species)`  
 
@@ -58,7 +58,7 @@ params:
 `r paste(params$intro)`
 
 
-## Défintion de la population impactée
+## Définition de la population impactée
 `r paste(params$def_pop_text)`
 
 
