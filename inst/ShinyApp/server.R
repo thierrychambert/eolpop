@@ -292,6 +292,7 @@ server <- function(input, output, session){
 
     shinyjs::hide("mat_fill_vr")
     shinyjs::hide("vr_mat_number_age_classes")
+    shinyjs::hide("button_use_custom_vr")
 
     shinyjs::hide("age_class_show")
 
@@ -403,8 +404,9 @@ server <- function(input, output, session){
 
     # Show inputs vital rates part
     if(input$button_vital_rates%%2 == 1){
-      shinyjs::show("mat_fill_vr")
       shinyjs::show("vr_mat_number_age_classes")
+      shinyjs::show("mat_fill_vr")
+      shinyjs::show("button_use_custom_vr")
     }
 
 
@@ -472,8 +474,8 @@ server <- function(input, output, session){
                       value = matrix(fill_mat, nrow = n_experts, ncol = 5, byrow = TRUE,
                                      dimnames = list(paste0("#", 1:n_experts),
                                                      c("Poids", "Min", "Best", "Max", "%IC" ))
-                                     )
                       )
+    )
   })
   #####
 
@@ -562,8 +564,8 @@ server <- function(input, output, session){
     out <- tryCatch(
       elicitation(vals, Cp, weights), error = function(e)
         return(NULL)
-        #message("Erreur : certaines valeurs dans la matrice d'experts n'ont pas de sens")
-      )
+      #message("Erreur : certaines valeurs dans la matrice d'experts n'ont pas de sens")
+    )
 
     if(!is.null(out)){
       OUT <- list(out = out, mean = out$mean_smooth, SE = sqrt(out$var_smooth))
@@ -810,7 +812,7 @@ server <- function(input, output, session){
         }
       }
 
-    ## 2. When analysis = cumulated impacts
+      ## 2. When analysis = cumulated impacts
     }else{
       if(input$analysis_choice == "cumulated"){
         output$title_distri_plot <- renderText({ "Mortalités annuelles par parc (impacts cumulés)" })
@@ -1021,7 +1023,7 @@ server <- function(input, output, session){
             matrix("Valeurs de survies et/ ou de fécondités manquantes",
                    nrow = 1, dimnames = list(NULL, "Erreur"))
           }else{
-            if(is.numeric(param$s_calib0) & is.numeric(param$s_calib0)){
+            if(is.numeric(param$s_calib0) & is.numeric(param$f_calib0)){
               s_use <- param$s_calib0
               f_use <- param$f_calib0
             } else {
@@ -1035,7 +1037,7 @@ server <- function(input, output, session){
         width = "500px",
         rownames = FALSE,
         digits = 0)
-    )
+  )
 
 
   #################################
@@ -1100,10 +1102,10 @@ server <- function(input, output, session){
     req(input$vr_mat_number_age_classes)
     number_age_class <- input$vr_mat_number_age_classes
     updateMatrixInput(session, inputId = "mat_fill_vr",
-                        value = matrix(data = NA,
-                                       nrow = number_age_class,
-                                       ncol = 2,
-                                       dimnames = list(c(paste("Age", (1:number_age_class)-1)), c("Survie", "Fécondité"))))
+                      value = matrix(data = NA,
+                                     nrow = number_age_class,
+                                     ncol = 2,
+                                     dimnames = list(c(paste("Age", (1:number_age_class)-1)), c("Survie", "Fécondité"))))
   }) # end observeEvent
 
 
@@ -1154,14 +1156,13 @@ server <- function(input, output, session){
         output$vital_rates_info <- renderTable({
 
           #input$mat_fill_vr
-
-          tab_species <- make_mat_vr(data_sf = data_sf_with_stars, species = input$species_choice)
-          ages <- tab_species$classes_age
+          ages <- paste("Age", (1:length(param$s_calib0))-1)
           matrix(data = c(param$s_calib0, param$f_calib0),
-                  nrow = length(param$s_calib0),
-                  ncol = 2,
-                  dimnames = list(ages, c("Survie", "Fécondité"))
-                 )
+                 nrow = length(param$s_calib0),
+                 ncol = 2,
+                 dimnames = list(ages, c("Survie", "Fécondité"))
+          )
+
         }, rownames = TRUE)
   )
 
@@ -1211,7 +1212,7 @@ server <- function(input, output, session){
 
   output$dispersal_mean_info <- renderText({
     paste0("Distance moyenne de dispersion : ", rv$distAVG, " km")
-    })
+  })
 
   output$dispersal_d03p_info <- renderText({
     paste0("Seuil de distance équiv. 3% de dispersion : ", rv$dist[1], " km")
@@ -1296,7 +1297,7 @@ server <- function(input, output, session){
         param$onset_year <- c(min(input$fatalities_mat_cumulated[,3]), input$fatalities_mat_cumulated[,3])
         param$onset_time <- param$onset_year - min(param$onset_year) + 1
 
-        # Case 3 : Scenarios
+        # Case 3 : Hypothetical Scenarios
       }else{
         req(input$fatalities_vec_scenario)
         vec01 <- as.numeric(unlist(strsplit(input$fatalities_vec_scenario, " ")))
@@ -1404,7 +1405,7 @@ server <- function(input, output, session){
           # Case 3 : Values directly provided as lower/upper interval
           ready$pop_growth <- TRUE
           param$pop_growth_mean <- round(get_mu(lower = make_lambda(input$pop_growth_lower),
-                                                          upper = make_lambda(input$pop_growth_upper)), 4)
+                                                upper = make_lambda(input$pop_growth_upper)), 4)
           param$pop_growth_se <- round(get_sd(lower = make_lambda(input$pop_growth_lower),
                                               upper = make_lambda(input$pop_growth_upper), coverage = CP), 5)
         } # end (if3)
@@ -1464,12 +1465,23 @@ server <- function(input, output, session){
     param$s_calib0 <- tab_species$survie
     param$f_calib0 <- tab_species$fecondite
 
+    #param$s_calib0 <- input$mat_fill_vr[,1]
+    #param$f_calib0 <- input$mat_fill_vr[,2]
+
   }) # end observeEvent
   #####
 
   #############################################
   ## Calibration of survivals & fecundities
   ##-------------------------------------------
+  ## Information display : update when hand filling values
+  observeEvent({
+    input$button_use_custom_vr
+  },{
+    param$s_calib0 <- input$mat_fill_vr[,1]
+    param$f_calib0 <- input$mat_fill_vr[,2]
+  })
+
   ## Calibration 1 : just for information display
   observeEvent({
     input$button_calibrate_vr
@@ -1506,14 +1518,29 @@ server <- function(input, output, session){
     param$s_calibrated <- head(param$vr_calibrated, length(param$survivals))
     param$f_calibrated <- tail(param$vr_calibrated, length(param$fecundities))
 
+
     # Make matrix of vital rate values for the report
-    tab_species <- make_mat_vr(data_sf = data_sf, species = input$species_choice)
-    ages <- tab_species$classes_age
-    out$vital_rates_mat <- matrix(data = round(c(param$s_calibrated, param$f_calibrated), 2),
-                                  nrow = length(param$s_calibrated),
-                                  ncol = 2,
-                                  dimnames = list(ages, c("Survie", "Fécondité"))
-    )
+    if(is.numeric(param$s_calib0) & is.numeric(param$f_calib0)){
+      s_use <- param$s_calib0
+      f_use <- param$f_calib0
+    } else {
+      s_use <- input$mat_fill_vr[,1]
+      f_use <- input$mat_fill_vr[,2]
+    }
+
+    ages <- paste("Age", (1:length(s_use))-1)
+    out$vital_rates_mat <-
+      matrix(data = round(c(s_use, f_use), 2),
+             nrow = length(s_use),
+             ncol = 2,
+             dimnames = list(ages, c("Survie", "Fécondité"))
+      )
+
+
+    print(round(param$s_calibrated,2))
+    print(round(param$f_calibrated,2))
+    print(out$vital_rates_mat)
+
   })
   #####
 
@@ -1950,31 +1977,54 @@ server <- function(input, output, session){
   observeEvent({
     input$run
   }, {
+
+    ## Unit
     if(input$fatalities_unit == "M"){
       out$fatalities_unit <- paste0("Unité : nombre de mortalités annuelles")
-      unit <- " mortalités"
+      unit <- " mortalité(s)"
     }
     if(input$fatalities_unit == "h"){
       out$fatalities_unit <- paste0("Unité : taux de mortalité (%) annuel")
       unit <- " %"
     }
 
-    if(input$fatalities_input_type == "itvl"){
-      out$fatalities_input_type <- "Saisie : intervalle"
-      out$fatalities_val1 <- paste0("Min : ", input$fatalities_lower, unit, " ; ")
-      out$fatalities_val2 <- paste0("Max : ", input$fatalities_upper, unit)
-    }
-    if(input$fatalities_input_type == "val"){
-      out$fatalities_input_type <- "Saisie : estimation et erreur-type"
-      out$fatalities_val1 <- paste0("Valeur estimée : ", input$fatalities_mean, unit, " ; ")
-      out$fatalities_val2 <- paste0("Erreur-type : ", input$fatalities_se, unit)
-    }
-    if(input$fatalities_input_type == "eli_exp"){
-      out$fatalities_input_type <- "Saisie : élicitation d'experts"
-      out$fatalities_val1 <- paste0("Moyenne estimée : ", round(param$fatalities_eli_result$mean, 2), unit, " ; ")
-      out$fatalities_val2 <- paste0("Erreur_type : ", round(param$fatalities_eli_result$SE, 2), unit)
-    }
-  })
+    ## Analysis : hypothetical scenarios
+    if(input$analysis_choice == "multi_scenario"){
+      req(input$fatalities_vec_scenario)
+      out$fatalities_input_type <- "Saisie : Scénarios hypothétiques"
+      vec01 <- as.numeric(unlist(strsplit(input$fatalities_vec_scenario, " ")))
+      out$fatalities_val1 <- paste0("Scénario(s) de mortalité: ",
+                                    vec01, unit, ".")
+      out$fatalities_val2 <- NULL
+    }else{
+
+      ## Analysis : cumulated impacts
+      if(input$analysis_choice == "cumulated"){
+        out$fatalities_input_type <- "Saisie : impacts cumulés"
+        out$fatalities_val1 <- paste0("Valeur estimée : ", input$fatalities_mat_cumulated[,1], unit, " ; ")
+        out$fatalities_val2 <- paste0("Erreur-type : ", input$fatalities_mat_cumulated[,2], unit)
+      }else{
+        ## Analysis : single farm
+        if(input$fatalities_input_type == "itvl"){
+          out$fatalities_input_type <- "Saisie : intervalle"
+          out$fatalities_val1 <- paste0("Min : ", input$fatalities_lower, unit, " ; ")
+          out$fatalities_val2 <- paste0("Max : ", input$fatalities_upper, unit)
+        }
+        if(input$fatalities_input_type == "val"){
+          out$fatalities_input_type <- "Saisie : estimation et erreur-type"
+          out$fatalities_val1 <- paste0("Valeur estimée : ", input$fatalities_mean, unit, " ; ")
+          out$fatalities_val2 <- paste0("Erreur-type : ", input$fatalities_se, unit)
+        }
+        if(input$fatalities_input_type == "eli_exp"){
+          out$fatalities_input_type <- "Saisie : élicitation d'experts"
+          out$fatalities_val1 <- paste0("Moyenne estimée : ", round(param$fatalities_eli_result$mean, 2), unit, " ; ")
+          out$fatalities_val2 <- paste0("Erreur_type : ", round(param$fatalities_eli_result$SE, 2), unit)
+        }
+        ##### END single fram ###
+      } # if 2: "cumulated"
+    } # if 1 : multi_scenario
+
+  }) # observeEvent
 
 
   # Population Size ####
@@ -2052,8 +2102,8 @@ server <- function(input, output, session){
         if(input$pop_trend_strength == "average") V2 <- "modéré"
         if(input$pop_trend_strength == "strong") V2 <- "fort"
       }
-        out$pop_growth_val1 <- V1
-        out$pop_growth_val2 <- V2
+      out$pop_growth_val1 <- V1
+      out$pop_growth_val2 <- V2
     }
   })
 
@@ -2186,7 +2236,7 @@ server <- function(input, output, session){
         QT = out$QT,
         risk_A = out$risk_A,
         impact_QT_table = out$impact_QT_table
-        )
+      )
 
 
       # Knit the document, passing in the `params` list, and eval it in a
