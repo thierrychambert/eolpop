@@ -12,7 +12,7 @@ rm(list = ls(all.names = TRUE))
   library(eolpop)
   library(popbio)
   library(knitr)
-  #library(kableExtra)
+  library(kableExtra)
 
   options(knitr.table.format = "latex")
 
@@ -119,7 +119,10 @@ rm(list = ls(all.names = TRUE))
                                                 options = list(container='body')
                                       )
                            ),
-                           choices = c("Impacts non cumulés" = "single_farm", "Impacts cumulés" = "cumulated", "Scénarios hypothétiques" = "multi_scenario")
+                           choices = c("Impacts non cumulés" = "single_farm",
+                                       "Impacts cumulés" = "cumulated",
+                                       "Scénarios hypothétiques" = "multi_scenario"
+                                       )
               )},
 
               # Choose species (selectInput)
