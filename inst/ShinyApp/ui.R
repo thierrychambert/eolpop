@@ -311,23 +311,23 @@ rm(list = ls(all.names = TRUE))
                                              # Interval
                                              numericInput(inputId = "fatalities_lower",
                                                           label = "Borne inférieure (mortalités annuelles)",
-                                                          value = 1.5,
+                                                          value = 1,
                                                           min = 0, max = Inf, step = 0.5),
 
                                              numericInput(inputId = "fatalities_upper",
                                                           label = "Borne supérieure (mortalités annuelles)",
-                                                          value = 4.5,
+                                                          value = 1,
                                                           min = 0, max = Inf, step = 0.5),
 
                                              # Values
                                              numericInput(inputId = "fatalities_mean",
                                                           label = "Moyenne (mortalités annuelles)",
-                                                          value = 3.0,
+                                                          value = 1,
                                                           min = 0, max = Inf, step = 0.5),
 
                                              numericInput(inputId = "fatalities_se",
                                                           label = "Erreur-type (mortalités annuelles)",
-                                                          value = 0.5,
+                                                          value = 0,
                                                           min = 0, max = Inf, step = 0.1),
 
                                              # Matrix for expert elicitation
@@ -366,9 +366,9 @@ rm(list = ls(all.names = TRUE))
                                                                                 options = list(container='body')
                                                                       )
                                                          ),
-                                                         value = matrix(c(2, 0.5, 2010,
-                                                                          5, 0.5, 2015,
-                                                                          3, 0.5, 2018),
+                                                         value = matrix(c(1, 0, 2011,
+                                                                          2, 0, 2012,
+                                                                          3, 0, 2013),
                                                                         nrow = 3, ncol = 3, byrow = TRUE,
                                                                         dimnames = list(c(paste0("Parc num.", c(1:3))),
                                                                                         c("Valeur centrale",
@@ -454,23 +454,23 @@ rm(list = ls(all.names = TRUE))
                                              # Interval
                                              numericInput(inputId = "pop_size_lower",
                                                           label = "Borne inférieure (taille population)",
-                                                          value = 750,
+                                                          value = 500,
                                                           min = 0, max = Inf, step = 10),
 
                                              numericInput(inputId = "pop_size_upper",
                                                           label = "Borne supérieure (taille population)",
-                                                          value = 850,
+                                                          value = 500,
                                                           min = 0, max = Inf, step = 10),
 
                                              # Values
                                              numericInput(inputId = "pop_size_mean",
                                                           label = "Moyenne de la taille de la population",
-                                                          value = 800,
+                                                          value = 500,
                                                           min = 0, max = Inf, step = 50),
 
                                              numericInput(inputId = "pop_size_se",
                                                           label = "Erreur-type de la taille de la population",
-                                                          value = 30,
+                                                          value = 0,
                                                           min = 0, max = Inf, step = 1),
 
                                              # Matrix for expert elicitation
@@ -534,23 +534,23 @@ rm(list = ls(all.names = TRUE))
                                              # Interval
                                              numericInput(inputId = "pop_growth_lower",
                                                           label = HTML("Borne inférieure<br>(taux d'accroissement en %)"),
-                                                          value = -6,
+                                                          value = -2,
                                                           min = -100, max = Inf, step = 1),
 
                                              numericInput(inputId = "pop_growth_upper",
                                                           label = HTML("Borne supérieure<br>(taux d'accroissement en %)"),
-                                                          value = -6,
+                                                          value = -2,
                                                           min = -100, max = Inf, step = 1),
 
                                              ## Input values: mean and se
                                              numericInput(inputId = "pop_growth_mean",
                                                           label = "Moyenne (taux d'accroissement en %)",
-                                                          value = -7.5,
+                                                          value = -2,
                                                           min = -100, max = Inf, step = 1),
 
                                              numericInput(inputId = "pop_growth_se",
                                                           label = "Erreur-type (aussi en %)",
-                                                          value = 0.1,
+                                                          value = 0,
                                                           min = 0, max = Inf, step = 0.5),
 
                                              ## Input expert elicitation: table
@@ -643,12 +643,12 @@ rm(list = ls(all.names = TRUE))
                                              # Interval
                                              numericInput(inputId = "carrying_capacity_lower",
                                                           label = "Borne inférieure (capacité de charge)",
-                                                          value = 850,
+                                                          value = 1000,
                                                           min = 0, max = Inf, step = 100),
 
                                              numericInput(inputId = "carrying_capacity_upper",
                                                           label = "Borne supérieure (capacité de charge)",
-                                                          value = 1250,
+                                                          value = 1000,
                                                           min = 0, max = Inf, step = 100),
 
                                              # Values
@@ -659,7 +659,7 @@ rm(list = ls(all.names = TRUE))
 
                                              numericInput(inputId = "carrying_capacity_se",
                                                           label = "Erreur-type de la capacité de charge",
-                                                          value = 100,
+                                                          value = 0,
                                                           min = 0, max = Inf, step = 50),
 
 
