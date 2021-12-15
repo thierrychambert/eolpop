@@ -1163,7 +1163,7 @@ server <- function(input, output, session){
                  dimnames = list(ages, c("Survie", "Fécondité"))
           )
 
-        }, rownames = TRUE)
+        }, rownames = TRUE, striped = TRUE, align = 'c')
   )
 
 
