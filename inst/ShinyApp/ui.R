@@ -224,7 +224,7 @@ rm(list = ls(all.names = TRUE))
                 br(" "),
                 numericInput(inputId = "vr_mat_number_age_classes",
                              label = "Nombre de classes d'age",
-                             value = 3, min = 2, max = Inf, step = 1),
+                             value = NA, min = 2, max = Inf, step = 1),
 
                 #br(),
                 matrixInput(inputId = "mat_fill_vr",
