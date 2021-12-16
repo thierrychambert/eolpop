@@ -1,61 +1,61 @@
 Species;Species_fr;Species_en;DistDispMoyKM
-Accipiter gentilis;Autour des palombes;Northern Goshawk;28.7
-Accipiter nisus;Epervier d'europe ;Eurasian Sparrowhawk;19.8
-Aegypius monachus;Vautour moine;Cinereous Vulture;17.6
-Alauda arvensis;Alouette des champs;Eurasian Skylark;15.9
-Alectoris rufa;Perdrix rouge;Red-legged partridge;NA
-Apus Apus;Martinet noir;Common Swift;24.8
-Aquila chrysaetos;Aigle royal;Golden Eagle;35.3
-Aquila fasciata;Aigle de Bonelli;Bonelli's Eagle;38.4
-Asio flammeus;Hibou des marais;short-eared Owl;26.6
-Bubo bubo;Grand Duc d'Europe;Eurasian eagle-owl;NA
-Burhinus oedicnemus;Oedicnème criard;Eurasian Stone curlew;NA
-Buteo buteo;Buse variable;Common Buzzard;28.4
-Carduelis cannabina;Linotte mélodieuse;Eurasian Linnet;14
+Accipiter gentilis;Autour des palombes;Northern Goshawk;26
+Accipiter nisus;Epervier d'europe ;Eurasian Sparrowhawk;19.3
+Aegypius monachus;Vautour moine;Cinereous Vulture;25.4
+Alauda arvensis;Alouette des champs;Eurasian Skylark;15.7
+Alectoris rufa;Perdrix rouge;Red-legged partridge;0.9
+Apus Apus;Martinet noir;Common Swift;24
+Aquila chrysaetos;Aigle royal;Golden Eagle;35.7
+Aquila fasciata;Aigle de Bonelli;Bonelli's Eagle;37.1
+Asio flammeus;Hibou des marais;short-eared Owl;26.4
+Bubo bubo;Grand Duc d'Europe;Eurasian eagle-owl;26.4
+Burhinus oedicnemus;Oedicnème criard;Eurasian Stone curlew;24.5
+Buteo buteo;Buse variable;Common Buzzard;27.3
+Carduelis cannabina;Linotte mélodieuse;Eurasian Linnet;13
 Carduelis carduelis;Chardonneret élégant;European Goldfinch;14.2
-Carduelis chloris;Verdier d'Europe;European Greenfinch;11
-Ciconia ciconia;Cigogne blanche;White Stork;19.2
-Ciconia nigra;Cigogne noire;Black Stork;18.6
-Circus aeruginosus;Busard des roseaux;Western Marsh-harrier;42
-Circus cyaneus;Busard Saint-Martin;Hen Harrier;26.8
-Circus pygargus;Busard cendrée;Montagu's Harrier;33.9
-Coturnix coturnix;Caille des blés;Common Quail;13.5
-Delichon urbica;Hirondelle de fenêtre;Common House Martin;18
-Elanus caeruleus;Elanion Blanc;Black-winged Kite;39.9
-Emberiza calandra;Bruant proyer;Corn bunting;NA
-Emberiza citrinella;Bruant jaune;Yellowhammer;NA
+Carduelis chloris;Verdier d'Europe;European Greenfinch;11.1
+Ciconia ciconia;Cigogne blanche;White Stork;17.6
+Ciconia nigra;Cigogne noire;Black Stork;17.8
+Circus aeruginosus;Busard des roseaux;Western Marsh-harrier;40
+Circus cyaneus;Busard Saint-Martin;Hen Harrier;20.2
+Circus pygargus;Busard cendrée;Montagu's Harrier;32
+Coturnix coturnix;Caille des blés;Common Quail;12.5
+Delichon urbica;Hirondelle de fenêtre;Common House Martin;17.9
+Elanus caeruleus;Elanion Blanc;Black-winged Kite;38
+Emberiza calandra;Bruant proyer;Corn bunting;16.2
+Emberiza citrinella;Bruant jaune;Yellowhammer;15.4
 Erithacus rubecula;Rouge-gorge familier;European Robin;8.7
-Falco naumanni;Faucon crecerellette;Lesser Kestrel;19.8
-Falco peregrinus;Faucon pèlerin;Peregrine Falcon;27.6
-Falco tinnunculus;Faucon crecerelle;Common Kestrel;33.5
-Ficedula hypoleuca;Gobemouche noir;European Pied Flycatcher;15.7
-Grus grus;Grue cendrée;Common Crane;23.9
-Gypaetus barbatus;Gypaète barbu;Bearded vulture;NA
-Gyps fulvus;Vautour fauve;Eurasian Griffon;35.9
-Haliaeetus albicilla;Pygargue à queue blanche;White-tailed Eagle;20.9
-Lanius collurio;Pie-grièche écorcheur;Red-backed Shrike;15
-Lanius excubitor;Pie-grièche grise ;Grey shrike;15
-Lanius meridionalis;Pie-grièche méridionale;Iberian grey shrike;15
-Lanius minor;Pie-grièche à poitrine rose;Lesser grey shrike;15
-Lanius senator;Pie-grièche à tête rousse;Woodchat shrike;15
-Larus argentatus;Goéland argenté;European Herring Gull;52.3
-Larus ridibundus;Mouette rieuse;Black-headed Gull;57
-Lullula arborea;Alouette lulu;Wood Lark;12.6
-Milvus migrans;Milan noir;Black Kite;32.9
-Milvus milvus;Milan royal;Red Kite;68.5
-Neophron percnopterus;Vautour percnoptère;Egyptian Vulture;23.4
-Pandion haliaetus;Balbuzard pêcheur;Osprey;25.2
-Passer domesticus;Moineau domestique;House sparrow;NA
-Passer montanus;Moineau friquet;Eurasian tree sparrow;NA
-Perdix perdix;Perdrix grise;Grey partridge;NA
-Pernis apivorus;Bondrée apivore;European Honey-buzzard;22
-Phylloscopus collybita;Pouillot véloce;Chiffchaff;NA
-Pluvialis apricaria;Pluvier doré;Eurasian Golden Plover;15.1
-Regulus ignicapillus;Roitelet triple-bandeau;Common Firecrest;6.8
-Regulus regulus;Roitelet huppé;Goldcrest;8.9
-Sterna hirundo;Sterne pierregarin;Common Tern;36.6
-Sturnus vulgaris;Etourneau sansonnet;Common Starling;12.7
-Tetrax tetrax;Outarde canepetière;Little bustard;NA
-Turdus merula;Merle noir;Eurasian Blackbird;8.7
-Turdus philomelos;Grive musicienne;Song Thrush;13.1
-Vanellus vanellus;Vanneau huppé;Northern Lapwing;18.2
+Falco naumanni;Faucon crecerellette;Lesser Kestrel;19.7
+Falco peregrinus;Faucon pèlerin;Peregrine Falcon;21.9
+Falco tinnunculus;Faucon crecerelle;Common Kestrel;33.2
+Ficedula hypoleuca;Gobemouche noir;European Pied Flycatcher;15.1
+Grus grus;Grue cendrée;Common Crane;19.7
+Gypaetus barbatus;Gypaète barbu;Bearded vulture;63
+Gyps fulvus;Vautour fauve;Eurasian Griffon;32.2
+Haliaeetus albicilla;Pygargue à queue blanche;White-tailed Eagle;20.5
+Lanius collurio;Pie-grièche écorcheur;Red-backed Shrike;14.9
+Lanius excubitor;Pie-grièche grise ;Grey shrike;16.2
+Lanius meridionalis;Pie-grièche méridionale;Iberian grey shrike;16.2
+Lanius minor;Pie-grièche à poitrine rose;Lesser grey shrike;15.3
+Lanius senator;Pie-grièche à tête rousse;Woodchat shrike;15.1
+Larus argentatus;Goéland argenté;European Herring Gull;50.9
+Larus ridibundus;Mouette rieuse;Black-headed Gull;61.7
+Lullula arborea;Alouette lulu;Wood Lark;11.9
+Milvus migrans;Milan noir;Black Kite;32
+Milvus milvus;Milan royal;Red Kite;75
+Neophron percnopterus;Vautour percnoptère;Egyptian Vulture;22.8
+Pandion haliaetus;Balbuzard pêcheur;Osprey;43.6
+Passer domesticus;Moineau domestique;House sparrow;15.5
+Passer montanus;Moineau friquet;Eurasian tree sparrow;15
+Perdix perdix;Perdrix grise;Grey partridge;1.1
+Pernis apivorus;Bondrée apivore;European Honey-buzzard;23.5
+Phylloscopus collybita;Pouillot véloce;Chiffchaff;18.8
+Pluvialis apricaria;Pluvier doré;Eurasian Golden Plover;18.3
+Regulus ignicapillus;Roitelet triple-bandeau;Common Firecrest;7
+Regulus regulus;Roitelet huppé;Goldcrest;8.8
+Sterna hirundo;Sterne pierregarin;Common Tern;37.1
+Sturnus vulgaris;Etourneau sansonnet;Common Starling;12.3
+Tetrax tetrax;Outarde canepetière;Little bustard;23.5
+Turdus merula;Merle noir;Eurasian Blackbird;8.3
+Turdus philomelos;Grive musicienne;Song Thrush;13.2
+Vanellus vanellus;Vanneau huppé;Northern Lapwing;19.8
