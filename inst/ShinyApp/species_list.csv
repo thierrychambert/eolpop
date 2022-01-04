@@ -1,57 +1,61 @@
-NumMAPE,NomEspece,NomScientifique,OrdreFamille,DistDispMoyKM
-1,Aigle de Bonelli,Hieraaetus fasciatus,Accipitriformes,38.4
-2,Aigle royal,Aquila chrysaetos,Accipitriformes,35.3
-3,Autour des palombes,Accipiter gentilis,Accipitriformes,28.7
-4,Balbuzard pêcheur,Pandion haliaetus,Accipitriformes,25.2
-5,Bondrée apivore,Pernis apivorus,Accipitriformes,22
-6,Busard cendré,Circus pygargus,Accipitriformes,33.9
-7,Busard des roseaux,Circus aeruginosus,Accipitriformes,42
-8,Busard Saint-Martin,Circus cyaneus,Accipitriformes,26.8
-9,Buse variable,Buteo buteo,Accipitriformes,28.4
-10,Elanion blanc,Elanus caeruleus,Accipitriformes,39.9
-11,Epervier d'Europe,Accipiter nisus,Accipitriformes,19.8
-12,Faucon crécerelle,Falco tinnunculus,Accipitriformes,33.5
-13,Faucon crécerellette,Falco naumanni,Accipitriformes,19.8
-14,Faucon pélerin,Falco peregrinus,Accipitriformes,27.6
-15,Gypaète barbu,Gypaetus barbatus,Accipitriformes,NA
-16,Milan noir,Milvus migrans,Accipitriformes,32.9
-17,Milan royal,Milvus milvus,Accipitriformes,68.5
-18,Pygarge à queue blanche,Haliaeetus albicilla,Accipitriformes,20.9
-19,Vautour fauve,Gyps fulvus,Accipitriformes,35.9
-20,Vautour moine,Aegypius monachus,Accipitriformes,17.6
-21,Vautour percnoptère,Neophron percnopterus,Accipitriformes,23.4
-22,Martinet noir,Apus apus,Caprimulgiformes,24.8
-23,Oedicnème criard,Burhinus oedicnemus,Charadriiformes,NA
-24,Pluvier doré,Pluvialis apricaria,Charadriiformes,15.1
-25,Sterne pierregarin,Sterna hirundo,Charadriiformes,36.6
-26,Vanneau huppé,Vanellus vanellus,Charadriiformes,18.2
-27,Caille des blés,Coturnix coturnix,Galliformes,13.5
-28,Perdrix grise,Perdix perdix,Galliformes,NA
-29,Perdrix rouge,Alectoris rufa,Galliformes,NA
-30,Grue cendrée,Grus grus,Gruiformes,23.9
-31,Goéland argenté,Larus argentatus,Laridés,52.3
-32,Mouette rieuse,Larus ridibundus,Laridés,57
-33,Outarde canepetière,Tetrax tetrax,Otidiformes,NA
-34,Alouette des champs,Alauda arvensis,Passeriformes,15.9
-35,Alouette lulu,Lullula arborea,Passeriformes,12.6
-36,Bruant proyer,Emberiza calandra,Passeriformes,NA
-37,Bruant jaune,Emberiza citrinella,Passeriformes,NA
-38,Chardonneret élégant,Carduelis carduelis,Passeriformes,14.2
-39,Etourneau sansonnet,Sturnus vulgaris,Passeriformes,12.7
-40,Gobemouche noir,Ficedula hypoleuca,Passeriformes,15.7
-41,Grive musicienne,Turdus philomelos,Passeriformes,13.1
-42,Hirondelle de fenêtre,Delichon urbica,Passeriformes,18
-43,Linotte mélodieuse,Carduelis cannabina,Passeriformes,14
-44,Merle noir,Turdus merula,Passeriformes,8.7
-45,Moineau domestique,Passer domesticus,Passeriformes,NA
-46,Moineau friquet,Passer montanus,Passeriformes,NA
-47,Pies-grièches (4 espèces en PNA),Lanius spp.,Passeriformes,15
-48,Pouillot véloce,Phylloscopus collybita,Passeriformes,NA
-49,Roitelet huppé,Regulus regulus,Passeriformes,8.9
-50,Roitelet triple-bandeau,Regulus ignicapillus,Passeriformes,6.8
-51,Rouge-gorge familier,Erithacus rubecula,Passeriformes,8.7
-52,Verdier d'Europe,Carduelis chloris,Passeriformes,11
-53,Cigogne blanche,Ciconia ciconia,Pelecaniformes,19.2
-54,Cigogne noire,Ciconia nigra,Pelecaniformes,18.6
-55,Grand Duc d'Europe,Bubo bubo,Strigiformes,NA
-56,Hibou des marais,Asio flammeus,Strigiformes,26.6
+Species;Species_fr;Species_en;DistDispMoyKM
+Accipiter gentilis;Autour des palombes;Northern Goshawk;26
+Accipiter nisus;Epervier d'europe ;Eurasian Sparrowhawk;19.3
+Aegypius monachus;Vautour moine;Cinereous Vulture;25.4
+Alauda arvensis;Alouette des champs;Eurasian Skylark;15.7
+Alectoris rufa;Perdrix rouge;Red-legged partridge;0.9
+Apus Apus;Martinet noir;Common Swift;24
+Aquila chrysaetos;Aigle royal;Golden Eagle;35.7
+Aquila fasciata;Aigle de Bonelli;Bonelli's Eagle;37.1
+Asio flammeus;Hibou des marais;short-eared Owl;26.4
+Bubo bubo;Grand Duc d'Europe;Eurasian eagle-owl;26.4
+Burhinus oedicnemus;Oedicnème criard;Eurasian Stone curlew;24.5
+Buteo buteo;Buse variable;Common Buzzard;27.3
+Carduelis cannabina;Linotte mélodieuse;Eurasian Linnet;13
+Carduelis carduelis;Chardonneret élégant;European Goldfinch;14.2
+Carduelis chloris;Verdier d'Europe;European Greenfinch;11.1
+Ciconia ciconia;Cigogne blanche;White Stork;17.6
+Ciconia nigra;Cigogne noire;Black Stork;17.8
+Circus aeruginosus;Busard des roseaux;Western Marsh-harrier;40
+Circus cyaneus;Busard Saint-Martin;Hen Harrier;20.2
+Circus pygargus;Busard cendrée;Montagu's Harrier;32
+Coturnix coturnix;Caille des blés;Common Quail;12.5
+Delichon urbica;Hirondelle de fenêtre;Common House Martin;17.9
+Elanus caeruleus;Elanion Blanc;Black-winged Kite;38
+Emberiza calandra;Bruant proyer;Corn bunting;16.2
+Emberiza citrinella;Bruant jaune;Yellowhammer;15.4
+Erithacus rubecula;Rouge-gorge familier;European Robin;8.7
+Falco naumanni;Faucon crecerellette;Lesser Kestrel;19.7
+Falco peregrinus;Faucon pèlerin;Peregrine Falcon;21.9
+Falco tinnunculus;Faucon crecerelle;Common Kestrel;33.2
+Ficedula hypoleuca;Gobemouche noir;European Pied Flycatcher;15.1
+Grus grus;Grue cendrée;Common Crane;19.7
+Gypaetus barbatus;Gypaète barbu;Bearded vulture;63
+Gyps fulvus;Vautour fauve;Eurasian Griffon;32.2
+Haliaeetus albicilla;Pygargue à queue blanche;White-tailed Eagle;20.5
+Lanius collurio;Pie-grièche écorcheur;Red-backed Shrike;14.9
+Lanius excubitor;Pie-grièche grise ;Grey shrike;16.2
+Lanius meridionalis;Pie-grièche méridionale;Iberian grey shrike;16.2
+Lanius minor;Pie-grièche à poitrine rose;Lesser grey shrike;15.3
+Lanius senator;Pie-grièche à tête rousse;Woodchat shrike;15.1
+Larus argentatus;Goéland argenté;European Herring Gull;50.9
+Larus ridibundus;Mouette rieuse;Black-headed Gull;61.7
+Lullula arborea;Alouette lulu;Wood Lark;11.9
+Milvus migrans;Milan noir;Black Kite;32
+Milvus milvus;Milan royal;Red Kite;75
+Neophron percnopterus;Vautour percnoptère;Egyptian Vulture;22.8
+Pandion haliaetus;Balbuzard pêcheur;Osprey;43.6
+Passer domesticus;Moineau domestique;House sparrow;15.5
+Passer montanus;Moineau friquet;Eurasian tree sparrow;15
+Perdix perdix;Perdrix grise;Grey partridge;1.1
+Pernis apivorus;Bondrée apivore;European Honey-buzzard;23.5
+Phylloscopus collybita;Pouillot véloce;Chiffchaff;18.8
+Pluvialis apricaria;Pluvier doré;Eurasian Golden Plover;18.3
+Regulus ignicapillus;Roitelet triple-bandeau;Common Firecrest;7
+Regulus regulus;Roitelet huppé;Goldcrest;8.8
+Sterna hirundo;Sterne pierregarin;Common Tern;37.1
+Sturnus vulgaris;Etourneau sansonnet;Common Starling;12.3
+Tetrax tetrax;Outarde canepetière;Little bustard;23.5
+Turdus merula;Merle noir;Eurasian Blackbird;8.3
+Turdus philomelos;Grive musicienne;Song Thrush;13.2
+Vanellus vanellus;Vanneau huppé;Northern Lapwing;19.8

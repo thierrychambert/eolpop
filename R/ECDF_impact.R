@@ -1,15 +1,11 @@
-##==============================================================================
-##                        Plot of the relative impact                         ==
-##==============================================================================
-#' Plot the relative impact for each scenario
+#' Plot the estimated cumulative distribution function (ECDF) impact for each scenario
 #'
 #' @param N a 4-D array containing demographic projection outputs
-#' @param onset_year a vector containing the years of each wind farm start being active
-#' (thus, the year at whihc each fatality value starts kicking in)
+#' @param show_quantile value between 0 and 1. The quantile to display on the plot
 #' @param sel_sc scenario to display on the plot. Either "all" or the ID number of a given scenario.
+#' @param xlims a vector of 2 values. x-axis limits (lower and upper).
 #' @param percent a logical value indicating whether the impact should be displayed in % (y axis).
 #' If FALSE, the impact value displayed is between 0 and -1 (negative impact).
-#' @param show_CI value between 0 and 1. The limits of C.I. to calculate
 #' @param xlab a character string. Label for the x axis.
 #' @param ylab a character string. Label for the y axis.
 #' @param Legend a vector of character strings. The legend to show on the side of the plot.
@@ -25,54 +21,44 @@
 #' @import ggplot2
 #'
 #'
-plot_impact <- function(N, onset_year = NULL, sel_sc = "all", percent = TRUE, show_CI = 0.95, xlab = "Year", ylab = "Relative impact (%)",
+ECDF_impact <- function(N, show_quantile = 0.95, sel_sc = "all", xlims = NULL,
+                        percent = TRUE, xlab = "Relative impact (%)", ylab = "Cumulative density",
                         Legend = NULL, legend_position = "right", text_size = "large", ...){
+
 
   # select subset of legends, if needed
   if(sel_sc != "all") sel_sc = as.numeric(sel_sc)
-  if(sel_sc != "all") Legend = Legend[c(1, sel_sc+1)]
+  if(sel_sc != "all") Legend = Legend[sel_sc]
 
   # Get metrics and dimensions
-  out <- get_metrics(N)$scenario$DR_N
-  out[which(is.nan(out))] <- -1
-
-  if(percent) out <- out*100
-
+  if(percent) out <- get_metrics(N)$scenario$DR_N*100 else out <- get_metrics(N)$scenario$DR_N
   TH <- dim(N)[2]
   nsc <- dim(N)[3]
-  if(is.null(onset_year)) onset_year <- 1
-  years <- min(onset_year) + (1:TH) - 1
-
-  CI <- apply(out[,,], c(1,3), quantile, probs = c(0.5, 1-(1-show_CI)/2, (1-show_CI)/2))
-  rownames(CI) <- c("avg", "lci", "uci")
 
 
   # Build dataframe
   if(sel_sc == "all"){
-    df <- as.data.frame(cbind(year = years, t(CI[,,1]), scenario = 1))
-    for(j in 2:nsc) df <- rbind(df, cbind(year = years, t(CI[,,j]), scenario = j))
+    df <- as.data.frame(cbind(impact = -out[TH,,2], scenario = 1))
+    if(nsc > 2) for(j in 3:nsc) df <- rbind(df, cbind(impact = -out[TH,,j], scenario = j-1))
   }else{
-    df <- as.data.frame(cbind(year = years, t(CI[,,1]), scenario = 1))
-    df <- rbind(df, cbind(year = years, t(CI[,,sel_sc+1]), scenario = sel_sc+1))
+    df <- as.data.frame(cbind(impact = -out[TH,,sel_sc+1], scenario = sel_sc))
   }
+
 
   ## Define Graphic Parameters
   size = 1.5
 
 
   # Plot lines
-  p <-
-    ggplot(data = df, aes(x = .data$year, y = .data$avg)) +
-    geom_line(size = size, aes(colour = factor(.data$scenario))) +
-    geom_ribbon(
-      aes(ymin = .data$uci, ymax = .data$lci, fill = factor(.data$scenario)), linetype = 0, alpha = 0.100)
+  p <- ggplot(df, aes(x = .data$impact)) +
+    stat_ecdf(geom = "step", size = size, aes(colour = factor(.data$scenario)))
 
-  # change color palette (we want sc0 in black)
-  if(sel_sc == "all") ColoR <- custom_palette_c25()[1:nsc] else ColoR <- custom_palette_c25()[c(1, sel_sc + 1)]
+  # change color palette
+  if(sel_sc == "all") ColoR <- custom_palette_c25()[2:nsc] else ColoR <- custom_palette_c25()[sel_sc + 1]
 
   p <- p +
     scale_color_manual(values = ColoR,
-                       labels = Legend, aesthetics = c("colour", "fill"))
+                       labels = Legend, aesthetics = c("colour"))
 
 
   # Add x/y labels and legend
@@ -106,16 +92,28 @@ plot_impact <- function(N, onset_year = NULL, sel_sc = "all", percent = TRUE, sh
 
   # Add y-axis on right side, and make pretty x/y axis and limits
   p <- p +
-    scale_y_continuous(limits = c(-100,0), expand = expansion(mult = c(0.015, 0.005)),
+    scale_y_continuous(limits = c(0,1), expand = expansion(mult = c(0.015, 0.005)),
                        breaks = scales::pretty_breaks(n = 10),
                        sec.axis = sec_axis(trans = ~.*1, name = "",
                                            breaks = scales::pretty_breaks(n = 10))) +
-    scale_x_continuous(expand = expansion(mult = c(0.015, 0)),
+    scale_x_continuous(limits = xlims, expand = expansion(mult = c(0.001, 0.001)),
                        breaks = scales::pretty_breaks(n = 10))
 
-  # Add horizontal dashed lines (for better viz)
-  p <- p + geom_hline(yintercept = seq(0 , -100, by = -10), size = 0.5, linetype = 3, colour = grey(0.15))
 
+  # Add quantile vline
+  QT <- apply(-out[TH,,], 2, quantile, probs = show_quantile)
+  QT <- QT[-1]
+
+  if(sel_sc != "all") QT <- QT[sel_sc]
+
+  df_qt <- data.frame(x = QT, xend = QT, y = 0, yend = show_quantile)
+
+  p <- p + geom_segment(data = df_qt,
+                   mapping = aes(x = .data$x,
+                                 xend = .data$xend,
+                                 y = .data$y,
+                                 yend = .data$yend),
+                   color = ColoR, linetype="dashed", size=1)
 
 
   return(p)

@@ -1,0 +1,150 @@
+---
+title: "Rapport : analyse démographique (eolpop)"
+header-includes:
+- \usepackage{booktabs}
+output: pdf_document
+params:
+  intro: NA
+  analysis: NA
+  species: NA
+  def_pop_text: NA
+  vital_rates_mat: NA
+  
+  fatalities_unit: NA
+  fatalities_input_type: NA
+  fatalities_val1: NA
+  fatalities_val2: NA
+  
+  pop_size_unit: NA
+  pop_size_input_type: NA
+  pop_size_val1: NA
+  pop_size_val2: NA
+  
+  pop_growth_input_type: NA
+  pop_growth_val1: NA
+  pop_growth_val2: NA
+  
+  carrying_cap_unit: NA
+  carrying_cap_input_type: NA
+  carrying_cap_val1: NA
+  carrying_cap_val2: NA
+  
+  PDF_plot: NA
+  ECDF_plot: NA
+  impact_plot: NA
+  #trajectory_plot : NA
+  
+  time_horizon: NA
+  impact_table: NA
+  PrExt_table: NA 
+  
+  CI: NA
+  QT: NA
+  risk_A: NA
+  impact_QT_table: NA
+---
+
+### Date de création: `r strftime(Sys.Date(), "%d/%m/%Y")`
+
+### Type d'analyse réalisée : `r paste(params$analysis)`
+
+### Espèce analysée: `r paste(params$species)`  
+
+### Horizon temporel: `r paste(params$time_horizon)` ans    
+    
+***
+  
+## Contexte de l'étude
+`r paste(params$intro)`
+
+
+## Définition de la population impactée
+`r paste(params$def_pop_text)`
+
+
+***
+
+# Paramètres d'entrée utilisés
+
+## Mortalités annuelles
+*`r paste(params$fatalities_unit)`*  
+`r paste(params$fatalities_input_type)`  
+  
+**`r paste(params$fatalities_val1)` `r paste(params$fatalities_val2)`**
+
+
+
+## Taille de la population
+*`r paste(params$pop_size_unit)`*  
+`r paste(params$pop_size_input_type)`  
+  
+**`r paste(params$pop_size_val1)` `r paste(params$pop_size_val2)`**
+
+
+
+## Taux de croissance annuel
+`r paste(params$pop_growth_input_type)`  
+  
+**`r paste(params$pop_growth_val1)` `r paste(params$pop_growth_val2)`**
+
+
+
+## Capacité de charge
+*`r paste(params$carrying_cap_unit)`*  
+`r paste(params$carrying_cap_input_type)`  
+  
+**`r paste(params$carrying_cap_val1)` `r paste(params$carrying_cap_val2)`**
+
+
+## Paramètres démographiques
+```{r, echo=FALSE}
+kable(params$vital_rates_mat, align = "c", booktabs=T)
+```  
+
+
+
+***
+
+
+# Résultats
+
+```{r, echo=FALSE}
+library(kableExtra)
+```
+
+## Impact global estimé au bout de `r params$time_horizon` ans
+```{r, echo=FALSE}
+kable(params$impact_table, align = "ccc", booktabs=T)
+```  
+Note : Intervalle de confiance (IC) à `r params$CI`%  
+
+## Valeur de l'impact au quantile de `r params$QT`%
+(soit un risque de `r params$risk_A`% de sous-estimer l'impact)
+```{r, echo=FALSE}
+kbl(params$impact_QT_table, align = "c", booktabs=T)
+```  
+## `r paste("Probabilité d'extinction à", params$time_horizon, "ans")`
+```{r, echo=FALSE}
+kbl(params$PrExt_table, align = "c", booktabs=T)
+```  
+
+
+
+## Graphique 1 : Densité de probabilité de l'impact relatif (à `r params$time_horizon` ans)
+```{r, echo=FALSE}
+params$PDF_plot
+```
+Note : La médiane et l'intervalle de confiance (IC à `r params$CI`%) sont montrés sur le graphe.  
+
+## Graphique 2 : Probabilité cumulée de l'impact relatif (à `r params$time_horizon` ans)
+```{r, echo=FALSE}
+params$ECDF_plot
+```
+Note : Quantile = `r params$QT`%,  
+soit un risque de `r params$risk_A`% de sous-estimer l'impact
+
+## Graphique 3 : Impact relatif au cours du temps
+```{r, echo=FALSE}
+params$impact_plot
+```
+Note : Intervalle de confiance (IC) à `r params$CI`%  

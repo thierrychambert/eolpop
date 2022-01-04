@@ -1,0 +1,187 @@
+Species;Species_fr;Species_en;classes_age;survie;fecondite
+Accipiter gentilis;Autour des palombes;Northern Goshawk;A0;0.55;0
+Accipiter gentilis;Autour des palombes;Northern Goshawk;A1;0.65;0.17
+Accipiter gentilis;Autour des palombes;Northern Goshawk;A2;0.78;1.09
+Accipiter nisus;Epervier d'europe ;Eurasian Sparrowhawk;A0;0.4;0
+Accipiter nisus;Epervier d'europe ;Eurasian Sparrowhawk;A1;0.62p;1.81
+Accipiter nisus;Epervier d'europe ;Eurasian Sparrowhawk;A2;0.64;2.46
+Aegypius monachus;Vautour moine;Cinereous Vulture;A0;0.84;0
+Aegypius monachus;Vautour moine;Cinereous Vulture;A1;0.86;0
+Aegypius monachus;Vautour moine;Cinereous Vulture;A2;0.86;0
+Aegypius monachus;Vautour moine;Cinereous Vulture;A3;0.86;0.55
+Aegypius monachus;Vautour moine;Cinereous Vulture;A4;0.86;0.55
+Aegypius monachus;Vautour moine;Cinereous Vulture;A5;0.95;0.56
+Alauda arvensis;Alouette des champs;Eurasian Skylark;A0;0.3;0
+Alauda arvensis;Alouette des champs;Eurasian Skylark;A1;0.66;2.87
+Alectoris rufa;Perdrix rouge;Red-legged partridge;A0;0.17;0
+Alectoris rufa;Perdrix rouge;Red-legged partridge;A1;0.45;4.39p
+Apus Apus;Martinet noir;Common Swift;A0;0.5p;0
+Apus Apus;Martinet noir;Common Swift;A1;0.75p;0.81p
+Apus Apus;Martinet noir;Common Swift;A2;0.77p;0.81p
+Apus Apus;Martinet noir;Common Swift;A3;0.79;1.61
+Aquila chrysaetos;Aigle royal;Golden Eagle;A0;0.71;0
+Aquila chrysaetos;Aigle royal;Golden Eagle;A1;0.85;0
+Aquila chrysaetos;Aigle royal;Golden Eagle;A2;0.85;0
+Aquila chrysaetos;Aigle royal;Golden Eagle;A3;0.85;0.24p
+Aquila chrysaetos;Aigle royal;Golden Eagle;A4;0.87;0.24p
+Aquila chrysaetos;Aigle royal;Golden Eagle;A5;0.9;0.48
+Aquila fasciata;Aigle de Bonelli;Bonelli's Eagle;A0;0.55;0
+Aquila fasciata;Aigle de Bonelli;Bonelli's Eagle;A1;0.62;0
+Aquila fasciata;Aigle de Bonelli;Bonelli's Eagle;A2;0.62;0.38
+Aquila fasciata;Aigle de Bonelli;Bonelli's Eagle;A3;0.84;0.98
+Aquila fasciata;Aigle de Bonelli;Bonelli's Eagle;A4;0.9;0.98
+Asio flammeus;Hibou des marais;short-eared Owl;A0;0.39p;0
+Asio flammeus;Hibou des marais;short-eared Owl;A1;0.58p;2.79p
+Bubo bubo;Grand Duc d'Europe;Eurasian eagle-owl;A0;0.56p;0
+Bubo bubo;Grand Duc d'Europe;Eurasian eagle-owl;A1;0.83p;0.59p
+Bubo bubo;Grand Duc d'Europe;Eurasian eagle-owl;A2;0.85p;1.18
+Burhinus oedicnemus;Oedicnème criard;Eurasian Stone curlew;A0;0.61;0
+Burhinus oedicnemus;Oedicnème criard;Eurasian Stone curlew;A1;0.81p;0
+Burhinus oedicnemus;Oedicnème criard;Eurasian Stone curlew;A2;0.84;0.65
+Buteo buteo;Buse variable;Common Buzzard;A0;0.61;0
+Buteo buteo;Buse variable;Common Buzzard;A1;0.86;0.5
+Buteo buteo;Buse variable;Common Buzzard;A2;0.89;0.5
+Buteo buteo;Buse variable;Common Buzzard;A3;0.85;1.55
+Carduelis cannabina;Linotte mélodieuse;Eurasian Linnet;A0;0.34;0
+Carduelis cannabina;Linotte mélodieuse;Eurasian Linnet;A1;0.41;2.58
+Carduelis carduelis;Chardonneret élégant;European Goldfinch;A0;0.4;0
+Carduelis carduelis;Chardonneret élégant;European Goldfinch;A1;0.45;2.38
+Carduelis chloris;Verdier d'Europe;European Greenfinch;A0;0.38;0
+Carduelis chloris;Verdier d'Europe;European Greenfinch;A1;0.47;2.2
+Ciconia ciconia;Cigogne blanche;White Stork;A0;0.49;0
+Ciconia ciconia;Cigogne blanche;White Stork;A1;0.7;0
+Ciconia ciconia;Cigogne blanche;White Stork;A2;0.7;2.5
+Ciconia ciconia;Cigogne blanche;White Stork;A3;0.69p;2.43p
+Ciconia ciconia;Cigogne blanche;White Stork;A4;0.73;2.36
+Ciconia nigra;Cigogne noire;Black Stork;A0;0.54p;0
+Ciconia nigra;Cigogne noire;Black Stork;A1;0.79p;0
+Ciconia nigra;Cigogne noire;Black Stork;A2;0.82p;1.1p
+Ciconia nigra;Cigogne noire;Black Stork;A3;0.84p;2.19
+Circus aeruginosus;Busard des roseaux;Western Marsh-harrier;A0;0.47p;0
+Circus aeruginosus;Busard des roseaux;Western Marsh-harrier;A1;0.7p;1.08p
+Circus aeruginosus;Busard des roseaux;Western Marsh-harrier;A2;0.72;2.17
+Circus cyaneus;Busard Saint-Martin;Hen Harrier;A0;0.34;0
+Circus cyaneus;Busard Saint-Martin;Hen Harrier;A1;0.56;0.99p
+Circus cyaneus;Busard Saint-Martin;Hen Harrier;A2;0.82;1.97
+Circus pygargus;Busard cendrée;Montagu's Harrier;A0;0.5;0
+Circus pygargus;Busard cendrée;Montagu's Harrier;A1;0.69p;0.97p
+Circus pygargus;Busard cendrée;Montagu's Harrier;A2;0.71;1.94
+Coturnix coturnix;Caille des blés;Common Quail;A0;0.2p;0
+Coturnix coturnix;Caille des blés;Common Quail;A1;0.29;4.55
+Delichon urbica;Hirondelle de fenêtre;Common House Martin;A0;0.24;0
+Delichon urbica;Hirondelle de fenêtre;Common House Martin;A1;0.39;2.85
+Elanus caeruleus;Elanion Blanc;Black-winged Kite;A0;0.47p;0
+Elanus caeruleus;Elanion Blanc;Black-winged Kite;A1;0.7p;1.75
+Emberiza calandra;Bruant proyer;Corn bunting;A0;0.37p;0
+Emberiza calandra;Bruant proyer;Corn bunting;A1;0.54p;2.37p
+Emberiza citrinella;Bruant jaune;Yellowhammer;A0;0.56;0
+Emberiza citrinella;Bruant jaune;Yellowhammer;A1;0.54;2.42
+Erithacus rubecula;Rouge-gorge familier;European Robin;A0;0.3p;0
+Erithacus rubecula;Rouge-gorge familier;European Robin;A1;0.44p;2.83p
+Falco naumanni;Faucon crecerellette;Lesser Kestrel;A0;0.45;0
+Falco naumanni;Faucon crecerellette;Lesser Kestrel;A1;0.7;1.06p
+Falco naumanni;Faucon crecerellette;Lesser Kestrel;A2;0.71;2.12
+Falco peregrinus;Faucon pèlerin;Peregrine Falcon;A0;0.42;0
+Falco peregrinus;Faucon pèlerin;Peregrine Falcon;A1;0.79p;0.88p
+Falco peregrinus;Faucon pèlerin;Peregrine Falcon;A2;0.81;1.76
+Falco tinnunculus;Faucon crecerelle;Common Kestrel;A0;0.33;0
+Falco tinnunculus;Faucon crecerelle;Common Kestrel;A1;0.67p;1.41p
+Falco tinnunculus;Faucon crecerelle;Common Kestrel;A2;0.69;2.82
+Ficedula hypoleuca;Gobemouche noir;European Pied Flycatcher;A0;0.28;0
+Ficedula hypoleuca;Gobemouche noir;European Pied Flycatcher;A1;0.48;1.67p
+Ficedula hypoleuca;Gobemouche noir;European Pied Flycatcher;A2;0.42;3.34
+Grus grus;Grue cendrée;Common Crane;A0;0.49;0
+Grus grus;Grue cendrée;Common Crane;A1;0.81;0
+Grus grus;Grue cendrée;Common Crane;A2;0.81;0
+Grus grus;Grue cendrée;Common Crane;A3;0.81;0
+Grus grus;Grue cendrée;Common Crane;A4;0.9;1.24
+Gypaetus barbatus;Gypaète barbu;Bearded vulture;A0;0.77;0
+Gypaetus barbatus;Gypaète barbu;Bearded vulture;A1;0.81;0
+Gypaetus barbatus;Gypaète barbu;Bearded vulture;A2;0.81;0
+Gypaetus barbatus;Gypaète barbu;Bearded vulture;A3;0.81;0
+Gypaetus barbatus;Gypaète barbu;Bearded vulture;A4;0.9;0
+Gypaetus barbatus;Gypaète barbu;Bearded vulture;A5;0.93;0
+Gypaetus barbatus;Gypaète barbu;Bearded vulture;A6;0.94;0.47
+Gyps fulvus;Vautour fauve;Eurasian Griffon;A0;0.86;0
+Gyps fulvus;Vautour fauve;Eurasian Griffon;A1;0.86;0
+Gyps fulvus;Vautour fauve;Eurasian Griffon;A2;0.89;0
+Gyps fulvus;Vautour fauve;Eurasian Griffon;A3;0.92p;0.41p
+Gyps fulvus;Vautour fauve;Eurasian Griffon;A4;0.98;0.82
+Haliaeetus albicilla;Pygargue à queue blanche;White-tailed Eagle;A0;0.82;0
+Haliaeetus albicilla;Pygargue à queue blanche;White-tailed Eagle;A1;0.82;0
+Haliaeetus albicilla;Pygargue à queue blanche;White-tailed Eagle;A2;0.86;0
+Haliaeetus albicilla;Pygargue à queue blanche;White-tailed Eagle;A3;0.95;0
+Haliaeetus albicilla;Pygargue à queue blanche;White-tailed Eagle;A4;0.8p;0.52p
+Haliaeetus albicilla;Pygargue à queue blanche;White-tailed Eagle;A5;0.85;1.04
+Lanius collurio;Pie-grièche écorcheur;Red-backed Shrike;A0;0.34p;0
+Lanius collurio;Pie-grièche écorcheur;Red-backed Shrike;A1;0.5;2.42p
+Lanius excubitor;Pie-grièche grise ;Grey shrike;A0;0.45p;0
+Lanius excubitor;Pie-grièche grise ;Grey shrike;A1;0.66;2.52
+Lanius meridionalis;Pie-grièche méridionale;Iberian grey shrike;A0;0.38p;0
+Lanius meridionalis;Pie-grièche méridionale;Iberian grey shrike;A1;0.56p;1.5
+Lanius minor;Pie-grièche à poitrine rose;Lesser grey shrike;A0;0.37p;0
+Lanius minor;Pie-grièche à poitrine rose;Lesser grey shrike;A1;0.54p;4.78
+Lanius senator;Pie-grièche à tête rousse;Woodchat shrike;A0;0.34p;0
+Lanius senator;Pie-grièche à tête rousse;Woodchat shrike;A1;0.51p;2.58p
+Larus argentatus;Goéland argenté;European Herring Gull;A0;0.73;0
+Larus argentatus;Goéland argenté;European Herring Gull;A1;0.85;0
+Larus argentatus;Goéland argenté;European Herring Gull;A2;0.82;0
+Larus argentatus;Goéland argenté;European Herring Gull;A3;0.82;0
+Larus argentatus;Goéland argenté;European Herring Gull;A4;0.89;1.17
+Larus ridibundus;Mouette rieuse;Black-headed Gull;A0;0.56;0
+Larus ridibundus;Mouette rieuse;Black-headed Gull;A1;0.8;0.79p
+Larus ridibundus;Mouette rieuse;Black-headed Gull;A2;0.85;1.58
+Lullula arborea;Alouette lulu;Wood Lark;A0;0.21;0
+Lullula arborea;Alouette lulu;Wood Lark;A1;0.61;4.36
+Milvus migrans;Milan noir;Black Kite;A0;0.5p;0
+Milvus migrans;Milan noir;Black Kite;A1;0.74p;0.44p
+Milvus migrans;Milan noir;Black Kite;A2;0.76;0.89
+Milvus milvus;Milan royal;Red Kite;A0;0.61;0
+Milvus milvus;Milan royal;Red Kite;A1;0.77;0.65p
+Milvus milvus;Milan royal;Red Kite;A2;0.85;1.29
+Neophron percnopterus;Vautour percnoptère;Egyptian Vulture;A0;0.81;0
+Neophron percnopterus;Vautour percnoptère;Egyptian Vulture;A1;0.81;0
+Neophron percnopterus;Vautour percnoptère;Egyptian Vulture;A2;0.83;0
+Neophron percnopterus;Vautour percnoptère;Egyptian Vulture;A3;0.83;0.34p
+Neophron percnopterus;Vautour percnoptère;Egyptian Vulture;A4;0.74;0.34p
+Neophron percnopterus;Vautour percnoptère;Egyptian Vulture;A5;0.81;0.69
+Pandion haliaetus;Balbuzard pêcheur;Osprey;A0;0.46;0
+Pandion haliaetus;Balbuzard pêcheur;Osprey;A1;0.82;0
+Pandion haliaetus;Balbuzard pêcheur;Osprey;A2;0.82;0.71p
+Pandion haliaetus;Balbuzard pêcheur;Osprey;A3;0.79;1.43
+Passer domesticus;Moineau domestique;House sparrow;A0;0.3;0
+Passer domesticus;Moineau domestique;House sparrow;A1;0.56;5.1
+Passer montanus;Moineau friquet;Eurasian tree sparrow;A0;0.49;0
+Passer montanus;Moineau friquet;Eurasian tree sparrow;A1;0.43;2.7
+Perdix perdix;Perdrix grise;Grey partridge;A0;0.22;0
+Perdix perdix;Perdrix grise;Grey partridge;A1;0.38;4.46
+Pernis apivorus;Bondrée apivore;European Honey-buzzard;A0;0.63;0
+Pernis apivorus;Bondrée apivore;European Honey-buzzard;A1;0.84;0
+Pernis apivorus;Bondrée apivore;European Honey-buzzard;A2;0.87;0.44p
+Pernis apivorus;Bondrée apivore;European Honey-buzzard;A3;0.81;0.44p
+Pernis apivorus;Bondrée apivore;European Honey-buzzard;A4;0.81;0.88
+Phylloscopus collybita;Pouillot véloce;Chiffchaff;A0;0.24;0
+Phylloscopus collybita;Pouillot véloce;Chiffchaff;A1;0.42;2.73p
+Pluvialis apricaria;Pluvier doré;Eurasian Golden Plover;A0;0.63;0
+Pluvialis apricaria;Pluvier doré;Eurasian Golden Plover;A1;0.82;0.42p
+Pluvialis apricaria;Pluvier doré;Eurasian Golden Plover;A2;0.7;0.84
+Regulus ignicapillus;Roitelet triple-bandeau;Common Firecrest;A0;0.17p;0
+Regulus ignicapillus;Roitelet triple-bandeau;Common Firecrest;A1;0.25p;4.15p
+Regulus regulus;Roitelet huppé;Goldcrest;A0;0.15p;0
+Regulus regulus;Roitelet huppé;Goldcrest;A1;0.23;4.15p
+Sterna hirundo;Sterne pierregarin;Common Tern;A0;0.59;0
+Sterna hirundo;Sterne pierregarin;Common Tern;A1;0.7;0
+Sterna hirundo;Sterne pierregarin;Common Tern;A2;0.63;0.58
+Sterna hirundo;Sterne pierregarin;Common Tern;A3;0.67;0.77p
+Sterna hirundo;Sterne pierregarin;Common Tern;A4;0.88;0.97
+Sturnus vulgaris;Etourneau sansonnet;Common Starling;A0;0.39;0
+Sturnus vulgaris;Etourneau sansonnet;Common Starling;A1;0.51;1.63
+Tetrax tetrax;Outarde canepetière;Little bustard;A0;0.25;0
+Tetrax tetrax;Outarde canepetière;Little bustard;A1;0.74;0.67
+Turdus merula;Merle noir;Eurasian Blackbird;A0;0.4;0
+Turdus merula;Merle noir;Eurasian Blackbird;A1;0.57;1.31
+Turdus philomelos;Grive musicienne;Song Thrush;A0;0.44;0
+Turdus philomelos;Grive musicienne;Song Thrush;A1;0.57;1.62
+Vanellus vanellus;Vanneau huppé;Northern Lapwing;A0;0.58;0
+Vanellus vanellus;Vanneau huppé;Northern Lapwing;A1;0.7p;0.43p
+Vanellus vanellus;Vanneau huppé;Northern Lapwing;A2;0.72;0.87
