@@ -64,12 +64,201 @@ rm(list = ls(all.names = TRUE))
 {ui <- navbarPage(
   "EolPop",
 
+  # Graphic Design Parameters
+  header =
+    {
+      tags$head(
+    tags$style(HTML("
+
+body {
+    font-family: 'Roboto', Sans-serif!important;
+    background-color: rgb(240, 244, 247) !important;
+}
+.navbar-default {
+    padding-right: 40px;
+    padding-left: 40px;
+    padding-top: 120px;
+    background-image: url(https://mape.cnrs.fr/webapp/images/logo-mape-2.png);
+    background-size: 600px;
+    background-repeat: no-repeat;
+    background-position: left top;
+}
+.navbar-default .navbar-brand {
+    font-size: 40px;
+    font-family: 'Roboto', Sans-serif;
+    font-weight: 300;
+    color:#005697 !important;
+
+}
+.navbar>.container-fluid .navbar-brand {
+    margin-left: -35px;
+}
+.container-fluid>.navbar-header {
+    padding-top: 10px;
+}
+.navbar-default .navbar-nav>.active>a{
+    background-color: #2898f3 !important;
+    border-color: #fff;
+    color: #fff!important;
+    border-radius: 50px;
+    margin:10px;
+}
+.navbar-default .navbar-nav>li>a{
+	background-color: #005697 !important;
+    border-color: #fff;
+    color: #fff!important;
+    border-radius: 50px;
+    margin:10px;
+}
+.navbar-default .navbar-nav>li>a:hover{
+    background-color: #2898f3 !important;
+    border-color: #fff;
+    color: #fff!important;
+    border-radius: 50px;
+    margin:10px;
+}
+.navbar-default {
+	color:#fff;
+    background-color: rgb(240, 244, 247) !important;
+    border-color:rgb(240, 244, 247)!important;
+}
+h2{
+	width:100%;
+	background-color:#77B82A;
+	padding:7px 15px 7px 15px;
+	border-radius: 15px;
+	margin-bottom:40px;
+	margin-top:20px;
+	font-size: 30px;
+  font-family: 'Roboto', Sans-serif;
+  font-weight: 300;
+  color:#ffffff !important;
+}
+.footermape{
+	box-shadow: 0px 0px 7px 0px rgb(0 0 0 / 10%);
+	background-image: url('https://mape.cnrs.fr/webapp/images/logos.png');
+	background-position: center;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-color:#fff;
+	margin-bottom:50px!important;
+	margin-top:30px!important;
+	display: inline-block!important;
+    width: 100%;
+    height: 130px;
+    content:''!important;
+    border:15px #fff solid;
+    border-radius: 15px;
+}
+.well {
+    margin-bottom: 40px!important;
+    background-color: #fff!important;
+    border: 1px solid #fff!important;
+    border-radius: 15px!important;
+    box-shadow: 0px 0px 7px 0px rgb(0 0 0 / 10%)!important;
+}
+.btn-default{
+	background-color: #005697!important;
+	border-color: #fff!important;
+	color: #fff!important;
+    border-radius: 50px!important;
+    border-color:#fff!important;
+    padding:10px!important;
+    margin-bottom:10px!important;
+}
+.btn:hover {
+    background-color: #2898f3!important;
+    border-color: #fff!important;
+	color: #fff!important;
+    border-radius: 50px!important;
+}
+.btn-group-xs>.btn, .btn-xs{
+	background-color:#cfcfcf!important;
+	padding:3px 7px 3px 7px!important;
+}
+.btn-group-xs>.btn, .btn-xs:focus{
+	background-color:#cfcfcf!important;
+	padding:3px 7px 3px 7px!important;
+}
+.btn-group-xs>.btn, .btn-xs:hover{
+	background-color:#acacac!important;
+	padding:3px 7px 3px 7px!important;
+}
+.nav-tabs {
+	border-color:#fff!important;
+    background-color:white!important;
+    border-radius:15px!important;
+	background-color: #e1e1e2!important;
+	border: 15px #005697!important;
+    margin:15px!important;
+    padding:5px!important;
+}
+.nav-tabs>li {
+	background-color: #e1e1e2!important;
+	border: 0!important;
+
+}
+.nav-tabs>li.active>a {
+    color: #fff!important;
+    cursor: default!important;
+    background-color: #2898f3!important;
+    border: 0px!important;
+    border-radius:12px!important;
+    border-bottom-color: transparent!important;
+}
+.nav-tabs>li>a {
+	border: 0px!important;
+    border-radius:12px!important;
+    color:#636363!important;
+}
+.nav-tabs>li>a:hover {
+	color: #fff!important;
+    background-color: #c7c7c8!important;
+    border: 0px!important;
+    border-radius:12px!important;
+    border-bottom-color: transparent!important;
+        color:#636363!important;
+}
+.nav-tabs>li>a:focus {
+	color: #fff!important;
+    background-color: #2898f3!important;
+    border: 0px!important;
+    border-radius:12px!important;
+    border-bottom-color: transparent!important;
+	color:#fff!important;
+}
+.tab-content>.active {
+    padding:20px!important;
+}
+hr {
+    margin-bottom:40px!important;
+    border: none!important;
+}
+h4{
+	font-weight:700!important;
+}
+.col-sm-8{
+	margin-bottom: 40px!important;
+    background-color: #fff!important;
+    border: 1px solid #fff!important;
+    border-radius: 15px!important;
+    box-shadow: 0px 0px 7px 0px rgb(0 0 0 / 10%)!important;
+    padding:20px!important;
+}
+
+                    "))
+  )},
+
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
   # Tab/Page 1 : About ########################################################
   {tabPanel(
+
     "A propos",
 
-    h4("Présentation"),
+
+    {wellPanel(
+
+      h4("Présentation"),
 
     p(HTML("<i>Eolpop</i> est un outil permettant de quantifier l'<b>impact démographique</b>
     des mortalités aviaires causées par les collisions avec les éoliennes.<br>
@@ -85,7 +274,15 @@ rm(list = ls(all.names = TRUE))
 
     p(tags$a(href="https://shiny.cefe.cnrs.fr/eolpop/Manuel.pdf", "Comment utiliser cette application ?")),
 
+
+
+    )}, # End wellpanel #########################################################
+    p(class="footermape"),
+
+
   )}, # End Page 1 #########################################################
+
+
 
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
   # Tab/Page 2 : Analytical tool #############################################
@@ -947,12 +1144,23 @@ rm(list = ls(all.names = TRUE))
                           ##
         )}, # close conditional panel
 
+
+
+
       )}, # End mainPanel
+
+
 
 
     )}, # sidebarLayout
 
+
+      p(class="footermape"),
+
+
+
   )} # End Page 2 ###################################################
+
 
 )} # End "NavBarPage ###################################################
 
