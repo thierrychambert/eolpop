@@ -141,7 +141,7 @@ h2{
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-color:#fff;
-	margin-bottom:50px!important;
+	margin-bottom:30px!important;
 	margin-top:30px!important;
 	display: inline-block!important;
     width: 100%;
@@ -245,6 +245,14 @@ h4{
     box-shadow: 0px 0px 7px 0px rgb(0 0 0 / 10%)!important;
     padding:20px!important;
 }
+.lien{
+	background-color: #909090!important;
+	border-color: #fff!important;
+	color: #fff!important;
+    border-radius: 50px!important;
+    border-color:#fff!important;
+    padding:10px!important;
+}
 
                     "))
   )},
@@ -260,7 +268,7 @@ h4{
 
       h4("Présentation"),
 
-    p(HTML("<i>Eolpop</i> est un outil permettant de quantifier l'<b>impact démographique</b>
+    p(HTML("<i>EolPop</i> est un outil permettant de quantifier l'<b>impact démographique</b>
     des mortalités aviaires causées par les collisions avec les éoliennes.<br>
     Il s'agit d'un outil d'aide à la décision, à vocation <i><b>informative</b></i>.
     Il vise à <i>fournir une évaluation objective</i> des conséquences de la mortalités
@@ -272,12 +280,19 @@ h4{
 
     p(strong("Contact: thierry.chambert@gmail.com")),
 
-    p(tags$a(href="https://shiny.cefe.cnrs.fr/eolpop/Manuel.pdf", "Comment utiliser cette application ?")),
+    br(),
+
+    p(tags$a(href="https://shiny.cefe.cnrs.fr/eolpop/Manuel.pdf", target="_blank", "Comment utiliser cette application ?", class="lien")),
+
+    br(),
+
+    p(tags$a(href="https://mape.cnrs.fr", target="_blank", "Visiter le site du projet MAPE", class="lien")),
 
 
 
     )}, # End wellpanel #########################################################
     p(class="footermape"),
+    p("Avec la participation de 23 opérateurs éoliens : ABO Wind, BayWa, Boralex, CNR, Compagnie Nationale du Rhone, EDF Renouvelables, EDPR, ENGIE Green, EOLFI, EOS Wind, ERG, H2Air, JP Energie Environnement, Neoen, RES, RWE, Siemens Gamesa Renewable Energy France, Total Quadran, Valeco, Valorem, Vestas, Volkswind France, Voltalia, VSB Energies Nouvelles"),
 
 
   )}, # End Page 1 #########################################################
@@ -287,10 +302,10 @@ h4{
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
   # Tab/Page 2 : Analytical tool #############################################
   {tabPanel(
-    HTML("Outil démographique <i>eolpop</i>"),
+    HTML("Outil démographique <i>EolPop</i>"),
 
     useShinyjs(),
-    titlePanel("eolpop : Impact démographique des collisions aviaires avec les éoliennes"),
+    titlePanel("EolPop : Impact démographique des collisions aviaires avec les éoliennes"),
 
 
     ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
@@ -1155,7 +1170,8 @@ h4{
     )}, # sidebarLayout
 
 
-      p(class="footermape"),
+    p(class="footermape"),
+    p("Avec la participation de 23 opérateurs éoliens : ABO Wind, BayWa, Boralex, CNR, Compagnie Nationale du Rhone, EDF Renouvelables, EDPR, ENGIE Green, EOLFI, EOS Wind, ERG, H2Air, JP Energie Environnement, Neoen, RES, RWE, Siemens Gamesa Renewable Energy France, Total Quadran, Valeco, Valorem, Vestas, Volkswind France, Voltalia, VSB Energies Nouvelles"),
 
 
 
