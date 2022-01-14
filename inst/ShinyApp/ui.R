@@ -276,7 +276,7 @@ h4{
 
     br(),
 
-    h5("Cette application a été développée par Thierry Chambert dans le cadre du projet MAPE"),
+    h5("Cette application a été développée par Thierry Chambert dans le cadre du programme de recherche MAPE"),
 
     p(strong("Contact: thierry.chambert@gmail.com")),
 
