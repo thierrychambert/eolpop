@@ -282,7 +282,7 @@ h4{
 
     br(),
 
-    p(tags$a(href="https://shiny.cefe.cnrs.fr/eolpop/Manuel.pdf", target="_blank", "Comment utiliser cette application ?", class="lien")),
+    p(tags$a(href="https://mape.cnrs.fr/applications/", target="_blank", "Comment utiliser cette application ?", class="lien")),
 
     br(),
 
