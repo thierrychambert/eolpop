@@ -960,9 +960,6 @@ h4{
 
           ## Parameter distribution
           {tabPanel(title = "Distribution paramètres",
-                    br(),
-                    hr(),
-
                     span(textOutput(outputId = "title_distri_plot"), style="font-size:24px; font-weight:bold"),
                     plotOutput(outputId = "distri_plot"),
 
