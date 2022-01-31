@@ -2185,7 +2185,7 @@ server <- function(input, output, session){
   ##-----------------------------------------------------------------------------------
   output$report <- downloadHandler(
 
-    filename = "RapportEolpopTEST001.pdf",
+    filename = "Rapport_Eolpop.pdf",
 
     content = function(file) {
       # Copy the report file to a temporary directory before processing it, in
