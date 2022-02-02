@@ -292,7 +292,7 @@ h4{
 
     )}, # End wellpanel #########################################################
     p(class="footermape"),
-    p("Avec la participation de 23 opérateurs éoliens : ABO Wind, BayWa, Boralex, CNR, Compagnie Nationale du Rhone, EDF Renouvelables, EDPR, ENGIE Green, EOLFI, EOS Wind, ERG, H2Air, JP Energie Environnement, Neoen, RES, RWE, Siemens Gamesa Renewable Energy France, Total Quadran, Valeco, Valorem, Vestas, Volkswind France, Voltalia, VSB Energies Nouvelles"),
+    p("Avec la participation des opérateurs éoliens partenaires du projet MAPE"),
 
 
   )}, # End Page 1 #########################################################
@@ -1168,7 +1168,7 @@ h4{
 
 
     p(class="footermape"),
-    p("Avec la participation de 23 opérateurs éoliens : ABO Wind, BayWa, Boralex, CNR, Compagnie Nationale du Rhone, EDF Renouvelables, EDPR, ENGIE Green, EOLFI, EOS Wind, ERG, H2Air, JP Energie Environnement, Neoen, RES, RWE, Siemens Gamesa Renewable Energy France, Total Quadran, Valeco, Valorem, Vestas, Volkswind France, Voltalia, VSB Energies Nouvelles"),
+    p("Avec la participation des opérateurs éoliens partenaires du projet MAPE"),
 
 
 
