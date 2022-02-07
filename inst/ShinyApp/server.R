@@ -1502,15 +1502,17 @@ server <- function(input, output, session){
     input$run
   },{
 
-    # We also define rMAX and theta here
-    #rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
+    # Define a limit for rMAX (theoretical formula from Niel & Lebreton 2005) or No limit (Inf)
+    # rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
     rMAX_species <- Inf
     param$rMAX_species <- rMAX_species
 
+    # Apply rmax limit on population growth rate
     param$pop_growth_mean_use <- round(min(1 + rMAX_species, param$pop_growth_mean), 4)
 
-    param$theta <- fixed_theta
-    #param$theta <- theta_spp(rMAX_species)
+    # Define theta (shape of DD)
+    param$theta <- fixed_theta                 # linear DD
+    #param$theta <- theta_spp(rMAX_species)    # non-linear DD, based on theoretical formula
 
     param$vr_calibrated <- calibrate_params(
       inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean_use),
