@@ -13,6 +13,7 @@ rm(list = ls(all.names = TRUE))
   library(popbio)
   library(knitr)
   library(kableExtra)
+  library(rmarkdown)
 
   options(knitr.table.format = "latex")
 
@@ -293,6 +294,15 @@ h4{
     )}, # End wellpanel #########################################################
     p(class="footermape"),
     p("Avec la participation des opérateurs éoliens partenaires du projet MAPE"),
+    br(),
+    h5("Mentions légales"),
+    p("Propriétaire du site : CNRS, 1919 route de Mende 34090 Montpellier"),
+    p("Site internet hébergé par la plateforme SIE du CEFE"),
+    br(),
+    p(HTML(
+      '<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Licence Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />Cette oeuvre est mise à disposition selon les termes de la <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Licence Creative Commons Attribution - Pas d&#39;Utilisation Commerciale - Pas de Modification 4.0 International</a>'
+      )
+    )
 
 
   )}, # End Page 1 #########################################################
@@ -1169,8 +1179,15 @@ h4{
 
     p(class="footermape"),
     p("Avec la participation des opérateurs éoliens partenaires du projet MAPE"),
-
-
+    br(),
+    h5("Mentions légales"),
+    p("Propriétaire du site : CNRS, 1919 route de Mende 34090 Montpellier"),
+    p("Site internet hébergé par la plateforme SIE du CEFE"),
+    br(),
+    p(HTML(
+      '<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Licence Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />Cette oeuvre est mise à disposition selon les termes de la <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Licence Creative Commons Attribution - Pas d&#39;Utilisation Commerciale - Pas de Modification 4.0 International</a>'
+    )
+    )
 
   )} # End Page 2 ###################################################
 
