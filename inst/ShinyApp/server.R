@@ -1503,7 +1503,8 @@ server <- function(input, output, session){
   },{
 
     # We also define rMAX and theta here
-    rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
+    #rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
+    rMAX_species <- Inf
     param$rMAX_species <- rMAX_species
 
     param$pop_growth_mean_use <- round(min(1 + rMAX_species, param$pop_growth_mean), 4)

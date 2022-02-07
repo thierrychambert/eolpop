@@ -96,11 +96,14 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
   ## Probability of extinction
   Pext_sc <- DR_Pext_sc <- NA
 
-  Pext_ref <- mean(colSums(N[,TH,"sc0",]) == 0)
+  Pext_ref <- mean(colSums(N[,TH,"sc0",]) < 2)
 
   for(j in 1:dim(N)[3]){
 
-    Pext_sc[j] <- mean(colSums(N[,TH,j,]) == 0 | colSums(N[,TH,"sc0",]) == 0)
+    Pext_sc[j] <- mean(colSums(N[,TH,j,]) < 2 |
+                         colSums(N[,TH,"sc0",]) < 2 |
+                         (colSums(N[,TH,j,]) / colSums(N[,TH,"sc0",])) < 1e-2)
+
     DR_Pext_sc[j] <- (Pext_sc[j] - Pext_ref) / Pext_ref
 
     DR_Pext_sc[DR_Pext_sc == Inf] <- Pext_sc[DR_Pext_sc == Inf]
@@ -192,7 +195,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
     Pext_indiv <- DR_Pext_indiv <- 0
 
     # for scenario 0
-    Pext_indiv[1] <- mean(colSums(N[,TH,1,]) == 0)
+    Pext_indiv[1] <- mean(colSums(N[,TH,1,]) < 2)
 
     for(j in 2:dim(N)[3]){
 
