@@ -7,7 +7,7 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 5
+nsim = 3
 
 pop_size_mean = 30000
 pop_size_se = 0
@@ -27,12 +27,12 @@ fecundities <- c(0, 0, 0, 0.27)
 lambda( build_Leslie(s = survivals, f = fecundities) )
 
 #pop_growth_mean = 1.07932597
+#pop_growth_mean = 1.044
 pop_growth_mean = 1.044
-#pop_growth_mean = 1.10
 pop_growth_se = 0
 
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
-time_horizon = 30
+time_horizon = 60
 coeff_var_environ = 0
 fatal_constant = "M"
 cumulated_impacts = FALSE
@@ -116,7 +116,7 @@ dim(out$run$N)
 res = get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)
 names(res)
 res$scenario$Pext
-
+res$scenario$impact[time_horizon,1,"sc1"]*100
 
 plot_impact(N = out$run$N, sel_sc = "1", show_CI = 0.999, Legend = paste("sc", (1:length(fatalities_mean))-1))
 
