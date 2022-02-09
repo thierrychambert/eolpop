@@ -7,53 +7,35 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 50
+nsim = 5
 
-pop_size_mean = 50000
+pop_size_mean = 30000
 pop_size_se = 0
 pop_size_type = "Ntotal"
 
-carrying_capacity_mean = 100000
+carrying_capacity_mean = 50000
 carrying_capacity_se = 0
 
-
-#(4.8/100)*sum(N000[-1])
-#(0.7/100)*sum(N000[-1])
-fatalities_mean = c(0, 10000) #c(0, 5, 3, 4, 2, 1, 4, 2, 2, 3)
+fatalities_mean = c(0, 1250) #c(0, 5, 3, 4, 2, 1, 4, 2, 2, 3)
 fatalities_se = c(0, 0) # c(0, rep(0.5,9))
 length(fatalities_mean)
-onset_year = c(2010, 2013, 2016) #, 2016, 2017, 2019, 2020, 2020, 2020, 2021) #rep(2010, 10)#
 
-survivals <- c(0.65, 0.75, 0.85, 0.94)
-fecundities <- c(0, 0, 0.05, 0.40)
-#survivals <- c(0.47, 0.67, 0.67)
-#fecundities <- c(0, 0.30, 1.16)
-#survivals <- c(0.25, 0.30)
-#fecundities <- c(0, 19.8)
+# onset_year = c(2010, 2013, 2016) #, 2016, 2017, 2019, 2020, 2020, 2020, 2021) #rep(2010, 10)#
 
-#survivals <- c(0.3, 0.65)
-#fecundities <- c(0, 4.5)
+survivals <- c(0.70, 0.83, 0.88, 0.90)
+fecundities <- c(0, 0, 0, 0.27)
+lambda( build_Leslie(s = survivals, f = fecundities) )
 
-pop_growth_mean = 0.98
-# lambda( build_Leslie(s = survivals, f = fecundities) )
+#pop_growth_mean = 1.07932597
+pop_growth_mean = 1.044
+#pop_growth_mean = 1.10
 pop_growth_se = 0
-
 
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
 time_horizon = 30
 coeff_var_environ = 0
-fatal_constant = "h"
-
-
-#if(length(fatalities_mean) > 2) cumulated_impacts = TRUE else cumulated_impacts = FALSE
+fatal_constant = "M"
 cumulated_impacts = FALSE
-
-
-length(onset_year)
-onset_time = onset_year - min(onset_year) + 1
-onset_time = c(min(onset_time), onset_time)
-if(!cumulated_impacts) onset_time = NULL
-onset_time
 
 # Pop size total
 N000 <- pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = survivals, f = fecundities)
@@ -64,29 +46,18 @@ K = pop_vector(pop_size = carrying_capacity_mean, pop_size_type = pop_size_type,
 K
 
 # Define theoretical rMAX for the species
-# rMAX_species <- rMAX_spp(surv = tail(survivals,1), afr = min(which(fecundities != 0)))
-rMAX_species <- Inf
+#rMAX_species <- rMAX_spp(surv = tail(survivals,1), afr = min(which(fecundities != 0)))
+rMAX_species <- 0.11
+rMAX_species
+
+##  Avoid unrealistic scenarios
+# pop_growth_mean <- min(1 + rMAX_species, pop_growth_mean)
+if(rMAX_species < (pop_growth_mean-1)) rMAX_species <- (pop_growth_mean-1)*1.1
 rMAX_species
 
 # Define the (theoretical) theta parameter (shape of Density-dependence) for the species
 # theta_spp(rMAX_species)
 theta = 1
-
-##
-rMAX_use <- infer_rMAX(K = K, theta = theta,
-                       pop_size_current = sum(N000), pop_growth_current = pop_growth_mean,
-                       rMAX_theoretical = rMAX_species)
-rMAX_use
-rMAX_species
-
-
-
-##  Avoid unrealistic scenarios
-pop_growth_mean <- min(1 + rMAX_species, pop_growth_mean)
-pop_growth_mean
-
-lambda( build_Leslie(s = survivals, f = fecundities) )
-
 
 ##--------------------------------------------
 ##  Calibration                             --
@@ -135,13 +106,8 @@ time <- system.time(
 )
 
 #####################################################
-
 time
-names(time)
 
-names(run0)
-N <- run0$N ; dim(N)
-#plot_traj(N, xlab = "Annee", ylab = "Taille de population (totale)")
 
 out = list()
 out$run = run0
@@ -152,67 +118,8 @@ names(res)
 res$scenario$Pext
 
 
-
-
-plot_impact(N, sel_sc = "3", show_CI = 0.999, Legend = paste("sc", (1:length(fatalities_mean))-1))
-
-
-# indiv
-#dr_N <- get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)$indiv_farm$DR_N
-
-# scenario
-dr_N <- get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)$scenario$DR_N
-
-quantiles_impact(dr_N, show_quantile = 0.975, show_CI = NULL, percent = TRUE)$QT[-1]
-
-QT <- quantiles_impact(dr_N, show_quantile = 0.975, show_CI = NULL, percent = TRUE)$QT[-1]
-paste("Scénario", 1:length(QT), ":", round(QT,1), "\n")
-
-###
-dim(N)
-ECDF_impact(N, show_quantile = 0.975, sel_sc = 3,
-                        percent = TRUE, xlab = "Relative impact (%)", ylab = "Cumulative density",
-                        Legend = NULL, legend_position = "right", text_size = "large")
-
-###
-
-
-
-
-
-##
-# Pop size total
-N00 <- pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = s_calibrated, f = f_calibrated)
-sum(N00)
-
-pop_size_mean
-pop_size_type
-sum(N00)
-N00
-sum(N000)
-
-NN <- apply(N, c(1:3), mean)
-colSums(NN[,1,1:2])
-sum(NN[-c(1:2),1,1])/2
-sum(NN[-1,1,1])
-sum(NN[,1,1])
-
+plot_impact(N = out$run$N, sel_sc = "1", show_CI = 0.999, Legend = paste("sc", (1:length(fatalities_mean))-1))
 
 x11()
-plot_traj(N, age_class_use = "pairs", fecundities = fecundities,
+plot_traj(N = out$run$N, age_class_use = "NotJuv0", fecundities = fecundities,
           Legend = paste("sc", 1:length(fatalities_mean)), ylim = c(0, NA))
-
-
-plot_traj(N, age_class_use = "NotJuv0", fecundities = fecundities,
-          Legend = paste("sc", 1:length(fatalities_mean)), ylim = c(0, NA))
-
-plot_traj(N, age_class_use = "all", fecundities = fecundities,
-          Legend = paste("sc", 1:length(fatalities_mean)), ylim = c(0, NA))
-
-
-###
-# plot_traj(N, Legend = paste("sc", 1:length(fatalities_mean)), ylim = c(0, NA))
-
-
-res$scenario$Pext
-N[,30,,] %>% colSums

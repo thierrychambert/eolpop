@@ -188,10 +188,32 @@ model_demo = NULL
         # GROWING population...
         if(lam_it[sim] > 1){
 
+
+
+
+
+
           # Extract rMAX
-          DD_params$rMAX <- infer_rMAX(K = K, theta = theta,
+          new_rMAX <- infer_rMAX(K = K, theta = theta,
                      pop_size_current = sum(N0), pop_growth_current = lam_it[sim],
-                     rMAX_theoretical = rMAX_species)
+                     rMAX_theoretical = Inf)
+
+          if(new_rMAX <= rMAX_species){
+            DD_params$rMAX <- new_rMAX
+          }else{
+
+            # Infer theta
+            DD_params$rMAX <- rMAX_species
+            DD_params$theta <- infer_theta(K = K,
+                       pop_size_current = sum(N0), pop_growth_current = lam_it[sim],
+                       rMAX = rMAX_species)
+
+          }
+
+
+print(DD_params)
+
+
 
           # ... and initially LARGE population
           if(sum(N0) > 500) model_demo <- M3_WithDD_noDemoStoch
