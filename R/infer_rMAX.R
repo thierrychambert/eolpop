@@ -25,7 +25,7 @@ infer_rMAX <- function(K, theta = 1, pop_size_current, pop_growth_current, rMAX_
       N_a = pop_size_current
       r_a = pop_growth_current - 1
 
-      rMAX <- r_a/((1-(N_a/K))^theta)
+      rMAX <- r_a/(1-((N_a/K)^theta))
 
 
       ## Take the minimum between this value and the theoretical species rMAX
