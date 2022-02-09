@@ -6,7 +6,7 @@
 #' @param s a vector of survival probabilities for each age class
 #' @param f a vector of fecundity values for each age class
 #'
-#' @returna list, including : the Leslie matrix A, vital rates values (as a vector and as a list),
+#' @return list, including : the Leslie matrix A, vital rates values (as a vector and as a list),
 #' a symbolic expression of the Leslie matrix, the elements (expression) of the symbolic Leslie matrix,
 #' a table of the sensitivities and elasticites ('sens_elas')
 #' @export
