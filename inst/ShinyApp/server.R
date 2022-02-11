@@ -1503,8 +1503,9 @@ server <- function(input, output, session){
   },{
 
     # Define a limit for rMAX (theoretical formula from Niel & Lebreton 2005) or No limit (Inf)
-    # rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
-    rMAX_species <- Inf
+    rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
+    rMAX_species <- rMAX_species*3  # avoid too much constraint
+    #rMAX_species <- Inf
     param$rMAX_species <- rMAX_species
 
     # Apply rmax limit on population growth rate
