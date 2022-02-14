@@ -2197,7 +2197,7 @@ server <- function(input, output, session){
       # can happen when deployed).
       tempReport <- file.path(tempdir(), "report.Rmd")
 
-      file.copy("./inst/ShinyApp/report.Rmd", tempReport, overwrite = TRUE)
+      file.copy("./inst/ShinyApp/report.Rmd", tempdir(), overwrite = TRUE)
 
       # Set up parameters to pass to Rmd document
       paramsRMD <- list(
