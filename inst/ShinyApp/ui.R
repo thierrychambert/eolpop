@@ -18,7 +18,7 @@ rm(list = ls(all.names = TRUE))
   options(knitr.table.format = "latex")
 
   ## Load species list
-  species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ";")
+  species_data <- read.csv("species_list.csv", sep = ";")
   species_list <- unique(as.character(species_data$Species_fr)) %>% sort
   species_list <- c(species_list, "Espèce générique")
 
