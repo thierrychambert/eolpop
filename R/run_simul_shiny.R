@@ -24,7 +24,8 @@
 #' It can thus be expressed as the total population or the number of pair.
 #' @param carrying_capacity_se Standard Error for the carrying capacity.
 #'
-#' @param theta a strictly positive number. Parameter defining the shape of the density-dependence relationship.
+#' @param theta NOT implemented.
+#' a strictly positive number. Parameter defining the shape of the density-dependence relationship.
 #' The relationship is defined as : r <- rMAX*(1-(N/K)^theta)
 #' Note lambda = r + 1
 #'
@@ -59,7 +60,7 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
                       pop_growth_mean, pop_growth_se,
                       survivals, fecundities,
                       carrying_capacity_mean, carrying_capacity_se,
-                      theta = 1, rMAX_species,
+                      theta = NULL, rMAX_species,
                       model_demo = NULL, time_horizon, coeff_var_environ, fatal_constant){
 
 
@@ -68,8 +69,8 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
 
   # Fill the list of DD parameters
   DD_params$K <- NULL
-  DD_params$theta <- theta
-  DD_params$rMAX <- rMAX_species
+  DD_params$theta <- NULL
+  DD_params$rMAX <- NULL
 
   # Number of years
   nyr <- time_horizon
@@ -163,10 +164,23 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
         # GROWING population...
         if(lam_it[sim] > 1){
 
-          # Extract rMAX
-          DD_params$rMAX <- infer_rMAX(K = K, theta = theta,
-                                       pop_size_current = sum(N0), pop_growth_current = lam_it[sim],
-                                       rMAX_theoretical = rMAX_species)
+          # Calculate rMAX (and theta if needed)
+          new_rMAX <- infer_rMAX(K = K, theta = theta,
+                                 pop_size_current = sum(N0), pop_growth_current = lam_it[sim],
+                                 rMAX_theoretical = Inf)
+
+          if(new_rMAX <= rMAX_species){
+            DD_params$rMAX <- new_rMAX
+          }else{
+
+            # Infer theta
+            DD_params$rMAX <- rMAX_species
+            DD_params$theta <- infer_theta(K = K,
+                                           pop_size_current = sum(N0), pop_growth_current = lam_it[sim],
+                                           rMAX = rMAX_species)
+
+          }
+
 
           # ... and initially LARGE population
           if(sum(N0) > 500) model_demo <- M3_WithDD_noDemoStoch

@@ -9,7 +9,7 @@ library(eolpop)
 ## Inputs
 nsim = 3
 
-pop_size_mean = 30000
+pop_size_mean = 12000
 pop_size_se = 0
 pop_size_type = "Ntotal"
 

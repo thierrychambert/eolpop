@@ -188,12 +188,7 @@ model_demo = NULL
         # GROWING population...
         if(lam_it[sim] > 1){
 
-
-
-
-
-
-          # Extract rMAX
+          # Calculate rMAX (and theta if needed)
           new_rMAX <- infer_rMAX(K = K, theta = theta,
                      pop_size_current = sum(N0), pop_growth_current = lam_it[sim],
                      rMAX_theoretical = Inf)
