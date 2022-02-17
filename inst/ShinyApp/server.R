@@ -1605,10 +1605,77 @@ server <- function(input, output, session){
     return(u_fr)
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
   #####
   ##-----------------------------------------------------------------------------------
   ##                                RUN SIMULATIONS
   ##-----------------------------------------------------------------------------------
+  # Status File
+  status_file <- tempfile()
+
+  get_status <- function(){
+    scan(status_file, what = "character",sep="\n")
+  }
+
+  set_status <- function(msg){
+    write(msg, status_file)
+  }
+
+  fire_interrupt <- function(){
+    set_status("interrupt")
+  }
+
+  fire_ready <- function(){
+    set_status("Ready")
+  }
+
+  fire_running <- function(perc_complete){
+    if(missing(perc_complete))
+      msg <- "Running..."
+    else
+      msg <- paste0("Running... ", perc_complete, "% Complete")
+    set_status(msg)
+  }
+
+  interrupted <- function(){
+    get_status() == "interrupt"
+  }
+
+  # Delete file at end of session
+  onStop(function(){
+    print(status_file)
+    if(file.exists(status_file))
+      unlink(status_file)
+  })
+
+  # Create Status File
+  fire_ready()
+
+  nclicks <- reactiveVal(0)
+  result_val <- reactiveVal()
+
+
+
+
+
+
+
+
+
+
+  #######################################################################################
   observeEvent({
     input$run
   }, {
@@ -1619,44 +1686,256 @@ server <- function(input, output, session){
       out$species_choice <- input$species_choice
       if(out$analysis_choice != "single_farm") out$show_scen_options <- TRUE
 
+      ## Define parameters
+      nsim = param$nsim
+      cumulated_impacts = param$cumulated_impacts
+
+      fatalities_mean = param$fatalities_mean_nb
+      fatalities_se = param$fatalities_se_nb
+      onset_time = param$onset_time
+
+      pop_size_mean = param$pop_size_mean
+      pop_size_se = param$pop_size_se
+      pop_size_type = param$pop_size_unit
+
+      pop_growth_mean = param$pop_growth_mean_use
+      pop_growth_se = param$pop_growth_se
+
+      survivals = param$s_calibrated
+      fecundities = param$f_calibrated
+
+      carrying_capacity_mean = param$carrying_capacity_mean
+      carrying_capacity_se = param$carrying_capacity_se
+
+      theta = param$theta
+      rMAX_species = param$rMAX_species
+
+      model_demo = NULL
+      time_horizon = param$time_horizon
+      coeff_var_environ = param$coeff_var_environ
+      fatal_constant = param$fatal_constant
+
+      # Time
       start_time <- Sys.time()
 
-      withProgress(message = 'Simulation progress', value = 0, {
 
-        out$run <- run_simul_shiny(nsim = param$nsim,
-                                   cumulated_impacts = param$cumulated_impacts,
 
-                                   fatalities_mean = param$fatalities_mean_nb,
-                                   fatalities_se = param$fatalities_se_nb,
-                                   onset_time = param$onset_time,
+      ################################
+      ##   run_simul starts here    ##
+      ################################
 
-                                   pop_size_mean = param$pop_size_mean,
-                                   pop_size_se = param$pop_size_se,
-                                   pop_size_type = param$pop_size_unit,
+      # Create object to store DD parameters
+      DD_params <- list()
 
-                                   pop_growth_mean = param$pop_growth_mean_use,
-                                   pop_growth_se = param$pop_growth_se,
+      # Fill the list of DD parameters
+      DD_params$K <- NULL
+      DD_params$theta <- theta
+      DD_params$rMAX <- rMAX_species
 
-                                   survivals = param$s_calibrated,
-                                   fecundities = param$f_calibrated,
+      # Number of years
+      nyr <- time_horizon
 
-                                   carrying_capacity_mean = param$carrying_capacity_mean,
-                                   carrying_capacity_se = param$carrying_capacity_se,
+      # Number of age classes
+      nac <- length(survivals)
 
-                                   theta = param$theta,
-                                   rMAX_species = param$rMAX_species,
+      # Number of fatalities scenario (+1 because we include a base scenario of NO fatality)
+      nsc <- length(fatalities_mean)
 
-                                   model_demo = NULL,
-                                   time_horizon = param$time_horizon,
-                                   coeff_var_environ = param$coeff_var_environ,
-                                   fatal_constant = param$fatal_constant)
-      }) # Close withProgress
+      # Initiate Pop Size (output) Array
+      out$run$N <- array(NA, dim = c(nac, nyr, nsc, nsim), dimnames = list(paste0("age", 1:nac),
+                                                                   paste0("year", 1:nyr),
+                                                                   paste0("sc", (1:nsc)-1)
+      ))
+      # Object to store values of population growth drawn at each iteration
+      lam_it <- rep(NA, nsim)
+
+
+
+
+      ##--------------------------------------------
+      # Prepare for Loops                         --
+      ##--------------------------------------------
+      # Don't do anything if analysis is already being run
+      if(nclicks() != 0){
+        showNotification("Already running analysis")
+        return(NULL)
+      }
+
+      # Increment clicks and prevent concurrent analyses
+      nclicks(nclicks() + 1)
+      result_val("Running...")
+      fire_running()
+
+      ##--------------------------------------------
+      # Start Loops over simulations              --
+      ##--------------------------------------------
+      result <- future(seed = NULL, {
+        print("Running...")
+
+        ## Loops now ##
+        for(sim in 1:nsim){
+
+          # Check for user interrupts
+          if(interrupted()){
+            print("Stopping...")
+            stop("User Interrupt")
+          }
+
+          # Notify status file of progress
+          fire_running(100*sim/nsim)
+
+
+          ## PARAMETER UNCERTAINTY : draw values for each input
+          # 1. Nomber of fatalities
+          M <- NA
+          for(j in 1:nsc){
+            M[j] <- sample_gamma(1, mu = fatalities_mean[j], sd = fatalities_se[j])
+          }
+
+          # 2. Population size : draw and distribute by age class
+          N0 <- sample_gamma(1, mu = pop_size_mean, sd =  pop_size_se) %>%
+            round %>%
+            pop_vector(pop_size_type = pop_size_type, s = survivals, f = fecundities)
+
+          # Draw carrying capacity
+          carrying_capacity <- sample_gamma(1, mu = carrying_capacity_mean, sd = carrying_capacity_se) %>%
+            round
+
+          # Define K
+          K <- sum(pop_vector(pop_size = carrying_capacity, pop_size_type = pop_size_type, s = survivals, f = fecundities))
+          if(K < sum(N0)) K <- round(sum(N0)*1.05)
+          DD_params$K <- K
+
+
+          if(pop_growth_se > 0){
+
+            # 3. Population Growth Rate
+            lam0 <- sample_gamma(1, mu = pop_growth_mean, sd = pop_growth_se)
+
+            # 4. Calibrate vital rates to match the the desired lambda
+            inits <- init_calib(s = survivals, f = fecundities, lam0 = lam0)
+
+            vr <- calibrate_params(inits = inits, f = fecundities, s = survivals, lam0 = lam0)
+            s <- head(vr, length(survivals))
+            f <- tail(vr, length(fecundities))
+            lam_it[sim] <- round(lambda(build_Leslie(s,f)),2)
+
+          }else{
+
+            # No parameter uncertainty on population growth
+            s <- survivals
+            f <- fecundities
+            lam_it[sim] <- round(lambda(build_Leslie(s,f)),2)
+
+          } # End if/else
+
+          model_demo = NULL
+
+          # Choose the model demographique to use (if choice was not forced)
+          if(is.null(model_demo)){
+
+            ## Define the complete model by default
+            model_demo <- M1_noDD_noDemoStoch # M4_WithDD_WithDemoStoch
+
+            # DECLINING (or stable), but initially LARGE population
+            if(lam_it[sim] <= 1 & sum(N0) > 3000) model_demo <- M1_noDD_noDemoStoch
+
+            # DECLINING  (or stable), and initially SMALL population
+            if(lam_it[sim] <= 1 & sum(N0) <= 3000) model_demo <- M2_noDD_WithDemoStoch
+
+
+            # GROWING population...
+            if(lam_it[sim] > 1){
+
+              # Calculate rMAX (and theta if needed)
+              new_rMAX <- infer_rMAX(K = K, theta = theta,
+                                     pop_size_current = sum(N0), pop_growth_current = lam_it[sim],
+                                     rMAX_theoretical = Inf)
+
+              if(new_rMAX <= rMAX_species){
+                DD_params$rMAX <- new_rMAX
+              }else{
+
+                # Infer theta
+                DD_params$rMAX <- rMAX_species
+                DD_params$theta <- infer_theta(K = K,
+                                               pop_size_current = sum(N0), pop_growth_current = lam_it[sim],
+                                               rMAX = rMAX_species)
+
+              }
+
+              print(DD_params)
+
+
+              # ... and initially LARGE population
+              if(sum(N0) > 500) model_demo <- M3_WithDD_noDemoStoch
+
+
+              # ... but initially SMALL population
+              if(sum(N0) <= 500) model_demo <- M4_WithDD_WithDemoStoch
+
+            } # if lam > 1
+
+
+          } # end if "is.null"
+
+
+          #
+          if(cumulated_impacts){
+            fun_project <- pop_project_cumulated_impacts
+          }else{
+            fun_project <- pop_project
+            onset_time = NULL
+          } # end if
+
+          # Project population trajectory
+          out$run$N[,,,sim] <- fun_project(fatalities = M, onset_time = onset_time, intial_pop_vector = N0,
+                                   s = s, f = f, DD_params = DD_params,
+                                   model_demo = model_demo, time_horizon = time_horizon,
+                                   coeff_var_environ = coeff_var_environ, fatal_constant = fatal_constant)
+
+          print(sim)
+
+        } # sim ##-----------------------------------------------------------------------------------------
+
+        # As result
+        "C'est fini !"
+
+      }) %...>% result_val()
+      ###################################################
+
+      ## Ouput of the run
+      #out$run <- list(N = N) # , lambdas = lam_it)
+      print(out$run)
+
+      ################################
+      ##    run_simul ends here     ##
+      ################################
 
       end_time <- Sys.time()
       duration <- end_time - start_time
       out$run_time <- paste(round(as.numeric(duration), 2), units_time_french(units(duration)))
       print(out$run_time)
 
+
+      # Catch inturrupt (or any other error) and notify user
+      result <- catch(result,
+                      function(e){
+                        result_val(NULL)
+                        print(e$message)
+                        showNotification(e$message)
+                      })
+
+      # After the promise has been evaluated set nclicks to 0 to allow for anlother Run
+      result <- finally(result,
+                        function(){
+                          fire_ready()
+                          nclicks(0)
+                        })
+
+
+      # Return something other than the promise so shiny remains responsive
+      NULL
 
     }else{
       out$run <- NULL
@@ -1666,11 +1945,31 @@ server <- function(input, output, session){
   #####
 
 
+  ### Buttons : CANCEL and STATUS
+  # Register user interrupt
+  observeEvent(input$cancel,{
+    print("Cancel")
+    fire_interrupt()
+  })
+
+
+  # Let user get analysis progress
+  observeEvent(input$status,{
+    print("Status")
+    showNotification(get_status())
+  })
+
 
   #####
   ##-----------------------------------------------------------------------------------
   ##                                OUTPUTS
   ##-----------------------------------------------------------------------------------
+
+  ### Run message
+  output$msg_run <- renderText({
+    req(result_val())
+  })
+
 
   ### Run time
   output$run_time <- renderText({
@@ -2170,8 +2469,6 @@ server <- function(input, output, session){
     out$QT <- 100-(input$risk_A)
     out$risk_A <- input$risk_A
 
-    #dr_N <- get_metrics(N = out$run$N, cumulated_impacts = param$cumulated_impacts)$scenario$DR_N
-    #out$impact_QT <- quantiles_impact(dr_N, show_quantile = 1-(input$risk_A/100), show_CI = NULL, percent = TRUE)$QT[-1]
     out$impact_QT_table <- table_impact_QT(show_quantile = 1-(input$risk_A/100))
 
     print(out$impact_QT_table)
@@ -2251,6 +2548,8 @@ server <- function(input, output, session){
       )
     }
   ) # close downloadHandler
+
+
 
 
   ###################################################################################

@@ -15,6 +15,9 @@ rm(list = ls(all.names = TRUE))
   library(kableExtra)
   library(rmarkdown)
 
+  library(promises)
+  library(future)
+
   options(knitr.table.format = "latex")
 
   ## Load species list
@@ -993,6 +996,11 @@ h4{
 
                     br(),
                     actionButton(inputId = "run", label = "Lancer l'analyse"),
+                    actionButton(inputId = "cancel", "Annuler"),
+                    actionButton(inputId = "status", "Verifier l'état"),
+
+                    br(" "),
+                    span(textOutput("msg_run"), align = "left", style = "font-weight: normal; font-size: 16px;"),
 
                     br(" "),
                     br(" "),
