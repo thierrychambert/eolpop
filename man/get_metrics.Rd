@@ -23,12 +23,3 @@ get_metrics takes the output array of the simulations run and calculate two impa
 When used on a cumulated_impacts analysis, this function also calculates these two metrics
 for each individual wind farm.
 }
-\examples{
-## Import Data
-data("demo_proj")
-
-## Calculate the metric
-get_metrics(demo_proj, cumulated_impacts = FALSE)
-
-
-}

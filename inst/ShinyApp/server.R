@@ -5,10 +5,10 @@ server <- function(input, output, session){
   ##  Fixed parameters in the server environment
   ##-------------------------------------------------
   ## Load species list
-  species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ";")
+  species_data <- read.csv("species_list.csv", sep = ";")
 
   ## Load survival and fecundities data
-  data_sf_with_stars <- read.csv("./inst/ShinyApp/data_sf.csv", sep = ";")
+  data_sf_with_stars <- read.csv("data_sf.csv", sep = ";")
   data_sf <- data_sf_with_stars
   data_sf$survie <- as.numeric(gsub("p", "", data_sf$survie))
   data_sf$fecondite <- as.numeric(gsub("p", "", data_sf$fecondite))
@@ -1503,8 +1503,9 @@ server <- function(input, output, session){
   },{
 
     # Define a limit for rMAX (theoretical formula from Niel & Lebreton 2005) or No limit (Inf)
-    # rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
-    rMAX_species <- Inf
+    rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
+    rMAX_species <- rMAX_species*3  # avoid too much constraint for the DD relationship
+    #rMAX_species <- Inf
     param$rMAX_species <- rMAX_species
 
     # Apply rmax limit on population growth rate
@@ -2196,7 +2197,7 @@ server <- function(input, output, session){
       # can happen when deployed).
       tempReport <- file.path(tempdir(), "report.Rmd")
 
-      file.copy("./inst/ShinyApp/report.Rmd", tempReport, overwrite = TRUE)
+      file.copy("report.Rmd", tempdir(), overwrite = TRUE)
 
       # Set up parameters to pass to Rmd document
       paramsRMD <- list(

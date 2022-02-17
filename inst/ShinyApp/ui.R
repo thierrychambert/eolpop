@@ -18,7 +18,7 @@ rm(list = ls(all.names = TRUE))
   options(knitr.table.format = "latex")
 
   ## Load species list
-  species_data <- read.csv("./inst/ShinyApp/species_list.csv", sep = ";")
+  species_data <- read.csv("species_list.csv", sep = ";")
   species_list <- unique(as.character(species_data$Species_fr)) %>% sort
   species_list <- c(species_list, "Espèce générique")
 
@@ -63,7 +63,7 @@ rm(list = ls(all.names = TRUE))
 ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 # Define User Interface ########################################################
 {ui <- navbarPage(
-  "EolPop",
+  "EolPop v1.1",
 
   # Graphic Design Parameters
   header =
@@ -277,7 +277,9 @@ h4{
 
     br(),
 
-    h5("Cette application a été développée par Thierry Chambert dans le cadre du programme de recherche MAPE"),
+    h5(HTML("Cette application a été développée par
+       <a href='https://sites.google.com/view/fr-thierrychambert/home'>Thierry Chambert</a>
+       dans le cadre du programme de recherche MAPE")),
 
     p(strong("Contact: aurelien.besnard@cefe.cnrs.fr")),
 

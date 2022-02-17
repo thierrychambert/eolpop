@@ -43,15 +43,12 @@ library(usethis)
 usethis::use_git()
 
 
-# Ignore file "run_shiny.R"
+# Ignore file
 usethis::use_build_ignore("draws_histog.R")
 
 
 # Tell Git to ignore the file "junk.R"
-library(gitignore)
-library(usethis)
 usethis::use_git_ignore(ignores = "junk.R", directory = ".")
-
 
 # Add package in the DESCRIPTION file: Imports
 usethis::use_package("dplyr")
@@ -63,3 +60,9 @@ usethis::use_package("shiny")
 
 # Add package in the DESCRIPTION file: Imports
 usethis::use_package("scales")
+
+
+# Ignore data file
+library(gitignore)
+library(usethis)
+usethis::use_git_ignore(ignores = "demo_proj.rda", directory = ".")

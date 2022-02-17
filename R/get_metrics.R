@@ -20,12 +20,6 @@
 #' @return a list of metric outputs : median, SD, 95% C.I. of the
 #' @export
 #'
-#' @examples
-#' ## Import Data
-#' data("demo_proj")
-#'
-#' ## Calculate the metric
-#' get_metrics(demo_proj, cumulated_impacts = FALSE)
 #'
 #'
 get_metrics <- function(N, cumulated_impacts = FALSE){
