@@ -24,8 +24,7 @@
 #' It can thus be expressed as the total population or the number of pair.
 #' @param carrying_capacity_se Standard Error for the carrying capacity.
 #'
-#' @param theta NOT implemented.
-#' a strictly positive number. Parameter defining the shape of the density-dependence relationship.
+#' @param theta a strictly positive number. Parameter defining the shape of the density-dependence relationship.
 #' The relationship is defined as : r <- rMAX*(1-(N/K)^theta)
 #' Note lambda = r + 1
 #'
@@ -60,7 +59,7 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
                       pop_growth_mean, pop_growth_se,
                       survivals, fecundities,
                       carrying_capacity_mean, carrying_capacity_se,
-                      theta = NULL, rMAX_species,
+                      theta = 1, rMAX_species,
                       model_demo = NULL, time_horizon, coeff_var_environ, fatal_constant){
 
 
@@ -69,8 +68,8 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
 
   # Fill the list of DD parameters
   DD_params$K <- NULL
-  DD_params$theta <- NULL
-  DD_params$rMAX <- NULL
+  DD_params$theta <- theta
+  DD_params$rMAX <- rMAX_species
 
   # Number of years
   nyr <- time_horizon
@@ -180,6 +179,8 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
                                            rMAX = rMAX_species)
 
           }
+
+          print(DD_params)
 
 
           # ... and initially LARGE population
