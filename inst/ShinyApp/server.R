@@ -1768,6 +1768,8 @@ server <- function(input, output, session){
         ## Loops now ##
         for(sim in 1:nsim){
 
+          #Sys.sleep(0.1)
+
           # Check for user interrupts
           if(interrupted()){
             print("Stopping...")
@@ -1897,7 +1899,7 @@ server <- function(input, output, session){
 
       ## Ouput of the run
       #out$N <- list(N = N) # , lambdas = lam_it)
-      print(out$N)
+      #print(out$N)
 
       ################################
       ##    run_simul ends here     ##
@@ -1905,8 +1907,8 @@ server <- function(input, output, session){
 
       end_time <- Sys.time()
       duration <- end_time - start_time
-      out$N_time <- paste(round(as.numeric(duration), 2), units_time_french(units(duration)))
-      print(out$N_time)
+      out$run_time <- paste(round(as.numeric(duration), 2), units_time_french(units(duration)))
+      print(out$run_time)
 
 
       # Catch inturrupt (or any other error) and notify user
@@ -1957,15 +1959,15 @@ server <- function(input, output, session){
   ##-----------------------------------------------------------------------------------
 
   ### Run message
-  output$msg_run <- renderText({
-    req(result_val())
-  })
+  #output$msg_run <- renderText({
+   # req(result_val())
+  #})
 
 
   ### Run time
   output$run_time <- renderText({
     req(input$run > 0)
-    paste("Temps de calcul (simulations) :", out$N_time)
+    paste("Temps de calcul (simulations) :", out$run_time)
   })
 
   ##################################################
