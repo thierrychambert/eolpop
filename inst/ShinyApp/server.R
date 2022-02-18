@@ -1735,7 +1735,7 @@ server <- function(input, output, session){
       nsc <- length(fatalities_mean)
 
       # Initiate Pop Size (output) Array
-      out$N <- array(NA, dim = c(nac, nyr, nsc, nsim), dimnames = list(paste0("age", 1:nac),
+      N <- array(NA, dim = c(nac, nyr, nsc, nsim), dimnames = list(paste0("age", 1:nac),
                                                                    paste0("year", 1:nyr),
                                                                    paste0("sc", (1:nsc)-1)
       ))
@@ -1884,7 +1884,7 @@ server <- function(input, output, session){
           } # end if
 
           # Project population trajectory
-          out$N[,,,sim] <- fun_project(fatalities = M, onset_time = onset_time, intial_pop_vector = N0,
+          N[,,,sim] <- fun_project(fatalities = M, onset_time = onset_time, intial_pop_vector = N0,
                                    s = s, f = f, DD_params = DD_params,
                                    model_demo = model_demo, time_horizon = time_horizon,
                                    coeff_var_environ = coeff_var_environ, fatal_constant = fatal_constant)
@@ -1892,7 +1892,7 @@ server <- function(input, output, session){
         } # sim ##-----------------------------------------------------------------------------------------
 
         # As result
-        "C'est fini !"
+        N
 
       }) %...>% result_val()
       ###################################################
@@ -1936,6 +1936,9 @@ server <- function(input, output, session){
     }
   }) # Close observEvent
   #####
+
+
+  #observe(out$N <- result_val())
 
 
   ### Buttons : CANCEL and STATUS
