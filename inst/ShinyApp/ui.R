@@ -999,6 +999,7 @@ h4{
                     actionButton(inputId = "run", label = "Lancer l'analyse"),
                     actionButton(inputId = "cancel", "Annuler"),
                     actionButton(inputId = "status", "Verifier l'état"),
+                    actionButton(inputId = 'clear', 'Clear results'),
 
                     br(" "),
                     span(textOutput("msg_run"), align = "left", style = "font-weight: normal; font-size: 16px;"),
