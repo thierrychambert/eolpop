@@ -1676,7 +1676,7 @@ server <- function(input, output, session){
       ##--------------------------------------------
       # Don't do anything if analysis is already being run
       if(nclicks() != 0){
-        showNotification("Already running analysis")
+        showNotification("Une analyse est déjà est en cours")
         return(NULL)
       }
 
@@ -1768,7 +1768,9 @@ server <- function(input, output, session){
         for(sim in 1:nsim){
 
           ## Progress bar
-          progress$set(value = sim)
+          progress$set(value = sim,
+                       message = "Simulation progress",
+                       detail = paste("simulation", sim))
           Sys.sleep(0.1)
 
           # Check for user interrupts
@@ -1912,7 +1914,9 @@ server <- function(input, output, session){
                         result_N(NULL)
                         print(e$message)
                         showNotification(e$message)
-                        Sys.sleep(1)
+                        #Sys.sleep(1)
+                        progress$close()
+                        nclicks(0)
                       })
 
       # After the promise has been evaluated set nclicks to 0 to allow for anlother Run
@@ -1956,7 +1960,7 @@ server <- function(input, output, session){
   observeEvent(input$status,{
     print("Status")
     showNotification(get_status())
-    if(get_status() == "Prêt") run_message("Prêt")
+    if(run_message() != "Analyse en cours...") run_message("Prêt")
   })
 
   # Let user get analysis progress

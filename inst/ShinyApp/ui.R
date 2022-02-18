@@ -1002,11 +1002,11 @@ h4{
                     actionButton(inputId = "status", "Verifier l'état"),
                     actionButton(inputId = 'clear', 'Effacer les résultats'),
 
-                    br(" "),
-                    span(textOutput("msg_run"), align = "left", style = "font-weight: normal; font-size: 16px;"),
-
                     br(),
-                    span(textOutput("run_time"), align = "left", style = "font-weight: normal; font-size: 16px;"),
+                    span(textOutput("msg_run"), align = "left", style = "font-weight: bold; font-size: 16px;"),
+
+                    br(" "),
+                    span(textOutput("run_time"), align = "left", style = "font-weight: normal; font-size: 12px;"),
 
                     #hr(),
                     #br(),
