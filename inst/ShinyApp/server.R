@@ -45,7 +45,7 @@ server <- function(input, output, session){
   ##############################################
   ##  Reactive values
   ##--------------------------------------------
-  out <- reactiveValues(run = NULL, run_time = NULL, msg = NULL, show_scen_options = FALSE)
+  out <- reactiveValues(run_time = NULL, msg = NULL, show_scen_options = FALSE)
 
   rv <- reactiveValues(distAVG = NULL, dist = NULL)
 
@@ -1487,8 +1487,6 @@ server <- function(input, output, session){
     input$button_calibrate_vr
   },{
 
-    print(param$pop_growth_mean)
-
     vr_calib0 <- calibrate_params(
       inits = init_calib(s = param$survivals, f = param$fecundities, lam0 = param$pop_growth_mean),
       f = param$fecundities, s = param$survivals, lam0 = param$pop_growth_mean
@@ -1538,11 +1536,6 @@ server <- function(input, output, session){
              ncol = 2,
              dimnames = list(ages, c("Survie", "Fécondité"))
       )
-
-
-    print(round(param$s_calibrated,2))
-    print(round(param$f_calibrated,2))
-    print(out$vital_rates_mat)
 
   })
   #####
@@ -1742,7 +1735,7 @@ server <- function(input, output, session){
       nsc <- length(fatalities_mean)
 
       # Initiate Pop Size (output) Array
-      out$run$N <- array(NA, dim = c(nac, nyr, nsc, nsim), dimnames = list(paste0("age", 1:nac),
+      out$N <- array(NA, dim = c(nac, nyr, nsc, nsim), dimnames = list(paste0("age", 1:nac),
                                                                    paste0("year", 1:nyr),
                                                                    paste0("sc", (1:nsc)-1)
       ))
@@ -1889,12 +1882,10 @@ server <- function(input, output, session){
           } # end if
 
           # Project population trajectory
-          out$run$N[,,,sim] <- fun_project(fatalities = M, onset_time = onset_time, intial_pop_vector = N0,
+          out$N[,,,sim] <- fun_project(fatalities = M, onset_time = onset_time, intial_pop_vector = N0,
                                    s = s, f = f, DD_params = DD_params,
                                    model_demo = model_demo, time_horizon = time_horizon,
                                    coeff_var_environ = coeff_var_environ, fatal_constant = fatal_constant)
-
-          print(sim)
 
         } # sim ##-----------------------------------------------------------------------------------------
 
@@ -1905,8 +1896,8 @@ server <- function(input, output, session){
       ###################################################
 
       ## Ouput of the run
-      #out$run <- list(N = N) # , lambdas = lam_it)
-      print(out$run)
+      #out$N <- list(N = N) # , lambdas = lam_it)
+      print(out$N)
 
       ################################
       ##    run_simul ends here     ##
@@ -1914,8 +1905,8 @@ server <- function(input, output, session){
 
       end_time <- Sys.time()
       duration <- end_time - start_time
-      out$run_time <- paste(round(as.numeric(duration), 2), units_time_french(units(duration)))
-      print(out$run_time)
+      out$N_time <- paste(round(as.numeric(duration), 2), units_time_french(units(duration)))
+      print(out$N_time)
 
 
       # Catch inturrupt (or any other error) and notify user
@@ -1938,7 +1929,7 @@ server <- function(input, output, session){
       NULL
 
     }else{
-      out$run <- NULL
+      out$N <- NULL
       out$msg <- "error_not_ready"
     }
   }) # Close observEvent
@@ -1974,7 +1965,7 @@ server <- function(input, output, session){
   ### Run time
   output$run_time <- renderText({
     req(input$run > 0)
-    paste("Temps de calcul (simulations) :", out$run_time)
+    paste("Temps de calcul (simulations) :", out$N_time)
   })
 
   ##################################################
@@ -1982,8 +1973,8 @@ server <- function(input, output, session){
   ##------------------------------------------------
   ## Function to print individual farm impacts
   print_indiv_impact <- function(){
-    req(out$run)
-    res <- get_metrics(N = out$run$N, cumulated_impacts = TRUE)
+    req(out$N)
+    res <- get_metrics(N = out$N, cumulated_impacts = TRUE)
     n_farm <- (dim(res$indiv_farm$impact)[3]-1)
 
     fil <- paste0(round(t(quantiles_impact(res$indiv_farm$DR_N, show_quantile = NULL, show_CI = input$show_CI/100)$CI)[-1,]), "%")
@@ -1995,8 +1986,8 @@ server <- function(input, output, session){
 
   ## Function to print the global impacts
   print_impact <- function(show_CI){
-    req(out$run)
-    res <- get_metrics(N = out$run$N, cumulated_impacts = FALSE)
+    req(out$N)
+    res <- get_metrics(N = out$N, cumulated_impacts = FALSE)
     n_scen <- (dim(res$scenario$impact)[3]-1)
 
     RowNam <- NULL
@@ -2013,8 +2004,8 @@ server <- function(input, output, session){
 
   ## Function to make a table of the impacts at given quantile
   table_impact_QT <- function(show_quantile){
-    req(out$run)
-    res <- get_metrics(N = out$run$N, cumulated_impacts = FALSE)
+    req(out$N)
+    res <- get_metrics(N = out$N, cumulated_impacts = FALSE)
     n_scen <- (dim(res$scenario$impact)[3]-1)
 
     RowNam <- NULL
@@ -2022,7 +2013,7 @@ server <- function(input, output, session){
     if(out$analysis_choice == "cumulated") RowNam <- c("Parc 1", paste("... + Parc", (2:n_scen)))
     if(out$analysis_choice == "multi_scenario") RowNam <- paste("Scenario", (1:n_scen))
 
-    dr_N <- get_metrics(N = out$run$N, cumulated_impacts = param$cumulated_impacts)$scenario$DR_N
+    dr_N <- get_metrics(N = out$N, cumulated_impacts = param$cumulated_impacts)$scenario$DR_N
     fil <- paste0(round(
       quantiles_impact(dr_N, show_quantile = 1-(input$risk_A/100), show_CI = NULL, percent = TRUE)$QT[-1]
       , 1), "%")
@@ -2035,8 +2026,8 @@ server <- function(input, output, session){
 
   ## Function to print the Probability of Extinction
   print_PrExt <- function(){
-    req(out$run)
-    res <- get_metrics(N = out$run$N, cumulated_impacts = FALSE)
+    req(out$N)
+    res <- get_metrics(N = out$N, cumulated_impacts = FALSE)
     n_scen <- dim(res$scenario$impact)[3]
 
     RowNam <- NULL
@@ -2053,15 +2044,15 @@ server <- function(input, output, session){
 
   ## Function to plot the probability density of the impact
   plot_out_PDF <- function(legend_position, text_size, show_scenario, show_CI){
-    if(is.null(out$run)) {} else {
+    if(is.null(out$N)) {} else {
 
-      n_scen <- dim(out$run$N)[3]
+      n_scen <- dim(out$N)[3]
       Legend <- NULL
       if(out$analysis_choice == "single_farm") Legend <- c("Parc 1")
       if(out$analysis_choice == "cumulated") Legend <- c("Parc 1", paste("... + Parc", (3:n_scen)-1))
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", 1:(n_scen-1))
 
-      density_impact(N = out$run$N, show_CI = show_CI, center = "median",
+      density_impact(N = out$N, show_CI = show_CI, center = "median",
                      sel_sc = show_scenario, xlims = c(0,100),
                      percent = TRUE, xlab = "\nImpact relatif (%)", ylab = "Densité de probabilité\n",
                      Legend = Legend, legend_position = legend_position, text_size = text_size)
@@ -2071,15 +2062,15 @@ server <- function(input, output, session){
 
   ## Function to plot the cumulative probability density of the impact
   plot_out_ECDF <- function(legend_position, text_size, show_scenario, show_quantile){
-    if(is.null(out$run)) {} else {
+    if(is.null(out$N)) {} else {
 
-      n_scen <- dim(out$run$N)[3]
+      n_scen <- dim(out$N)[3]
       Legend <- NULL
       if(out$analysis_choice == "single_farm") Legend <- c("Parc 1")
       if(out$analysis_choice == "cumulated") Legend <- c("Parc 1", paste("... + Parc", (3:n_scen)-1))
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", 1:(n_scen-1))
 
-      ECDF_impact(N = out$run$N, show_quantile = show_quantile, sel_sc = show_scenario,
+      ECDF_impact(N = out$N, show_quantile = show_quantile, sel_sc = show_scenario,
                   xlims = c(0,100),
                   percent = TRUE, xlab = "\nImpact relatif (%)", ylab = "Densité de probabilité cumulée\n",
                   Legend = Legend, legend_position = legend_position, text_size = text_size)
@@ -2089,15 +2080,15 @@ server <- function(input, output, session){
 
   ## Function to plot the relative impact over time
   plot_out_impact <- function(legend_position, text_size, show_scenario, show_CI){
-    if(is.null(out$run)) {} else {
+    if(is.null(out$N)) {} else {
 
-      n_scen <- dim(out$run$N)[3]
+      n_scen <- dim(out$N)[3]
       Legend <- NULL
       if(out$analysis_choice == "single_farm") Legend <- c("Sans parc", "Avec parc")
       if(out$analysis_choice == "cumulated") Legend <- c("Sans parc", "+ Parc 1", paste("... + Parc", (3:n_scen)-1))
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", (1:n_scen)-1)
 
-      plot_impact(N = out$run$N, onset_year = param$onset_year, sel_sc = show_scenario,
+      plot_impact(N = out$N, onset_year = param$onset_year, sel_sc = show_scenario,
                   percent = TRUE, show_CI = show_CI,
                   xlab = "\nAnnée", ylab = "Impact relatif (%)\n", Legend = Legend,
                   legend_position = legend_position, text_size = text_size)
@@ -2107,10 +2098,10 @@ server <- function(input, output, session){
 
   # Function to plot trajectories
   plot_out_traj <- function(show_scenario){
-    if(is.null(out$run)) {
+    if(is.null(out$N)) {
     } else {
 
-      n_scen <- dim(out$run$N)[3]
+      n_scen <- dim(out$N)[3]
 
       # Define Legend
       Legend <- NULL
@@ -2119,7 +2110,7 @@ server <- function(input, output, session){
       if(out$analysis_choice == "multi_scenario") Legend <- paste("Scenario", (1:n_scen)-1)
 
       # Plot population trajectories
-      plot_traj(N = out$run$N, age_class_use = input$age_class_show, fecundities = param$f_calibrated,
+      plot_traj(N = out$N, age_class_use = input$age_class_show, fecundities = param$f_calibrated,
                 onset_year = param$onset_year, sel_sc = show_scenario,
                 xlab = "\nAnnée", ylab = "Taille de population\n", Legend = Legend, ylim = c(0, NA))}
   }
@@ -2168,8 +2159,8 @@ server <- function(input, output, session){
   ##-------------------------------------------
   # Choose which scenario(s) to show
   observe({
-    if(!is.null(out$run)){
-      n_scen <- dim(out$run$N)[3] - 1
+    if(!is.null(out$N)){
+      n_scen <- dim(out$N)[3] - 1
 
       choices <- c("all", paste(1:n_scen))
       names(choices) <- c("Tous", paste("Scenario", 1:n_scen))
@@ -2212,7 +2203,7 @@ server <- function(input, output, session){
 
 
   output$quantile_impact_result <- renderText({
-    dr_N <- get_metrics(N = out$run$N, cumulated_impacts = param$cumulated_impacts)$scenario$DR_N
+    dr_N <- get_metrics(N = out$N, cumulated_impacts = param$cumulated_impacts)$scenario$DR_N
     impact_QT <- quantiles_impact(dr_N, show_quantile = 1-(input$risk_A/100), show_CI = NULL, percent = TRUE)$QT[-1]
     paste0("Scénario ", 1:length(impact_QT), " : ", round(impact_QT,1), "%", collapse = "\n")
   })
