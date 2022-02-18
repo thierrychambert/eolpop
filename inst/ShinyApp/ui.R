@@ -17,6 +17,7 @@ rm(list = ls(all.names = TRUE))
 
   library(promises)
   library(future)
+  library(ipc)
   plan(multisession)
 
   options(knitr.table.format = "latex")

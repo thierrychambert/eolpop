@@ -1756,6 +1756,7 @@ server <- function(input, output, session){
 
 
 
+      progress <- AsyncProgress$new(session, min=1, max=nsim, message = "Simulation progress")
 
       ##--------------------------------------------
       # Start Loops over simulations              --
@@ -1766,6 +1767,8 @@ server <- function(input, output, session){
         ## Loops now ##
         for(sim in 1:nsim){
 
+          ## Progress bar
+          progress$set(value = sim)
           Sys.sleep(0.1)
 
           # Check for user interrupts
@@ -1893,18 +1896,14 @@ server <- function(input, output, session){
 
         } # sim ##-----------------------------------------------------------------------------------------
 
+
+        progress$close()
+
         # As result
         N
 
       }) %...>% result_N()
       ###################################################
-
-
-      ################################
-      ##    run_simul ends here     ##
-      ################################
-
-
 
 
       # Catch inturrupt (or any other error) and notify user
