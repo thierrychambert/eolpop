@@ -1627,23 +1627,23 @@ server <- function(input, output, session){
   }
 
   fire_interrupt <- function(){
-    set_status("interrupt")
+    set_status("Analyse interrompue")
   }
 
   fire_ready <- function(){
-    set_status("Ready")
+    set_status("Prêt")
   }
 
   fire_running <- function(perc_complete){
     if(missing(perc_complete))
-      msg <- "Running..."
+      msg <- "Analyse en cours..."
     else
-      msg <- paste0("Running... ", perc_complete, "% Complete")
+      msg <- paste0("Analyse en cours... ", perc_complete, "%")
     set_status(msg)
   }
 
   interrupted <- function(){
-    get_status() == "interrupt"
+    get_status() == "Analyse interrompue"
   }
 
   # Delete file at end of session
@@ -1658,7 +1658,7 @@ server <- function(input, output, session){
 
   nclicks <- reactiveVal(0)
   result_N <- reactiveVal()
-  run_message <- reactiveVal("Ready")
+  run_message <- reactiveVal("Prêt")
 
   observe(if(input$run > 0 & nclicks() == 0 & !is.null(result_N())) run_message("Analyse terminé"))
 
@@ -1671,6 +1671,22 @@ server <- function(input, output, session){
 
     if(ready$fatalities & ready$pop_size & ready$pop_growth & ready$carrying_capacity){
 
+      ##--------------------------------------------
+      # Prepare for Loops                         --
+      ##--------------------------------------------
+      # Don't do anything if analysis is already being run
+      if(nclicks() != 0){
+        showNotification("Already running analysis")
+        return(NULL)
+      }
+
+      # Increment clicks and prevent concurrent analyses
+      nclicks(nclicks() + 1)
+      run_message("Analyse en cours...")
+      fire_running()
+
+
+      # For outputs
       out$analysis_choice <- input$analysis_choice
       out$species_choice <- input$species_choice
       if(out$analysis_choice != "single_farm") out$show_scen_options <- TRUE
@@ -1740,20 +1756,6 @@ server <- function(input, output, session){
 
 
 
-
-      ##--------------------------------------------
-      # Prepare for Loops                         --
-      ##--------------------------------------------
-      # Don't do anything if analysis is already being run
-      if(nclicks() != 0){
-        showNotification("Already running analysis")
-        return(NULL)
-      }
-
-      # Increment clicks and prevent concurrent analyses
-      nclicks(nclicks() + 1)
-      run_message("Running...")
-      fire_running()
 
       ##--------------------------------------------
       # Start Loops over simulations              --
@@ -1902,10 +1904,7 @@ server <- function(input, output, session){
       ##    run_simul ends here     ##
       ################################
 
-      end_time <- Sys.time()
-      duration <- end_time - start_time
-      out$run_time <- paste(round(as.numeric(duration), 2), units_time_french(units(duration)))
-      print(out$run_time)
+
 
 
       # Catch inturrupt (or any other error) and notify user
@@ -1922,8 +1921,12 @@ server <- function(input, output, session){
                         function(){
                           fire_ready()
                           nclicks(0)
-                        })
 
+                          ## Simulation time
+                          duration <- Sys.time() - start_time
+                          out$run_time <- paste(round(as.numeric(duration), 2), units_time_french(units(duration)))
+                          print(out$run_time)
+                        })
 
       # Return something other than the promise so shiny remains responsive
       NULL
@@ -1946,7 +1949,7 @@ server <- function(input, output, session){
     print("Cancel")
     fire_interrupt()
     result_N(NULL)
-    run_message("Run Canceled!")
+    run_message("Analyse interrompue")
   })
 
 
@@ -1954,7 +1957,7 @@ server <- function(input, output, session){
   observeEvent(input$status,{
     print("Status")
     showNotification(get_status())
-    if(get_status() == "Ready") run_message("Ready again")
+    if(get_status() == "Prêt") run_message("Prêt")
   })
 
   # Let user get analysis progress
@@ -1962,7 +1965,7 @@ server <- function(input, output, session){
     nclicks(0)
     print("Clearing")
     result_N(NULL)
-    run_message("Ready")
+    run_message("Prêt")
   })
 
 
@@ -1976,18 +1979,19 @@ server <- function(input, output, session){
     req(run_message())
   })
 
-
   ### Run time
   output$run_time <- renderText({
-    req(input$run > 0)
+    req(input$run > 0 & nclicks() == 0)
     paste("Temps de calcul (simulations) :", out$run_time)
   })
+
 
   ##################################################
   ## Functions for OUTPUT
   ##------------------------------------------------
   ## Function to print individual farm impacts
   print_indiv_impact <- function(N){
+    req(N)
     res <- get_metrics(N = N, cumulated_impacts = TRUE)
     n_farm <- (dim(res$indiv_farm$impact)[3]-1)
 
@@ -2000,6 +2004,7 @@ server <- function(input, output, session){
 
   ## Function to print the global impacts
   print_impact <- function(N, show_CI){
+    req(N)
     res <- get_metrics(N = N, cumulated_impacts = FALSE)
     n_scen <- (dim(res$scenario$impact)[3]-1)
 
@@ -2111,8 +2116,7 @@ server <- function(input, output, session){
 
   # Function to plot trajectories
   plot_out_traj <- function(N, show_scenario){
-    if(is.null(N)) {
-    } else {
+    if(is.null(N)) {} else {
 
       n_scen <- dim(N)[3]
 
@@ -2216,6 +2220,7 @@ server <- function(input, output, session){
 
 
   output$quantile_impact_result <- renderText({
+    req(result_N())
     dr_N <- get_metrics(N = result_N(), cumulated_impacts = param$cumulated_impacts)$scenario$DR_N
     impact_QT <- quantiles_impact(dr_N, show_quantile = 1-(input$risk_A/100), show_CI = NULL, percent = TRUE)$QT[-1]
     paste0("Scénario ", 1:length(impact_QT), " : ", round(impact_QT,1), "%", collapse = "\n")
@@ -2475,7 +2480,6 @@ server <- function(input, output, session){
 
     out$impact_QT_table <- table_impact_QT(result_N(), show_quantile = 1-(input$risk_A/100))
 
-    print(out$impact_QT_table)
   })
 
 
