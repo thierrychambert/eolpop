@@ -1762,11 +1762,7 @@ server <- function(input, output, session){
         ## Loops now ##
         for(sim in 1:nsim){
 
-          ## Progress bar
-          progress$set(value = sim,
-                       message = "Simulation progress",
-                       detail = paste("simulation", sim))
-          Sys.sleep(0.1)
+          Sys.sleep(0)
 
           # Check for user interrupts
           if(interrupted()){
@@ -1775,7 +1771,7 @@ server <- function(input, output, session){
           }
 
           # Notify status file of progress
-          fire_running(100*sim/nsim)
+          #fire_running(100*sim/nsim)
 
 
           ## PARAMETER UNCERTAINTY : draw values for each input
@@ -1888,6 +1884,11 @@ server <- function(input, output, session){
                                    coeff_var_environ = coeff_var_environ, fatal_constant = fatal_constant)
 
 
+          ## Progress bar
+          progress$set(value = sim,
+                       message = "Simulation progress",
+                       detail = paste("simulation", sim))
+
           # Notify status file of progress
           fire_running(100*sim/nsim)
 
@@ -1929,7 +1930,7 @@ server <- function(input, output, session){
       NULL
 
     }else{
-      rpint("Not ready : missing values")
+      print("Not ready : missing values")
       result_N(NULL)
       run_message("Not ready : missing values")
     }
@@ -1944,7 +1945,7 @@ server <- function(input, output, session){
   observeEvent(input$cancel,{
     print("Cancel")
     fire_interrupt()
-    result_N(NULL)
+    #result_N(NULL)
     run_message("Analyse interrompue")
   })
 
