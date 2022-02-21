@@ -1,3 +1,4 @@
+rm(list = ls(all.names = TRUE))
 setwd( paste0(getwd(),"/inst/ShinyApp/") )
 getwd()
 

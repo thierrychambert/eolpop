@@ -765,7 +765,7 @@ server <- function(input, output, session){
   ##----------------------
   observeEvent({
     input$analysis_choice
-    input$button_fatalities
+    input$show_ditri_fatalities
     input$fatalities_input_type
     input$fatalities_run_expert
     input$farm_number_cumulated
@@ -776,7 +776,7 @@ server <- function(input, output, session){
     if(input$analysis_choice == "single_farm"){
 
       # Show from input values: if button is ON and input_type is set on "value" or "itvl" (thus not "eli_exp")
-      if(input$button_fatalities%%2 == 1 & input$fatalities_input_type != "eli_exp"){
+      if(input$fatalities_input_type != "eli_exp"){
         output$title_distri_plot <- renderText({ "Mortalités annuelles" })
 
         output$distri_plot <- renderPlot({
@@ -792,7 +792,7 @@ server <- function(input, output, session){
 
       } else {
         # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
-        if(input$button_fatalities%%2 == 1 & input$fatalities_input_type == "eli_exp"){
+        if(input$fatalities_input_type == "eli_exp"){
           if(!is.null(param$fatalities_eli_result)){
             output$title_distri_plot <- renderText({ "Mortalités annuelles" })
             output$distri_plot <- renderPlot({ plot_expert(param$fatalities_eli_result$out) })
@@ -835,11 +835,11 @@ server <- function(input, output, session){
   ## Population size
   ##----------------------
   observeEvent({
-    input$button_pop_size
+    input$show_ditri_pop_size
     input$pop_size_input_type
   },{
     # Show from input values: if button is ON and input_type is set on "value"
-    if(input$button_pop_size%%2 == 1 & input$pop_size_input_type != "eli_exp"){
+    if(input$pop_size_input_type != "eli_exp"){
       output$title_distri_plot <- renderText({ "Taille initiale de la population" })
 
       output$distri_plot <- renderPlot({
@@ -849,7 +849,7 @@ server <- function(input, output, session){
 
     } else {
       # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
-      if(input$button_pop_size%%2 == 1 & input$pop_size_input_type == "eli_exp"){
+      if(input$pop_size_input_type == "eli_exp"){
         if(!is.null(param$pop_size_eli_result)){
           output$title_distri_plot <- renderText({ "Taille initiale de la population" })
           output$distri_plot <- renderPlot({ plot_expert(param$pop_size_eli_result$out) })
@@ -871,11 +871,11 @@ server <- function(input, output, session){
   ##----------------------
   observeEvent({
     input$pop_growth_input_type
-    input$button_pop_growth
+    input$show_ditri_pop_growth
   },{
 
     # Show from input values: if button is ON and input_type is set on "value" or "interval"
-    if(input$button_pop_growth%%2 == 1 & input$pop_growth_input_type != "eli_exp" & input$pop_growth_input_type != "trend"){
+    if(input$pop_growth_input_type != "eli_exp" & input$pop_growth_input_type != "trend"){
       output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
 
       output$distri_plot <- renderPlot({
@@ -885,7 +885,7 @@ server <- function(input, output, session){
 
     } else {
       # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
-      if(input$button_pop_growth%%2 == 1 & input$pop_growth_input_type == "eli_exp"){
+      if(input$pop_growth_input_type == "eli_exp"){
         if(!is.null(param$pop_growth_eli_result)){
           output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
           output$distri_plot <- renderPlot({ plot_expert(param$pop_growth_eli_result$out) })
@@ -906,10 +906,10 @@ server <- function(input, output, session){
   ##----------------------
   observeEvent({
     input$carrying_cap_input_type
-    input$button_carrying_cap
+    input$show_ditri_carrying_cap
   },{
     # Show from input values: if button is ON and input_type is set on "value"
-    if(input$button_carrying_cap%%2 == 1 & input$carrying_cap_input_type != "eli_exp"){
+    if(input$carrying_cap_input_type != "eli_exp"){
       output$title_distri_plot <- renderText({ "Capacité de charge" })
 
       output$distri_plot <- renderPlot({
@@ -919,7 +919,7 @@ server <- function(input, output, session){
 
     } else {
       # Show from elicitation expert: if button is ON and input_type is set on "expert elicitation"
-      if(input$button_carrying_cap%%2 == 1 & input$carrying_cap_input_type == "eli_exp"){
+      if(input$carrying_cap_input_type == "eli_exp"){
         if(!is.null(param$carrying_cap_eli_result)){
           if(!is.na(param$carrying_cap_eli_result$out)){
             output$title_distri_plot <- renderText({ "Capacité de charge" })

@@ -444,7 +444,6 @@ h4{
 
         ## Modify vital rates, if needed (actionButton and matrixInput)
         {column(width = 4,
-                tags$style(HTML('#button_vital_rates{background-color:#C2C8D3}')),
                 actionButton(inputId = "button_vital_rates",
                              label = tags$span("Modifier les paramètres démographiques",
                                                style = "font-weight: bold; font-size: 18px;")
@@ -501,7 +500,6 @@ h4{
         ##~~~~~~~~~~~~~~~~~~~~~~~~~
         {column(width = 3,
 
-                tags$style(HTML('#button_fatalities{background-color:#C2C8D3}')),
                 actionButton(inputId = "button_fatalities", width = '100%',
                              label = tags$span("Mortalités annuelles", style = "font-weight: bold; font-size: 18px;")
                 ),
@@ -540,12 +538,12 @@ h4{
                                              # Interval
                                              numericInput(inputId = "fatalities_lower",
                                                           label = "Borne inférieure (mortalités annuelles)",
-                                                          value = 1,
+                                                          value = 5,
                                                           min = 0, max = Inf, step = 0.5),
 
                                              numericInput(inputId = "fatalities_upper",
                                                           label = "Borne supérieure (mortalités annuelles)",
-                                                          value = 1,
+                                                          value = 10,
                                                           min = 0, max = Inf, step = 0.5),
 
                                              # Values
@@ -595,9 +593,9 @@ h4{
                                                                                 options = list(container='body')
                                                                       )
                                                          ),
-                                                         value = matrix(c(1, 0, 2011,
-                                                                          2, 0, 2012,
-                                                                          3, 0, 2013),
+                                                         value = matrix(c(2, 0.5, 2011,
+                                                                          5, 0.5, 2012,
+                                                                          10, 0.5, 2013),
                                                                         nrow = 3, ncol = 3, byrow = TRUE,
                                                                         dimnames = list(c(paste0("Parc num.", c(1:3))),
                                                                                         c("Valeur centrale",
@@ -647,7 +645,6 @@ h4{
         ##~~~~~~~~~~~~~~~~~~~~~~~~~
         {column(width = 3,
 
-                tags$style(HTML('#button_pop_size{background-color:#C2C8D3}')),
                 actionButton(inputId = "button_pop_size", width = '100%',
                              label = tags$span("Taille de la population", style = "font-weight: bold; font-size: 18px;")
                 ),
@@ -688,7 +685,7 @@ h4{
 
                                              numericInput(inputId = "pop_size_upper",
                                                           label = "Borne supérieure (taille population)",
-                                                          value = 500,
+                                                          value = 700,
                                                           min = 0, max = Inf, step = 10),
 
                                              # Values
@@ -735,7 +732,6 @@ h4{
         ##~~~~~~~~~~~~~~~~~~~~~~~~~
         {column(width = 3,
 
-                tags$style(HTML('#button_pop_growth{background-color:#C2C8D3}')),
                 actionButton(inputId = "button_pop_growth", width = '100%',
                              label = tags$span("Taux de croissance", style = "font-weight: bold; font-size: 18px;")
                 ),
@@ -768,7 +764,7 @@ h4{
 
                                              numericInput(inputId = "pop_growth_upper",
                                                           label = HTML("Borne supérieure<br>(taux d'accroissement en %)"),
-                                                          value = -2,
+                                                          value = -3,
                                                           min = -100, max = Inf, step = 1),
 
                                              ## Input values: mean and se
@@ -836,7 +832,6 @@ h4{
         ##~~~~~~~~~~~~~~~~~~~~~~~~~
         {column(width = 3,
 
-                tags$style(HTML('#button_carrying_cap{background-color:#C2C8D3}')),
                 actionButton(inputId = "button_carrying_cap", width = '100%',
                              label = tags$span("Capacité de charge", style = "font-weight: bold; font-size: 18px;")
                 ),
@@ -877,7 +872,7 @@ h4{
 
                                              numericInput(inputId = "carrying_capacity_upper",
                                                           label = "Borne supérieure (capacité de charge)",
-                                                          value = 1000,
+                                                          value = 1500,
                                                           min = 0, max = Inf, step = 100),
 
                                              # Values
@@ -977,6 +972,10 @@ h4{
 
           ## Parameter distribution
           {tabPanel(title = "Distribution paramètres",
+                    actionButton("show_ditri_fatalities", label = "Mortalités annuelles"),
+                    actionButton("show_ditri_pop_size", label = "Taille de la population"),
+                    actionButton("show_ditri_pop_growth", label = "Taux de croissance"),
+                    actionButton("show_ditri_carrying_cap", label = "Capacité de charge"),
                     span(textOutput(outputId = "title_distri_plot"), style="font-size:24px; font-weight:bold"),
                     plotOutput(outputId = "distri_plot"),
 
