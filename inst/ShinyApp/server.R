@@ -191,6 +191,17 @@ server <- function(input, output, session){
 
   outputOptions(output, "hide_graph_choice", suspendWhenHidden = FALSE)
 
+  ## Main panel : All graph result
+  output$hide_graphs <- eventReactive({
+    input$run
+    input$choose_graph
+  },{
+    if(input$run > 0) TRUE else FALSE
+  }, ignoreInit = TRUE)
+
+  outputOptions(output, "hide_graphs", suspendWhenHidden = FALSE)
+
+
   ## Graph result : PDF
   output$hide_graph_PDF <- eventReactive({
     input$run
@@ -1756,7 +1767,7 @@ server <- function(input, output, session){
 
 
 
-      progress <- AsyncProgress$new(session, min=1, max=nsim, message = "Simulation progress")
+      progress <- AsyncProgress$new(session, min=1, max=nsim, message = "En préparation")
 
       ##--------------------------------------------
       # Start Loops over simulations              --
@@ -1914,7 +1925,6 @@ server <- function(input, output, session){
                         result_N(NULL)
                         print(e$message)
                         showNotification(e$message)
-                        #Sys.sleep(1)
                         progress$close()
                         nclicks(0)
                       })
@@ -1935,10 +1945,9 @@ server <- function(input, output, session){
       NULL
 
     }else{
+      rpint("Not ready : missing values")
       result_N(NULL)
       run_message("Not ready : missing values")
-      #out$N <- NULL
-      #out$msg <- "error_not_ready"
     }
   }) # Close observEvent
   #####

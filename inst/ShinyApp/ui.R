@@ -157,7 +157,7 @@ h2{
     border-radius: 15px;
 }
 .well {
-    margin-bottom: 40px!important;
+    margin-bottom: 15px!important;
     background-color: #fff!important;
     border: 1px solid #fff!important;
     border-radius: 15px!important;
@@ -973,7 +973,7 @@ h4{
       ###  Main Panel
 
       {mainPanel(
-        tabsetPanel(
+        tabsetPanel(id = NULL, selected = "Impact population",
 
           ## Parameter distribution
           {tabPanel(title = "Distribution paramètres",
@@ -1045,12 +1045,10 @@ h4{
     hr(),
 
     conditionalPanel("output.hide_RES_TITLE",
-                     wellPanel(style = "background:#A9D7FF", #F0F8FF
-                               h1("Résultats")
-                     ),
+                       h1("Résultats")
     ),
 
-    hr(),
+    #hr(),
 
     ## Results : text
     {sidebarLayout(
@@ -1058,7 +1056,6 @@ h4{
       ##  Side Panel
       {conditionalPanel("output.hide_show_CI",
                         {sidebarPanel(
-                          ##
                           ## Choose CI
                           sliderInput("show_CI", label = "Intervalle de confiance (%)", min = 0, max = 100, value = 95, step = 1),
                           hr(),
@@ -1067,32 +1064,32 @@ h4{
 
       #######################################################
 
-      {mainPanel(
-        ## Outputs
-        {conditionalPanel("output.hide_results",
-                          ##
-                          # Text : Global impact
+      {conditionalPanel("output.hide_results",
+                        {mainPanel(
+
+                          # Table : Global impact
                           {column(
                             width = 7,
                             span(textOutput("title_impact_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
                             strong(span(tableOutput("impact_table"), style="color:blue; font-size:18px", align = "left")),
                           )},
 
+                          # Table : Probability of extinction
                           {column(
                             width = 5,
                             span(textOutput("title_PrExt_result"), align = "left", style = "font-weight: bold; font-size: 18px;"),
                             strong(span(tableOutput("PrExt_table"), style="color:orange; font-size:18px", align = "left")),
                           )},
-                          ##
-        )}, # close conditional panel
-      )}, # End mainPanel
+
+                        )}, # End mainPanel
+      )}, # close conditional panel
 
 
     )}, # sidebarLayout
 
 
     ###############################################################################################################################
-    hr(),
+    #hr(),
 
     ## Results : Graphs
     {sidebarLayout(
@@ -1138,50 +1135,52 @@ h4{
 
       #######################################################
 
-      {mainPanel(
-        ## Graph : Probability Density (PDF)
-        {conditionalPanel("output.hide_graph_PDF",
-                          tags$h4(textOutput("title_PDF_plot"), align = "center"),
-                          plotOutput("PDF_plot", width = "100%", height = "550px"),
-        )}, # close conditional panel
+      {conditionalPanel("output.hide_graphs",
+                        {mainPanel(
+                          ## Graph : Probability Density (PDF)
+                          {conditionalPanel("output.hide_graph_PDF",
+                                            tags$h4(textOutput("title_PDF_plot"), align = "center"),
+                                            plotOutput("PDF_plot", width = "100%", height = "550px"),
+                          )}, # close conditional panel
 
-        ## Graph : Cumulative Distibution (ECDF)
-        {conditionalPanel("output.hide_graph_ECDF",
-                          tags$h4(textOutput("title_ECDF_plot"), align = "center"),
-                          plotOutput("ECDF_plot", width = "100%", height = "550px"),
-        )}, # close conditional panel
+                          ## Graph : Cumulative Distibution (ECDF)
+                          {conditionalPanel("output.hide_graph_ECDF",
+                                            tags$h4(textOutput("title_ECDF_plot"), align = "center"),
+                                            plotOutput("ECDF_plot", width = "100%", height = "550px"),
+                          )}, # close conditional panel
 
-        ## Graph : Relative Impact over time
-        {conditionalPanel("output.hide_graph_impact_time",
-                          tags$h4(textOutput("title_impact_plot"), align = "center"),
-                          plotOutput("impact_plot", width = "100%", height = "550px"),
-        )}, # close conditional panel
+                          ## Graph : Relative Impact over time
+                          {conditionalPanel("output.hide_graph_impact_time",
+                                            tags$h4(textOutput("title_impact_plot"), align = "center"),
+                                            plotOutput("impact_plot", width = "100%", height = "550px"),
+                          )}, # close conditional panel
 
-        ## Graph : Population trajectory (pop size over time)
-        {conditionalPanel("output.hide_graph_demog_proj",
-                          tags$h4(textOutput("title_traj_plot"), align = "center"),
-                          br(),
+                          ## Graph : Population trajectory (pop size over time)
+                          {conditionalPanel("output.hide_graph_demog_proj",
+                                            tags$h4(textOutput("title_traj_plot"), align = "center"),
+                                            br(),
 
-                          wellPanel(
-                            span(textOutput("warning_traj_plot"), align = "left", style = "font-size: 14px;"),
-                          ),
+                                            wellPanel(
+                                              span(textOutput("warning_traj_plot"), align = "left", style = "font-size: 14px;"),
+                                            ),
 
-                          br(" "),
-                          radioButtons(inputId = "age_class_show",
-                                       label = "Classes d'âge à inclure sur le graphe",
-                                       choices = c("Tous âges sauf juvéniles" = "NotJuv0",
-                                                   "Tous âges, y compris juvéniles" = "all",
-                                                   "Nombre de couples" = "pairs"),
-                                       inline = TRUE
-                          ),
-                          plotOutput("traj_plot", width = "100%", height = "550px")
-                          ##
-        )}, # close conditional panel
+                                            br(" "),
+                                            radioButtons(inputId = "age_class_show",
+                                                         label = "Classes d'âge à inclure sur le graphe",
+                                                         choices = c("Tous âges sauf juvéniles" = "NotJuv0",
+                                                                     "Tous âges, y compris juvéniles" = "all",
+                                                                     "Nombre de couples" = "pairs"),
+                                                         inline = TRUE
+                                            ),
+                                            plotOutput("traj_plot", width = "100%", height = "550px")
+                          )}, # close conditional panel
+
+                      )}, # End mainPanel
+      )}, # close conditional panel (of mainpanel)
 
 
 
 
-      )}, # End mainPanel
 
 
 
