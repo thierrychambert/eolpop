@@ -45,7 +45,7 @@ server <- function(input, output, session){
   ##############################################
   ##  Reactive values
   ##--------------------------------------------
-  out <- reactiveValues(run_time = NULL, msg = NULL, show_scen_options = FALSE)
+  out <- reactiveValues(run_time = NULL, msg = NULL, show_scen_options = FALSE, show_res = FALSE)
 
   rv <- reactiveValues(distAVG = NULL, dist = NULL)
 
@@ -154,51 +154,29 @@ server <- function(input, output, session){
   })
 
 
-  ## SHOW Result TITLE
-  output$hide_RES_TITLE <- eventReactive({
-    input$run
-  },{
-    if(input$run > 0) TRUE else FALSE
-  }, ignoreInit = TRUE)
+  ### Show/hide results
+  observeEvent(input$run, out$show_res <- TRUE)
+  observeEvent(input$clear, out$show_res <- FALSE)
 
+  ## SHOW Result TITLE
+  output$hide_RES_TITLE <- reactive( if(out$show_res) TRUE else FALSE )
   outputOptions(output, "hide_RES_TITLE", suspendWhenHidden = FALSE)
 
   ## Outputs / show CI
-  output$hide_show_CI <- eventReactive({
-    input$run
-  },{
-    if(input$run > 0) TRUE else FALSE
-  }, ignoreInit = TRUE)
-
+  output$hide_show_CI <- reactive( if(out$show_res) TRUE else FALSE )
   outputOptions(output, "hide_show_CI", suspendWhenHidden = FALSE)
 
 
   ## Outputs / text results
-  output$hide_results <- eventReactive({
-    input$run
-  },{
-    if(input$run > 0) TRUE else FALSE
-  }, ignoreInit = TRUE)
-
+  output$hide_results <- reactive( if(out$show_res) TRUE else FALSE )
   outputOptions(output, "hide_results", suspendWhenHidden = FALSE)
 
   ## Graph choices
-  output$hide_graph_choice <- eventReactive({
-    input$run
-  },{
-    if(input$run > 0) TRUE else FALSE
-  }, ignoreInit = TRUE)
-
+  output$hide_graph_choice <- reactive( if(out$show_res) TRUE else FALSE )
   outputOptions(output, "hide_graph_choice", suspendWhenHidden = FALSE)
 
   ## Main panel : All graph result
-  output$hide_graphs <- eventReactive({
-    input$run
-    input$choose_graph
-  },{
-    if(input$run > 0) TRUE else FALSE
-  }, ignoreInit = TRUE)
-
+  output$hide_graphs <- reactive( if(out$show_res) TRUE else FALSE )
   outputOptions(output, "hide_graphs", suspendWhenHidden = FALSE)
 
 
@@ -207,7 +185,7 @@ server <- function(input, output, session){
     input$run
     input$choose_graph
   },{
-    if(input$run > 0 & input$choose_graph == "show_PDF") TRUE else FALSE
+    if(input$choose_graph == "show_PDF") TRUE else FALSE
   }, ignoreInit = TRUE)
 
   outputOptions(output, "hide_graph_PDF", suspendWhenHidden = FALSE)
@@ -218,7 +196,7 @@ server <- function(input, output, session){
     input$run
     input$choose_graph
   },{
-    if(input$run > 0 & input$choose_graph == "show_ECDF") TRUE else FALSE
+    if(input$choose_graph == "show_ECDF") TRUE else FALSE
   }, ignoreInit = TRUE)
 
   outputOptions(output, "hide_graph_ECDF", suspendWhenHidden = FALSE)
@@ -228,7 +206,7 @@ server <- function(input, output, session){
     input$run
     input$choose_graph
   },{
-    if(input$run > 0 & input$choose_graph == "show_ECDF") TRUE else FALSE
+    if(input$choose_graph == "show_ECDF") TRUE else FALSE
   }, ignoreInit = TRUE)
 
   outputOptions(output, "hide_risk_A", suspendWhenHidden = FALSE)
@@ -239,7 +217,7 @@ server <- function(input, output, session){
     input$run
     input$choose_graph
   },{
-    if(input$run > 0 & input$choose_graph == "show_impact_time") TRUE else FALSE
+    if(input$choose_graph == "show_impact_time") TRUE else FALSE
   }, ignoreInit = TRUE)
 
   outputOptions(output, "hide_graph_impact_time", suspendWhenHidden = FALSE)
@@ -250,7 +228,7 @@ server <- function(input, output, session){
     input$run
     input$choose_graph
   },{
-    if(input$run > 0 & input$choose_graph == "show_demog_proj") TRUE else FALSE
+    if(input$choose_graph == "show_demog_proj") TRUE else FALSE
   }, ignoreInit = TRUE)
 
   outputOptions(output, "hide_graph_demog_proj", suspendWhenHidden = FALSE)
@@ -616,7 +594,9 @@ server <- function(input, output, session){
       output$distri_plot <- renderPlot({ plot_expert(param$fatalities_eli_result$out) })
 
     } else {
+      param$fatalities_eli_result <- NULL
       print("missing value")
+      output$title_distri_plot <- renderText({ "Des valeurs sont manquantes dans la table 'experts'" })
     } # end if
   }) # end observeEvent
 
@@ -636,7 +616,9 @@ server <- function(input, output, session){
       output$distri_plot <- renderPlot({ plot_expert(param$pop_size_eli_result$out) })
 
     } else {
+      param$pop_size_eli_result <- NULL
       print("missing value")
+      output$title_distri_plot <- renderText({ "Des valeurs sont manquantes dans la table 'experts'" })
     } # end if
   }) # end observeEvent
 
@@ -659,7 +641,9 @@ server <- function(input, output, session){
       output$distri_plot <- renderPlot({ plot_expert(param$pop_growth_eli_result$out) })
 
     } else {
+      param$pop_growth_eli_result <- NULL
       print("missing value")
+      output$title_distri_plot <- renderText({ "Des valeurs sont manquantes dans la table 'experts'" })
     } # end if
   }) # end observeEvent
 
@@ -674,7 +658,7 @@ server <- function(input, output, session){
       ## run elicitation analysis
       param$carrying_cap_eli_result <- func_eli(input$carrying_cap_mat_expert)
 
-      ## show output
+      ## plot distribution
       if(!is.na(param$carrying_cap_eli_result$out)){
         output$title_distri_plot <- renderText({ "Capacité de charge" })
         output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out, show_se = FALSE) })
