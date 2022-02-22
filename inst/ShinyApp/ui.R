@@ -538,12 +538,12 @@ h4{
                                              # Interval
                                              numericInput(inputId = "fatalities_lower",
                                                           label = "Borne inférieure (mortalités annuelles)",
-                                                          value = 5,
+                                                          value = 1,
                                                           min = 0, max = Inf, step = 0.5),
 
                                              numericInput(inputId = "fatalities_upper",
                                                           label = "Borne supérieure (mortalités annuelles)",
-                                                          value = 10,
+                                                          value = 1,
                                                           min = 0, max = Inf, step = 0.5),
 
                                              # Values
@@ -685,7 +685,7 @@ h4{
 
                                              numericInput(inputId = "pop_size_upper",
                                                           label = "Borne supérieure (taille population)",
-                                                          value = 700,
+                                                          value = 500,
                                                           min = 0, max = Inf, step = 10),
 
                                              # Values
@@ -764,7 +764,7 @@ h4{
 
                                              numericInput(inputId = "pop_growth_upper",
                                                           label = HTML("Borne supérieure<br>(taux d'accroissement en %)"),
-                                                          value = -3,
+                                                          value = -2,
                                                           min = -100, max = Inf, step = 1),
 
                                              ## Input values: mean and se
@@ -872,7 +872,7 @@ h4{
 
                                              numericInput(inputId = "carrying_capacity_upper",
                                                           label = "Borne supérieure (capacité de charge)",
-                                                          value = 1500,
+                                                          value = 1000,
                                                           min = 0, max = Inf, step = 100),
 
                                              # Values
