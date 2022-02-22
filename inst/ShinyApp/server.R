@@ -1497,7 +1497,7 @@ server <- function(input, output, session){
 
     # Define a limit for rMAX (theoretical formula from Niel & Lebreton 2005) or No limit (Inf)
     rMAX_species <- rMAX_spp(surv = tail(param$survivals,1), afr = min(which(param$fecundities != 0)))
-     rMAX_species <- rMAX_species*1.5  # avoid too much constraint for the linear DD relationship
+    rMAX_species <- rMAX_species*1.5  # avoid too much constraint for the linear DD relationship
     param$rMAX_species <- rMAX_species
 
     # Apply rmax limit on population growth rate
@@ -1762,7 +1762,11 @@ server <- function(input, output, session){
         ## Loops now ##
         for(sim in 1:nsim){
 
-          Sys.sleep(0)
+          ## Progress bar
+          progress$set(value = sim,
+                       message = "Simulation progress",
+                       detail = paste("simulation", sim))
+          Sys.sleep(0.1)
 
           # Check for user interrupts
           if(interrupted()){
@@ -1771,7 +1775,7 @@ server <- function(input, output, session){
           }
 
           # Notify status file of progress
-          #fire_running(100*sim/nsim)
+          fire_running(100*sim/nsim)
 
 
           ## PARAMETER UNCERTAINTY : draw values for each input
@@ -1853,6 +1857,9 @@ server <- function(input, output, session){
 
               }
 
+              print(DD_params)
+
+
               # ... and initially LARGE population
               if(sum(N0) > 500) model_demo <- M3_WithDD_noDemoStoch
 
@@ -1880,11 +1887,6 @@ server <- function(input, output, session){
                                    model_demo = model_demo, time_horizon = time_horizon,
                                    coeff_var_environ = coeff_var_environ, fatal_constant = fatal_constant)
 
-
-          ## Progress bar
-          progress$set(value = sim,
-                       message = "Simulation progress",
-                       detail = paste("simulation", sim))
 
           # Notify status file of progress
           fire_running(100*sim/nsim)
@@ -1927,7 +1929,7 @@ server <- function(input, output, session){
       NULL
 
     }else{
-      print("Not ready : missing values")
+      rpint("Not ready : missing values")
       result_N(NULL)
       run_message("Not ready : missing values")
     }
@@ -1942,7 +1944,7 @@ server <- function(input, output, session){
   observeEvent(input$cancel,{
     print("Cancel")
     fire_interrupt()
-    #result_N(NULL)
+    result_N(NULL)
     run_message("Analyse interrompue")
   })
 
