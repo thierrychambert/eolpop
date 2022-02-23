@@ -1762,10 +1762,6 @@ server <- function(input, output, session){
         ## Loops now ##
         for(sim in 1:nsim){
 
-          ## Progress bar
-          progress$set(value = sim,
-                       message = "Simulation progress",
-                       detail = paste("simulation", sim))
           Sys.sleep(0.1)
 
           # Check for user interrupts
@@ -1773,6 +1769,11 @@ server <- function(input, output, session){
             print("Stopping...")
             stop("User Interrupt")
           }
+
+          ## Progress bar
+          progress$set(value = sim,
+                       message = "Simulation progress",
+                       detail = paste("simulation", sim))
 
           # Notify status file of progress
           fire_running(100*sim/nsim)
@@ -1887,10 +1888,6 @@ server <- function(input, output, session){
                                    model_demo = model_demo, time_horizon = time_horizon,
                                    coeff_var_environ = coeff_var_environ, fatal_constant = fatal_constant)
 
-
-          # Notify status file of progress
-          fire_running(100*sim/nsim)
-
         } # sim ##-----------------------------------------------------------------------------------------
 
 
@@ -1929,7 +1926,7 @@ server <- function(input, output, session){
       NULL
 
     }else{
-      rpint("Not ready : missing values")
+      print("Not ready : missing values")
       result_N(NULL)
       run_message("Not ready : missing values")
     }
