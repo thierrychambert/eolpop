@@ -2264,8 +2264,8 @@ server <- function(input, output, session){
 
   ###################################################################################
 
-  #############################################
-  ## Save outputs for report
+  ##-------------------------------------------
+  ## Save outputs for report ####
   ##-------------------------------------------
   # Type of analysis & time horizon ####
   observeEvent({
@@ -2449,8 +2449,6 @@ server <- function(input, output, session){
   })
 
 
-
-  #####
 
   ## Results #####
   # Graphs ####
