@@ -98,7 +98,7 @@ params:
 
 ## Paramètres démographiques
 ```{r, echo=FALSE}
-kable(params$vital_rates_mat, align = "c", booktabs=T)
+kable(params$vital_rates_mat, align = "c", booktabs = TRUE)
 ```  
 
 
@@ -114,18 +114,19 @@ library(kableExtra)
 
 ## Impact global estimé au bout de `r params$time_horizon` ans
 ```{r, echo=FALSE}
-kable(params$impact_table, align = "ccc", booktabs=T)
+kable(params$impact_table, align = "ccc", booktabs = TRUE)
 ```  
 Note : Intervalle de confiance (IC) à `r params$CI`%  
 
 ## Valeur de l'impact au quantile de `r params$QT`%
 (soit un risque de `r params$risk_A`% de sous-estimer l'impact)
 ```{r, echo=FALSE}
-kbl(params$impact_QT_table, align = "c", booktabs=T)
+params$impact_QT_table
 ```  
+
 ## `r paste("Probabilité d'extinction à", params$time_horizon, "ans")`
 ```{r, echo=FALSE}
-kbl(params$PrExt_table, align = "c", booktabs=T)
+kable(params$PrExt_table, align = "c", booktabs = TRUE)
 ```  
 
 
