@@ -2384,7 +2384,7 @@ server <- function(input, output, session){
       out$pop_growth_val2 <- paste0("Erreur_type : ", round(param$pop_growth_eli_result$SE, 2), unit)
     }
 
-    ## TREND ####
+    ## TREND ##
     if(input$pop_growth_input_type == "trend"){
       out$pop_growth_input_type <- "Saisie : tendance"
 
@@ -2449,29 +2449,32 @@ server <- function(input, output, session){
   })
 
 
-
-  ## Results #####
-  # Graphs ####
-  observeEvent({
-    input$run
-    input$show_CI
-    input$risk_A
-  }, {
-    req(input$run > 0)
-    out$PDF_plot <- plot_out_PDF(result_N(), legend_position = "bottom", text_size = "small",
-                                 show_scenario = "all", show_CI = input$show_CI/100)
-    out$ECDF_plot <- plot_out_ECDF(result_N(), legend_position = "bottom", text_size = "small",
-                                   show_scenario = "all", show_quantile = 1-(input$risk_A/100))
-    out$impact_plot <- plot_out_impact(result_N(), legend_position = "bottom", text_size = "small",
-                                       show_scenario = "all", show_CI = input$show_CI/100)
+  ## Results for report ####
+  observe({
 
     out$CI <- input$show_CI
     out$QT <- 100-(input$risk_A)
     out$risk_A <- input$risk_A
 
-    out$impact_QT_table <- table_impact_QT(result_N(), show_quantile = 1-(input$risk_A/100))
+    if(input$run == 0){
+      out$PDF_plot <- NULL
+      out$ECDF_plot <- NULL
+      out$impact_plot <- NULL
+      out$impact_QT_table <- NULL
 
-  })
+    }else{
+
+      out$PDF_plot <- plot_out_PDF(result_N(), legend_position = "bottom", text_size = "small",
+                                   show_scenario = "all", show_CI = input$show_CI/100)
+      out$ECDF_plot <- plot_out_ECDF(result_N(), legend_position = "bottom", text_size = "small",
+                                     show_scenario = "all", show_quantile = 1-(input$risk_A/100))
+      out$impact_plot <- plot_out_impact(result_N(), legend_position = "bottom", text_size = "small",
+                                         show_scenario = "all", show_CI = input$show_CI/100)
+
+
+      out$impact_QT_table <- table_impact_QT(result_N(), show_quantile = 1-(input$risk_A/100))
+    }
+  }) # end observe
 
 
 
