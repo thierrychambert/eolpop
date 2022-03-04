@@ -7,7 +7,7 @@ rm(list = ls(all.names = TRUE))
   list.of.packages <- c("shiny", "shinyjs", "shinyBS", "shinyMatrix", "tidyverse", "SHELF",
                         "promises", "future", "ipc", "popbio", "knitr", "kableExtra", "rmarkdown")
   new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
+  if(length(new.packages) > 0) install.packages(new.packages)
 
 
   ## Load libraries
