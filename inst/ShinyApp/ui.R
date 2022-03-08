@@ -1027,7 +1027,8 @@ h4{
                   ## Report
                   {tabPanel(title = "Rapport",
                             br(" "),
-                            textAreaInput("intro_report", label = "Contexte de l'étude", value = "Analyse réalisée dans le cadre de ...", width = "1000px"),
+                            textAreaInput("intro_report", label = "Contexte de l'étude",
+                                          value = "Analyse réalisée dans le cadre de ...", width = "1000px"),
 
                             br(" "),
                             textAreaInput("def_pop_text", label = "Délimitation de la population",
