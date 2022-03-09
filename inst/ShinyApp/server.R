@@ -767,6 +767,12 @@ server <- function(input, output, session){
     input$analysis_choice
     input$show_ditri_fatalities
     input$fatalities_input_type
+    input$fatalities_lower
+    input$fatalities_upper
+    input$fatalities_mean
+    input$fatalities_se
+    input$fatalities_unit
+    input$fatalities_vec_scenario
     input$fatalities_run_expert
     input$farm_number_cumulated
     input$fatalities_mat_cumulated
@@ -777,7 +783,14 @@ server <- function(input, output, session){
 
       # Show from input values: if button is ON and input_type is set on "value" or "itvl" (thus not "eli_exp")
       if(input$fatalities_input_type != "eli_exp"){
-        output$title_distri_plot <- renderText({ "Mortalités annuelles" })
+        #output$title_distri_plot <- renderText({ "Mortalités annuelles" })
+
+        req(param$fatalities_se)
+        if(param$fatalities_se[2] == 0){
+          output$title_distri_plot <- renderText({ "Mortalités annuelles: Pas de variation/incertitude dans la valeur fournie" })
+        }else{
+          output$title_distri_plot <- renderText({ "Mortalités annuelles" })
+        }
 
         output$distri_plot <- renderPlot({
           req(param$fatalities_mean, param$fatalities_se > 0)
@@ -797,7 +810,7 @@ server <- function(input, output, session){
             output$title_distri_plot <- renderText({ "Mortalités annuelles" })
             output$distri_plot <- renderPlot({ plot_expert(param$fatalities_eli_result$out) })
           } else {
-            output$title_distri_plot <- NULL
+            output$title_distri_plot <- renderText({ "No plot (values are missing in the 'experts' table)" })
             output$distri_plot <- NULL
           }
           # Hide otherwise (when button is OFF)
@@ -837,10 +850,22 @@ server <- function(input, output, session){
   observeEvent({
     input$show_ditri_pop_size
     input$pop_size_input_type
+    input$pop_size_lower
+    input$pop_size_upper
+    input$pop_size_mean
+    input$pop_size_se
+    input$pop_size_unit
   },{
     # Show from input values: if button is ON and input_type is set on "value"
     if(input$pop_size_input_type != "eli_exp"){
-      output$title_distri_plot <- renderText({ "Taille initiale de la population" })
+      #output$title_distri_plot <- renderText({ "Taille initiale de la population" })
+
+      req(param$pop_size_se)
+      if(param$pop_size_se == 0){
+        output$title_distri_plot <- renderText({ "Taille initiale de la population: Pas de variation/incertitude dans la valeur fournie" })
+      }else{
+        output$title_distri_plot <- renderText({ "Taille initiale de la population" })
+      }
 
       output$distri_plot <- renderPlot({
         req(param$pop_size_mean, param$pop_size_se > 0)
@@ -854,7 +879,7 @@ server <- function(input, output, session){
           output$title_distri_plot <- renderText({ "Taille initiale de la population" })
           output$distri_plot <- renderPlot({ plot_expert(param$pop_size_eli_result$out) })
         } else {
-          output$title_distri_plot <- NULL
+          output$title_distri_plot <- renderText({ "No plot (values are missing in the 'experts' table)" })
           output$distri_plot <- NULL
         }
         # Hide otherwise (when button is OFF)
@@ -870,13 +895,24 @@ server <- function(input, output, session){
   ## Population growth
   ##----------------------
   observeEvent({
-    input$pop_growth_input_type
     input$show_ditri_pop_growth
+    input$pop_growth_input_type
+    input$pop_growth_lower
+    input$pop_growth_upper
+    input$pop_growth_mean
+    input$pop_growth_se
   },{
 
     # Show from input values: if button is ON and input_type is set on "value" or "interval"
     if(input$pop_growth_input_type != "eli_exp" & input$pop_growth_input_type != "trend"){
-      output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
+      # output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
+
+      req(param$pop_growth_se)
+      if(param$pop_growth_se == 0){
+        output$title_distri_plot <- renderText({ "Taux de croissance de la population: Pas de variation/incertitude dans la valeur fournie" })
+      }else{
+        output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
+      }
 
       output$distri_plot <- renderPlot({
         req(param$pop_growth_mean, param$pop_growth_se > 0)
@@ -890,7 +926,7 @@ server <- function(input, output, session){
           output$title_distri_plot <- renderText({ "Taux de croissance de la population" })
           output$distri_plot <- renderPlot({ plot_expert(param$pop_growth_eli_result$out) })
         } else {
-          output$title_distri_plot <- NULL
+          output$title_distri_plot <- renderText({ "No plot (values are missing in the 'experts' table)" })
           output$distri_plot <- NULL
         }
         # Hide otherwise (when button is OFF)
@@ -905,12 +941,23 @@ server <- function(input, output, session){
   ## Carrying capacity
   ##----------------------
   observeEvent({
-    input$carrying_cap_input_type
     input$show_ditri_carrying_cap
+    input$carrying_cap_input_type
+    input$carrying_capacity_lower
+    input$carrying_capacity_upper
+    input$carrying_capacity_mean
+    input$carrying_capacity_se
   },{
     # Show from input values: if button is ON and input_type is set on "value"
     if(input$carrying_cap_input_type != "eli_exp"){
-      output$title_distri_plot <- renderText({ "Capacité de charge" })
+      #output$title_distri_plot <- renderText({ "Capacité de charge" })
+
+      req(param$carrying_capacity_se)
+      if(param$carrying_capacity_se == 0){
+        output$title_distri_plot <- renderText({ "Capacité de charge: Pas de variation/incertitude dans la valeur fournie" })
+      }else{
+        output$title_distri_plot <- renderText({ "Capacité de charge" })
+      }
 
       output$distri_plot <- renderPlot({
         req(param$carrying_capacity_mean, param$carrying_capacity_se > 0)
@@ -925,7 +972,7 @@ server <- function(input, output, session){
             output$title_distri_plot <- renderText({ "Capacité de charge" })
             output$distri_plot <- renderPlot({ plot_expert(param$carrying_cap_eli_result$out) })
           }else{
-            output$title_distri_plot <- renderText({ "Erreur" })
+            output$title_distri_plot <- renderText({ "No plot (values are missing in the 'experts' table)" })
             output$distri_plot <- NULL
           }
         } else {
