@@ -291,7 +291,8 @@ h4{
 
     h5(HTML("Cette application a été développée par
        <a href='https://sites.google.com/view/fr-thierrychambert/home'>Thierry Chambert</a>
-       dans le cadre du programme de recherche MAPE")),
+       dans le cadre du programme de recherche
+            <a href='https://mape.cnrs.fr'>MAPE</a>.")),
 
     p(strong("Contact: aurelien.besnard@cefe.cnrs.fr")),
 
