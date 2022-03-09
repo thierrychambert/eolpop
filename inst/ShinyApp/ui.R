@@ -349,7 +349,7 @@ h4{
                                        bsPopover(id = "Q_analysis_choice",
                                                  title = "Choix du type d\\'analyse",
                                                  content = HTML(
-                                                   "<b>Impacts non cumulés</b> : pour analyser l\\'impact d\\'<b>un seul parc éolien</b>. <br><br> <b>Impact cumulés</b> : pour analyser l\\'impact de <b>plusieurs parcs éoliens</b> (attention : il faudra fournir des valeurs de mortalités propres à chaque parc)."
+                                                   "<b>Impacts non cumulés</b> : pour analyser l\\'impact d\\'<b>un seul parc éolien</b>. <br><br> <b>Impact cumulés</b> : pour analyser l\\'impact de <b>plusieurs parcs éoliens</b> (attention : il faudra fournir des valeurs de mortalités propres à chaque parc).<br><br> <b>Scénarios hypothétiques</b> : permet d'évaluer plusieurs scénarios de mortalités hypothétiques en une seule analyse."
                                                  ),
                                                  placement = "right",
                                                  trigger = "click",
@@ -370,7 +370,7 @@ h4{
                                       bsPopover(id = "Q_species_choice",
                                                 title = "Choix de l\\'espèce",
                                                 content = HTML(
-                                                  "Nécessaire pour fixer les valeurs de <b>paramètres démographiques</b> (survie, fécondité). <br> La liste fournie correspond à une liste d\\'espèces prioritaires. Au besoin, une option \\'espèce générique\\' est disponible à la fin de la liste."
+                                                  "Nécessaire pour fixer les valeurs de <b>paramètres démographiques</b> (survie, fécondité). <br><br> La liste fournie correspond à une liste d\\'espèces prioritaires. Au besoin, une option \\'espèce générique\\' est disponible à la fin de la liste."
                                                 ),
                                                 placement = "right",
                                                 trigger = "click",
