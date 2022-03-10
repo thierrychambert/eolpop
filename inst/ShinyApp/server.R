@@ -786,14 +786,19 @@ server <- function(input, output, session){
         #output$title_distri_plot <- renderText({ "Mortalités annuelles" })
 
         req(param$fatalities_se)
-        if(param$fatalities_se[2] == 0){
+        if(length(param$fatalities_se) < 2){
           output$title_distri_plot <- renderText({ "Mortalités annuelles: Pas de variation/incertitude dans la valeur fournie" })
         }else{
-          output$title_distri_plot <- renderText({ "Mortalités annuelles" })
+          if(param$fatalities_se[2] == 0){
+            output$title_distri_plot <- renderText({ "Mortalités annuelles: Pas de variation/incertitude dans la valeur fournie" })
+          }else{
+            output$title_distri_plot <- renderText({ "Mortalités annuelles" })
+          }
         }
 
+
         output$distri_plot <- renderPlot({
-          req(param$fatalities_mean, param$fatalities_se > 0)
+          req(param$fatalities_mean, param$fatalities_se[2] > 0)
           if(input$fatalities_input_type == "itvl"){
             req(input$fatalities_lower, input$fatalities_upper)
             plot_gamma(mu = tail(param$fatalities_mean, -1), se = tail(param$fatalities_se, -1))
@@ -1317,6 +1322,7 @@ server <- function(input, output, session){
           # Case 1.2 : Values directly provided as mean & SE
           param$fatalities_mean <- c(0, input$fatalities_mean)
           param$onset_time <- NULL
+          req(input$fatalities_se)
           param$fatalities_se <- c(0, input$fatalities_se)
           ready$fatalities <- TRUE
 
@@ -1324,6 +1330,7 @@ server <- function(input, output, session){
           # Case 1.3 : Values directly provided as lower/upper interval
           param$fatalities_mean <- c(0, round(get_mu(lower = input$fatalities_lower, upper = input$fatalities_upper), 2))
           param$onset_time <- NULL
+          req(input$fatalities_lower, input$fatalities_upper)
           param$fatalities_se <- c(0, round(get_sd(lower = input$fatalities_lower, upper = input$fatalities_upper, coverage = CP), 3))
           ready$fatalities <- TRUE
         } # end (if3)
