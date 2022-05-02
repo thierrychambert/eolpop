@@ -1933,7 +1933,6 @@ server <- function(input, output, session){
             fun_project <- pop_project_cumulated_impacts
           }else{
             fun_project <- pop_project
-            onset_time = NULL
           } # end if
 
           # Project population trajectory
