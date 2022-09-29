@@ -1,7 +1,7 @@
 Package: eolpop
 Title: A demographic tool to quantify the impact of fatalities
 Version: 1.5
-Authors@R: 
+Authors: 
     person(given = "Thierry",
            family = "Chambert",
            role = c("aut", "cre"),
