@@ -7,38 +7,40 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 3
+nsim = 100
 
-pop_size_mean = 12000
-pop_size_se = 0
-pop_size_type = "Ntotal"
+pop_size_mean = 126
+pop_size_se = 2
+pop_size_type = "Npair"
 
-carrying_capacity_mean = 50000
-carrying_capacity_se = 0
+carrying_capacity_mean = 718
+carrying_capacity_se = 185.8
 
-fatalities_mean = c(0, 1250) #c(0, 5, 3, 4, 2, 1, 4, 2, 2, 3)
-fatalities_se = c(0, 0) # c(0, rep(0.5,9))
+fatalities_mean = c(0, 1.5) #c(0, 5, 3, 4, 2, 1, 4, 2, 2, 3)
+fatalities_se = c(0, 0.194) # c(0, rep(0.5,9))
 length(fatalities_mean)
 
 # onset_year = c(2010, 2013, 2016) #, 2016, 2017, 2019, 2020, 2020, 2020, 2021) #rep(2010, 10)#
 
-survivals <- c(0.70, 0.83, 0.88, 0.90)
-fecundities <- c(0, 0, 0, 0.27)
+# Bruant Proyer
+survivals <- c(0.37, 0.54)
+fecundities <- c(0, 1.18)
 lambda( build_Leslie(s = survivals, f = fecundities) )
+(lambda( build_Leslie(s = survivals, f = fecundities) ) - 1)*100
 
-#pop_growth_mean = 1.07932597
-#pop_growth_mean = 1.044
-pop_growth_mean = 1.044
-pop_growth_se = 0
+pop_growth_mean = 1
+pop_growth_se = 0.05
+
 
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
-time_horizon = 60
-coeff_var_environ = 0
+time_horizon = 20
+coeff_var_environ = sqrt(0.08)
 fatal_constant = "M"
 cumulated_impacts = FALSE
 
 # Pop size total
 N000 <- pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = survivals, f = fecundities)
+N000
 sum(N000)
 
 # Define K
@@ -46,8 +48,7 @@ K = pop_vector(pop_size = carrying_capacity_mean, pop_size_type = pop_size_type,
 K
 
 # Define theoretical rMAX for the species
-#rMAX_species <- rMAX_spp(surv = tail(survivals,1), afr = min(which(fecundities != 0)))
-rMAX_species <- 0.11
+rMAX_species <- rMAX_spp(surv = tail(survivals,1), afr = min(which(fecundities != 0)))
 rMAX_species
 
 ##  Avoid unrealistic scenarios
@@ -75,6 +76,8 @@ lambda( build_Leslie(s = s_calibrated, f = f_calibrated) )
 ##==============================================================================
 ##                         Analyses (simulations)                             ==
 ##==============================================================================
+set.seed(128)
+
 time <- system.time(
   run0 <- run_simul(nsim = nsim,
                     cumulated_impacts = cumulated_impacts,
@@ -107,6 +110,7 @@ time <- system.time(
 
 #####################################################
 time
+
 
 
 out = list()
