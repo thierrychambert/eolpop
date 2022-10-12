@@ -75,7 +75,7 @@ rm(list = ls(all.names = TRUE))
 ###~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~###
 # Define User Interface ########################################################
 {ui <- navbarPage(
-  "EolPop v1.5",
+  "EolPop v1.6",
 
   # Graphic Design Parameters
   header =
