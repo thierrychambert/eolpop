@@ -180,8 +180,6 @@ run_simul_shiny <- function(nsim, cumulated_impacts,
 
           }
 
-          print(DD_params)
-
 
           # ... and initially LARGE population
           if(sum(N0) > 500) model_demo <- M3_WithDD_noDemoStoch

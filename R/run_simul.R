@@ -157,6 +157,7 @@ run_simul <- function(nsim, cumulated_impacts,
         inits <- init_calib(s = survivals, f = fecundities, lam0 = lam0)
 
         vr <- calibrate_params(inits = inits, f = fecundities, s = survivals, lam0 = lam0)
+
         s <- head(vr, length(survivals))
         f <- tail(vr, length(fecundities))
         lam_it[sim] <- lambda(build_Leslie(s,f))
@@ -204,11 +205,6 @@ model_demo = NULL
                        rMAX = rMAX_species)
 
           }
-
-
-print(DD_params)
-
-
 
           # ... and initially LARGE population
           if(sum(N0) > 500) model_demo <- M3_WithDD_noDemoStoch
