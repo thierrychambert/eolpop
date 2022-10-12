@@ -51,13 +51,21 @@ calibrate_params <- function(inits = NULL, s, f, lam0){
   if(is.null(inits)) inits <- c(fu, s)
 
   # Optimize the utility function
-  opt <- stats::optim(par = inits, fn = uti_fun, fo=fo, nac=nac, lam0=lam0,
-                      lower = lower, upper = upper, method="L-BFGS-B")
+  opt <- tryCatch(
+    stats::optim(par = inits, fn = uti_fun, fo=fo, nac=nac, lam0=lam0,
+                 lower = lower, upper = upper, method="L-BFGS-B"),
+    error=function(e) NULL
+  )
 
 
-  # Return output : New fecundity vector
-  params <- c(tail(opt$par, nac), fo, head(opt$par, -nac))
+  # Return output
+  if(!is.null(opt)){
+    params <- c(tail(opt$par, nac), fo, head(opt$par, -nac))
+  }else{
+    params <- c(tail(inits, nac), fo, head(inits, -nac))
+  }
   names(params) <- c(paste0("s", (1:nac)-1), paste0("f", (1:nac)-1))
+
 
   return(params)
 
