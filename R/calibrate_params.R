@@ -131,8 +131,9 @@ init_calib  <- function(s, f, lam0){
   # Combine vital rates
   inits_vr <- c(s_init,f_init)
   inits_vr <- c(tail(inits_vr, nac), head(inits_vr, nac))
-  inits <- inits_vr[inits_vr != 0]
-  inits
+
+  # remove fecundities = 0 (but not survivals = 0, in case there is any)
+  inits <- inits_vr[-which(inits_vr == 0 & (substr(names(inits_vr),1,1) == "f"))]
 
   return(inits)
 } # End function
