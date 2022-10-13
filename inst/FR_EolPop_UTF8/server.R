@@ -1912,9 +1912,6 @@ server <- function(input, output, session){
 
               }
 
-              print(DD_params)
-
-
               # ... and initially LARGE population
               if(sum(N0) > 500) model_demo <- M3_WithDD_noDemoStoch
 
