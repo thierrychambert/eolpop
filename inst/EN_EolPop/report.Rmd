@@ -1,0 +1,151 @@
+---
+title: "Report : Demographic analysis (eolpop)"
+header-includes:
+- \usepackage{booktabs}
+output: pdf_document
+params:
+  intro: NA
+  analysis: NA
+  species: NA
+  def_pop_text: NA
+  vital_rates_mat: NA
+  
+  fatalities_unit: NA
+  fatalities_input_type: NA
+  fatalities_val1: NA
+  fatalities_val2: NA
+  
+  pop_size_unit: NA
+  pop_size_input_type: NA
+  pop_size_val1: NA
+  pop_size_val2: NA
+  
+  pop_growth_input_type: NA
+  pop_growth_val1: NA
+  pop_growth_val2: NA
+  
+  carrying_cap_unit: NA
+  carrying_cap_input_type: NA
+  carrying_cap_val1: NA
+  carrying_cap_val2: NA
+  
+  PDF_plot: NA
+  ECDF_plot: NA
+  impact_plot: NA
+  #trajectory_plot : NA
+  
+  time_horizon: NA
+  impact_table: NA
+  PrExt_table: NA 
+  
+  CI: NA
+  QT: NA
+  risk_A: NA
+  impact_QT_table: NA
+---
+
+### Date of creation (dd/mm/yyyy): `r strftime(Sys.Date(), "%d/%m/%Y")`
+
+### Type of analysis performed: `r paste(params$analysis)`
+
+### Species: `r paste(params$species)`  
+
+### Time horizon: `r paste(params$time_horizon)` years   
+    
+***
+  
+## Contexteof the study
+`r paste(params$intro)`
+
+
+## How the impacted population was defined/delineated
+`r paste(params$def_pop_text)`
+
+
+***
+
+# Input parameters used
+
+## Annual fatalities
+*`r paste(params$fatalities_unit)`*  
+`r paste(params$fatalities_input_type)`  
+  
+**`r paste(params$fatalities_val1)` `r paste(params$fatalities_val2)`**
+
+
+
+## Population size
+*`r paste(params$pop_size_unit)`*  
+`r paste(params$pop_size_input_type)`  
+  
+**`r paste(params$pop_size_val1)` `r paste(params$pop_size_val2)`**
+
+
+
+## Annual population growth rate
+`r paste(params$pop_growth_input_type)`  
+  
+**`r paste(params$pop_growth_val1)` `r paste(params$pop_growth_val2)`**
+
+
+
+## Carrying capacity
+*`r paste(params$carrying_cap_unit)`*  
+`r paste(params$carrying_cap_input_type)`  
+  
+**`r paste(params$carrying_cap_val1)` `r paste(params$carrying_cap_val2)`**
+
+
+## Species vital rates
+```{r, echo=FALSE}
+kable(params$vital_rates_mat, align = "c", booktabs = TRUE)
+```  
+
+
+
+***
+
+
+# Results
+
+```{r, echo=FALSE}
+library(kableExtra)
+```
+
+## Estimated impact after `r params$time_horizon` years
+```{r, echo=FALSE}
+kable(params$impact_table, align = "ccc", booktabs = TRUE)
+```  
+Note :  `r params$CI`% Confidence Interval (CI)  
+
+## Value of impact at the `r params$QT`% quantile
+(i.e., there is a risk of `r params$risk_A`% to under-estimate the real impact)
+```{r, echo=FALSE}
+params$impact_QT_table
+```  
+
+## `r paste("Probability of extinction after", params$time_horizon, "years")`
+```{r, echo=FALSE}
+kable(params$PrExt_table, align = "c", booktabs = TRUE)
+```  
+
+
+
+## Figure 1 : Probability density of the relative impact (after `r params$time_horizon` years)
+```{r, echo=FALSE}
+params$PDF_plot
+```
+Note : The median and confiance interval (`r params$CI`% CI) are shown on the graph.  
+
+## Figure 2 : Cumulative probability density of the relative impact (after `r params$time_horizon` years)
+```{r, echo=FALSE}
+params$ECDF_plot
+```
+Note : Quantile = `r params$QT`%,  
+(i.e., there is a risk of `r params$risk_A`% to under-estimate the real impact)
+
+## Figure 3 : Relative impact across time
+```{r, echo=FALSE}
+params$impact_plot
+```
+Note : `r params$CI`% Confidence Interval (CI)  
