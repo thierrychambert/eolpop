@@ -7,7 +7,7 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 100
+nsim = 200
 
 pop_size_mean = 126
 pop_size_se = 2

@@ -24,6 +24,8 @@
 #'
 get_metrics <- function(N, cumulated_impacts = FALSE){
 
+  CS_noNA <- function(x) colSums(x, na.rm = TRUE)
+
   TH <- dim(N)[2]
   warning <- NULL
 
@@ -42,7 +44,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
 
   # Define reference population size (sc0)
-  N_ref <- colSums(N[,,"sc0",])
+  N_ref <- CS_noNA(N[,,"sc0",])
 
   # Remove cases where pop size under sc0 is too small (N < 30)
   ## to get accurate proportion (avg) and uncertainty metrics
@@ -64,7 +66,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
   for(j in 1:dim(N)[3]){
     # Relative Difference of Population Size
-    DR_N <- (colSums(N[,,j,]) - N_ref) / N_ref
+    DR_N <- (CS_noNA(N[,,j,]) - N_ref) / N_ref
     DR_N_sc[,,j] <- DR_N
 
     # Remove cases where impact > 0
@@ -90,13 +92,13 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
   ## Probability of extinction
   Pext_sc <- DR_Pext_sc <- NA
 
-  Pext_ref <- mean(colSums(N[,TH,"sc0",]) < 2)
+  Pext_ref <- mean(CS_noNA(N[,TH,"sc0",]) < 2)
 
   for(j in 1:dim(N)[3]){
 
-    Pext_sc[j] <- mean(colSums(N[,TH,j,]) < 2 |
-                         colSums(N[,TH,"sc0",]) < 2 |
-                         (colSums(N[,TH,j,]) / colSums(N[,TH,"sc0",])) < 1e-2)
+    Pext_sc[j] <- mean(CS_noNA(N[,TH,j,]) < 2 |
+                         CS_noNA(N[,TH,"sc0",]) < 2 |
+                         (CS_noNA(N[,TH,j,]) / CS_noNA(N[,TH,"sc0",])) < 1e-2)
 
     DR_Pext_sc[j] <- (Pext_sc[j] - Pext_ref) / Pext_ref
 
@@ -122,10 +124,10 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
   ### Impact of each WIND FARM (only in case of a cumluted impact run)
   DR_N_indiv <- array(NA, dim = c(dim(N)[2], dim(N)[4], dim(N)[3]),
-                   dimnames = list(paste0("year", 1:dim(N)[2]),
-                                   NULL,
-                                   paste0("wind_farm", (1:dim(N)[3])-1)
-                   ))
+                      dimnames = list(paste0("year", 1:dim(N)[2]),
+                                      NULL,
+                                      paste0("wind_farm", (1:dim(N)[3])-1)
+                      ))
   impact_indiv <- array(NA, dim = c(dim(N)[2], 4, dim(N)[3]),
                         dimnames = list(paste0("year", 1:dim(N)[2]),
                                         c("avg", "se", "lci", "uci"),
@@ -142,7 +144,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
     for(j in 2:dim(N)[3]){
 
       # Define reference population size (sc0)
-      N_ref <- colSums(N[,,j-1,])
+      N_ref <- CS_noNA(N[,,j-1,])
 
       # Remove cases where pop size under sc0 is too small (N < 30)
       ## to get accurate proportion (avg) and uncertainty metrics
@@ -163,7 +165,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
 
 
       # Relative Difference of Population Size
-      DR_N <- (colSums(N[,,j,]) - N_ref) / N_ref
+      DR_N <- (CS_noNA(N[,,j,]) - N_ref) / N_ref
       DR_N_indiv[,,j] <- DR_N
 
       # Remove cases where impact > 0
@@ -189,7 +191,7 @@ get_metrics <- function(N, cumulated_impacts = FALSE){
     Pext_indiv <- DR_Pext_indiv <- 0
 
     # for scenario 0
-    Pext_indiv[1] <- mean(colSums(N[,TH,1,]) < 2)
+    Pext_indiv[1] <- mean(CS_noNA(N[,TH,1,]) < 2)
 
     for(j in 2:dim(N)[3]){
 

@@ -63,9 +63,9 @@ plot_traj <- function(N, age_class_use = "NotJuv0", fecundities = NULL, onset_ye
     out <- colSums(N)
   }
 
-  N_avg <- apply(out, c(1,2), median)
-  N_lci <- apply(out, c(1,2), quantile, prob = pnorm(0.5))
-  N_uci <- apply(out, c(1,2), quantile, prob = pnorm(-0.5))
+  N_avg <- apply(out, c(1,2), median, na.rm = TRUE)
+  N_lci <- apply(out, c(1,2), quantile, prob = pnorm(0.5), na.rm = TRUE)
+  N_uci <- apply(out, c(1,2), quantile, prob = pnorm(-0.5), na.rm = TRUE)
 
   # Build dataframe
   if(sel_sc == "all"){
