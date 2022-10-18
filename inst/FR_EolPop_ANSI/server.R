@@ -1816,6 +1816,7 @@ server <- function(input, output, session){
         ## Loops now ##
         for(sim in 1:nsim){
 
+          print(paste("simul", sim))
           Sys.sleep(0.1)
 
           # Check for user interrupts

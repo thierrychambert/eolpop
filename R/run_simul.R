@@ -126,9 +126,8 @@ run_simul <- function(nsim, cumulated_impacts,
     ##--------------------------------------------
     for(sim in 1:nsim){
 
+      print("################################")
       print(paste("simul", sim))
-      Sys.sleep(0.01)
-      flush.console()
 
       ## PARAMETER UNCERTAINTY : draw values for each input
       # 1. Nomber of fatalities

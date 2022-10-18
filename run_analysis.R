@@ -7,7 +7,7 @@ library(magrittr)
 library(eolpop)
 
 ## Inputs
-nsim = 200
+nsim = 500
 
 pop_size_mean = 126
 pop_size_se = 2
@@ -28,8 +28,8 @@ fecundities <- c(0, 1.18)
 lambda( build_Leslie(s = survivals, f = fecundities) )
 (lambda( build_Leslie(s = survivals, f = fecundities) ) - 1)*100
 
-pop_growth_mean = 1
-pop_growth_se = 0.05
+pop_growth_mean = 0.90
+pop_growth_se = 0
 
 
 model_demo = NULL # M2_noDD_WithDemoStoch #M1_noDD_noDemoStoch #M4_WithDD_WithDemoStoch #M3_WithDD_noDemoStoch #
@@ -37,6 +37,7 @@ time_horizon = 20
 coeff_var_environ = sqrt(0.08)
 fatal_constant = "M"
 cumulated_impacts = FALSE
+
 
 # Pop size total
 N000 <- pop_vector(pop_size = pop_size_mean, pop_size_type = pop_size_type, s = survivals, f = fecundities)
@@ -115,15 +116,32 @@ time
 
 out = list()
 out$run = run0
+
+unique(which(is.na(out$run$N), arr.ind = TRUE)[,4])
+#out$run$N <- run0$N[,,,-rem]
 dim(out$run$N)
+dim(run0$N)
+
 
 res = get_metrics(N = out$run$N, cumulated_impacts = cumulated_impacts)
 names(res)
 res$scenario$Pext
 res$scenario$impact[time_horizon,1,"sc1"]*100
 
-plot_impact(N = out$run$N, sel_sc = "1", show_CI = 0.999, Legend = paste("sc", (1:length(fatalities_mean))-1))
+res$scenario$impact
+
+plot_impact(N = out$run$N, sel_sc = "1", show_CI = 0.999,
+            Legend = paste("sc", (1:length(fatalities_mean))-1))
 
 x11()
 plot_traj(N = out$run$N, age_class_use = "NotJuv0", fecundities = fecundities,
           Legend = paste("sc", 1:length(fatalities_mean)), ylim = c(0, NA))
+
+
+x11()
+density_impact(N = out$run$N, show_CI = 0.95, center = "median", sel_sc = "all", xlims = NULL,
+                           percent = TRUE, xlab = "Relative impact (%)", ylab = "Probability density",
+                           Legend = NULL, legend_position = "right", text_size = "large")
+
+x11()
+ECDF_impact(N = out$run$N)
