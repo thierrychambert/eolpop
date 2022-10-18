@@ -40,7 +40,7 @@ density_impact <- function(N, show_CI = 0.95, center = "median", sel_sc = "all",
 
     max_y <- c()
     for(j in unique(df0$scenario)){
-      dd <- density(df0$impact[df0$scenario == j])
+      dd <- density(df0$impact[df0$scenario == j], na.rm = TRUE)
       max_y[j] <- max(dd$y)
     }
     max_y <- max(max_y)
@@ -113,7 +113,7 @@ density_impact <- function(N, show_CI = 0.95, center = "median", sel_sc = "all",
 
       yend <- x <- c()
       for(j in unique(dat$scenario)){
-        dd <- density(dat$impact[dat$scenario == j])
+        dd <- density(dat$impact[dat$scenario == j], na.rm = TRUE)
 
         if(QT[1] == "mode"){
           x[j] <- dd$x[which.max(dd$y)]
@@ -129,7 +129,7 @@ density_impact <- function(N, show_CI = 0.95, center = "median", sel_sc = "all",
     }
 
     # Add LCI vlines
-    LCI <- apply(-out[TH,,], 2, quantile, probs = (1-show_CI)/2)
+    LCI <- apply(-out[TH,,], 2, quantile, probs = (1-show_CI)/2, na.rm = TRUE)
     LCI <- LCI[-1]
 
     yend <- get_density(dat = p$data, QT = LCI)$yend
@@ -145,7 +145,7 @@ density_impact <- function(N, show_CI = 0.95, center = "median", sel_sc = "all",
 
 
     # Add UCI vlines
-    UCI <- apply(-out[TH,,], 2, quantile, probs = 1-(1-show_CI)/2)
+    UCI <- apply(-out[TH,,], 2, quantile, probs = 1-(1-show_CI)/2, na.rm = TRUE)
     UCI <- UCI[-1]
 
     yend <- get_density(dat = p$data, QT = UCI)$yend
@@ -165,7 +165,7 @@ density_impact <- function(N, show_CI = 0.95, center = "median", sel_sc = "all",
       xQT <- get_density(dat = p$data, QT = "mode")$x
       yend <- get_density(dat = p$data, QT = "mode")$yend
     }else{
-      xQT <- apply(-out[TH,,], 2, quantile, probs = 0.5)
+      xQT <- apply(-out[TH,,], 2, quantile, probs = 0.5, na.rm = TRUE)
       xQT <- xQT[-1]
       yend <- get_density(dat = p$data, QT = xQT)$yend
       if(sel_sc != "all") xQT <- xQT[sel_sc]

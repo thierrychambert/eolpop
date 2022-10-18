@@ -46,6 +46,8 @@ plot_impact <- function(N, onset_year = NULL, sel_sc = "all", percent = TRUE, sh
   CI <- apply(out[,,], c(1,3), quantile, probs = c(0.5, 1-(1-show_CI)/2, (1-show_CI)/2))
   rownames(CI) <- c("avg", "lci", "uci")
 
+  # null scenario
+  CI["uci",,"sc0"] <- CI["lci",,"sc0"] <- CI["avg",,"sc0"]
 
   # Build dataframe
   if(sel_sc == "all"){

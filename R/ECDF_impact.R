@@ -101,7 +101,7 @@ ECDF_impact <- function(N, show_quantile = 0.95, sel_sc = "all", xlims = NULL,
 
 
   # Add quantile vline
-  QT <- apply(-out[TH,,], 2, quantile, probs = show_quantile)
+  QT <- apply(-out[TH,,], 2, quantile, probs = show_quantile, na.rm = TRUE)
   QT <- QT[-1]
 
   if(sel_sc != "all") QT <- QT[sel_sc]
