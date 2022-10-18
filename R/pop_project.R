@@ -85,6 +85,9 @@ pop_project <- function(fatalities,
       }
     }
 
+    ## Prevent error, when N = 0 & M = 0
+    if( any(is.na(h) | is.nan(h)) ) h[] <- 0
+
     ## Projection : apply the LESLIE matrix calculation forward
     # Scenario 0
     j=1

@@ -95,8 +95,8 @@ pop_project_cumulated_impacts <- function(fatalities,
       }
     }
 
-    # Sample a seed for RNG
-    seed <- ((((Sys.time() %>% as.numeric) %% 1e10) * 1e9) %% 1e5) %>% round
+    ## Prevent error, when N = 0 & M = 0
+    if( any(is.na(h) | is.nan(h)) ) h[] <- 0
 
     ## Projection : apply the LESLIE matrix calculation forward
     # Scenario 0
